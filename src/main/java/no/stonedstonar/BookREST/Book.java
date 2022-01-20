@@ -21,6 +21,9 @@ public class Book {
 
     private int numberOfPages;
 
+    public Book(){
+
+    }
     /**
       * Makes an instance of the Books class.
       * @param ID the ID the book has.

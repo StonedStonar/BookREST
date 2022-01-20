@@ -1,13 +1,15 @@
 package no.stonedstonar.BookREST;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import no.stonedstonar.BookREST.exceptions.CouldNotAddBookException;
 import no.stonedstonar.BookREST.exceptions.CouldNotGetBookException;
+import no.stonedstonar.BookREST.exceptions.CouldNotRemoveBookException;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,23 +30,80 @@ public class BookController {
         RegisterTestData.addBooksToRegister(bookRegister);
     }
 
+    /**
+     * Gets all the books in the register.
+     * @return all the books in the register.
+     */
     @GetMapping("/books")
     public List<Book> getBooks(){
         return bookRegister.getBookList();
     }
 
+    /**
+     * Gets a book by its id.
+     * @param id the ID of the book.
+     * @return a book that matches that description.
+     * @throws CouldNotGetBookException gets thrown if the book could not be found.
+     */
     @GetMapping("/books/{id}")
     public Book getBookById(@PathVariable long id) throws CouldNotGetBookException {
         return bookRegister.getBook(id);
     }
 
     /**
+     * Adds a new book to the register.
+     * @param body the body that contains the JSON file.
+     * @throws JsonProcessingException gets thrown if the JSON could not be translated to the wanted object.
+     * @throws CouldNotAddBookException gets thrown if the book could not be added.
+     */
+    @PostMapping("/books")
+    public void postBook(@RequestBody String body) throws JsonProcessingException, CouldNotAddBookException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Book book = objectMapper.readValue(body, Book.class);
+        bookRegister.addBook(book);
+    }
+
+    /**
+     * Deletes a book from the book register.
+     * @param id the ID of the book.
+     * @throws CouldNotGetBookException gets thrown if the book could not be found.
+     * @throws CouldNotRemoveBookException gets thrown if the book could not be removed.
+     */
+    @DeleteMapping("/books/{id}")
+    public void deleteBook(@PathVariable long id) throws CouldNotGetBookException, CouldNotRemoveBookException {
+        Book book = bookRegister.getBook(id);
+        bookRegister.removeBook(book);
+    }
+
+    /**
      * Handles the CouldNotGetBookException.
+     * @param exception the exception that was thrown.
      * @return a response according to the exception.
      */
     @ExceptionHandler(CouldNotGetBookException.class)
     public ResponseEntity<String> handleCouldNotGetBookException(CouldNotGetBookException exception){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+
+    /**
+     * Handles a CouldNotRemoveBookException
+     * @param exception the exception that was thrown.
+     * @return a response according to the exception
+     */
+    @ExceptionHandler(CouldNotRemoveBookException.class)
+    public ResponseEntity<String> handleCouldNotRemoveBookException(CouldNotGetBookException exception){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    /**
+     * Handles the CouldNotAddBookException.
+     * @param exception the exception that was thrown.
+     * @return a response according to the exception.
+     */
+    @ExceptionHandler(CouldNotAddBookException.class)
+    public ResponseEntity<String> handleCouldNotAddBookException(CouldNotAddBookException exception){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
     }
     
     /**

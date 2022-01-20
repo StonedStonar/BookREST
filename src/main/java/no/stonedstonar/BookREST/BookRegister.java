@@ -32,7 +32,7 @@ public class BookRegister {
      */
     public void addBook(Book book) throws CouldNotAddBookException {
         checkBook(book);
-        if (!bookList.contains(book)){
+        if (bookList.stream().noneMatch(book2 -> book2.getID() == book.getID())){
             bookList.add(book);
         }else {
             throw new CouldNotAddBookException("The book is already in the register.");
