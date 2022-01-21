@@ -52,6 +52,16 @@ public class BookRegister {
     }
 
     /**
+     * Gets all the books this authorID is a part of.
+     * @param authorID the author ID to check.
+     * @return a list with all the books this author is a part of.
+     */
+    public List<Book> getAllBooksOfAuthorID(long authorID){
+        checkAuthorID(authorID);
+        return bookList.stream().filter(book -> book.checkIfAuthorIsPartOfBook(authorID)).toList();
+    }
+
+    /**
      * Gets a book based on its bookID.
      * @param bookID the bookID of the wanted book.
      * @return a book that matches the bookID
@@ -74,6 +84,15 @@ public class BookRegister {
     private void checkBook(Book bookToCheck){
         checkIfObjectIsNull(bookToCheck, "book");
     }
+
+    /**
+     * Checks if the author ID is above zero.
+     * @param authorID the author ID.
+     */
+    private void checkAuthorID(long authorID){
+        checkIfLongIsAboveZero(authorID, "authorID");
+    }
+
 
     /**
      * Checks if the ID is above zero.

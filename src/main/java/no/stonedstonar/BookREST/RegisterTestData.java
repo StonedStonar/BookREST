@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * A class that holds methods to fill the registers with test data.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
@@ -20,16 +20,16 @@ public class RegisterTestData {
      */
     public static void addBooksToRegister(BookRegister bookRegister) throws CouldNotAddBookException {
         checkIfObjectIsNull(bookRegister, "book register");
-        List<Integer> authors = new ArrayList<>();
-        List<Integer> authors2 = new ArrayList<>();
-        List<Integer> authors3 = new ArrayList<>();
-        List<Integer> authors4 = new ArrayList<>();
+        List<Long> authors = new ArrayList<>();
+        List<Long> authors2 = new ArrayList<>();
+        List<Long> authors3 = new ArrayList<>();
+        List<Long> authors4 = new ArrayList<>();
 
-        authors.add(1);
-        authors2.add(2);
-        authors3.add(3);
-        authors3.add(4);
-        authors4.add(5);
+        authors.add(1L);
+        authors2.add(2L);
+        authors3.add(3L);
+        authors3.add(4L);
+        authors4.add(5L);
 
         bookRegister.addBook(new Book(1, "Snømannen", authors,2007, 438));
         bookRegister.addBook(new Book(2, "Kniv", authors,2019, 519));

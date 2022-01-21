@@ -3,15 +3,20 @@ package no.stonedstonar.BookREST;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
-import no.stonedstonar.BookREST.exceptions.CouldNotAddBookException;
-import no.stonedstonar.BookREST.exceptions.CouldNotGetBookException;
-import no.stonedstonar.BookREST.exceptions.CouldNotRemoveBookException;
+import no.stonedstonar.BookREST.exceptions.*;
 import org.apache.coyote.Response;
+import org.apache.tomcat.util.json.JSONParser;
+import org.springframework.core.annotation.AliasFor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.RequestScope;
 
+import javax.management.DescriptorKey;
+import javax.websocket.server.PathParam;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -19,6 +24,7 @@ import java.util.List;
  * @author Steinar Hjelle Midthus
  */
 @RestController
+@RequestMapping("/books")
 public class BookController {
 
     private BookRegister bookRegister;
@@ -34,9 +40,13 @@ public class BookController {
      * Gets all the books in the register.
      * @return all the books in the register.
      */
-    @GetMapping("/books")
-    public List<Book> getBooks(){
-        return bookRegister.getBookList();
+    @GetMapping
+    public List<Book> getBooks(@RequestParam(value = "authorID", required = false) Optional<Long> optionalAuthorID){
+        if (optionalAuthorID.isEmpty()){
+            return bookRegister.getBookList();
+        }else {
+            return bookRegister.getAllBooksOfAuthorID(optionalAuthorID.get());
+        }
     }
 
     /**
@@ -45,7 +55,7 @@ public class BookController {
      * @return a book that matches that description.
      * @throws CouldNotGetBookException gets thrown if the book could not be found.
      */
-    @GetMapping("/books/{id}")
+    @GetMapping("/{id}")
     public Book getBookById(@PathVariable long id) throws CouldNotGetBookException {
         return bookRegister.getBook(id);
     }
@@ -56,7 +66,7 @@ public class BookController {
      * @throws JsonProcessingException gets thrown if the JSON could not be translated to the wanted object.
      * @throws CouldNotAddBookException gets thrown if the book could not be added.
      */
-    @PostMapping("/books")
+    @PostMapping
     public void postBook(@RequestBody String body) throws JsonProcessingException, CouldNotAddBookException {
         ObjectMapper objectMapper = new ObjectMapper();
         Book book = objectMapper.readValue(body, Book.class);
@@ -64,12 +74,55 @@ public class BookController {
     }
 
     /**
+     * Changes the existing book and its details.
+     * @param body the body of the HTTP request.
+     * @throws JsonProcessingException gets thrown if the body could not be made into a book.
+     * @throws CouldNotGetBookException gets thrown if the target book could not be found.
+     */
+    @PutMapping
+    public void changeBook(@RequestBody String body) throws JsonProcessingException, CouldNotGetBookException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Book newDetails = objectMapper.readValue(body, Book.class);
+        Book bookToChange = bookRegister.getBook(newDetails.getID());
+        String title = newDetails.getTitle();
+        int year = newDetails.getYear();
+        int pages = newDetails.getNumberOfPages();
+        if (pages > 0){
+            bookToChange.setNumberOfPages(pages);
+        }
+        if (year > Integer.MIN_VALUE){
+            bookToChange.setYear(year);
+        }
+        if (!title.isEmpty()){
+            bookToChange.setTitle(title);
+        }
+        List<Long> authors = newDetails.getAuthors();
+        authors.forEach(author -> {
+            //Todo: Maybe change this.
+            if (author < 0){
+                try {
+                    System.out.println(-author);
+                    bookToChange.removeAuthor(-author);
+                }catch (CouldNotRemoveAuthorException exception){
+
+                }
+            }else if (author > 0){
+                try {
+                    bookToChange.addAuthor(author);
+                }catch (CouldNotAddAuthorException exception){
+                }
+            }
+        });
+    }
+
+
+    /**
      * Deletes a book from the book register.
      * @param id the ID of the book.
      * @throws CouldNotGetBookException gets thrown if the book could not be found.
      * @throws CouldNotRemoveBookException gets thrown if the book could not be removed.
      */
-    @DeleteMapping("/books/{id}")
+    @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable long id) throws CouldNotGetBookException, CouldNotRemoveBookException {
         Book book = bookRegister.getBook(id);
         bookRegister.removeBook(book);
@@ -104,18 +157,6 @@ public class BookController {
     @ExceptionHandler(CouldNotAddBookException.class)
     public ResponseEntity<String> handleCouldNotAddBookException(CouldNotAddBookException exception){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
-    }
-    
-    /**
-     * Checks if a string is of a valid format or not.
-     * @param stringToCheck the string you want to check.
-     * @param errorPrefix the error the exception should have if the string is invalid.
-     */
-    private void checkString(String stringToCheck, String errorPrefix){
-        checkIfObjectIsNull(stringToCheck, errorPrefix);
-        if (stringToCheck.isEmpty()){
-            throw new IllegalArgumentException("The " + errorPrefix + " cannot be empty.");
-        }
     }
     
     /**
