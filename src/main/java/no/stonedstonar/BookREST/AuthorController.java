@@ -1,12 +1,17 @@
 package no.stonedstonar.BookREST;
 
 import no.stonedstonar.BookREST.exceptions.CouldNotAddAuthorException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  *
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+@RestController
 public class AuthorController {
 
     private AuthorRegister authorRegister;
@@ -17,6 +22,11 @@ public class AuthorController {
     public AuthorController() throws CouldNotAddAuthorException {
         authorRegister = new AuthorRegister();
         RegisterTestData.addAuthorsToRegister(authorRegister);
+    }
+
+    @GetMapping("/authors")
+    public List<Author> getAllAuthors(){
+        return authorRegister.getAuthorList();
     }
     
     /**

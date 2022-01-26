@@ -32,7 +32,7 @@ public class BookRegister {
      */
     public void addBook(Book book) throws CouldNotAddBookException {
         checkBook(book);
-        if (!bookList.contains(book)){
+        if (bookList.stream().noneMatch(book2 -> book2.getID() == book.getID())){
             bookList.add(book);
         }else {
             throw new CouldNotAddBookException("The book is already in the register.");
@@ -49,6 +49,16 @@ public class BookRegister {
         if (!bookList.remove(book)){
             throw new CouldNotRemoveBookException("The input book could not be removed.");
         }
+    }
+
+    /**
+     * Gets all the books this authorID is a part of.
+     * @param authorID the author ID to check.
+     * @return a list with all the books this author is a part of.
+     */
+    public List<Book> getAllBooksOfAuthorID(long authorID){
+        checkAuthorID(authorID);
+        return bookList.stream().filter(book -> book.checkIfAuthorIsPartOfBook(authorID)).toList();
     }
 
     /**
@@ -74,6 +84,15 @@ public class BookRegister {
     private void checkBook(Book bookToCheck){
         checkIfObjectIsNull(bookToCheck, "book");
     }
+
+    /**
+     * Checks if the author ID is above zero.
+     * @param authorID the author ID.
+     */
+    private void checkAuthorID(long authorID){
+        checkIfLongIsAboveZero(authorID, "authorID");
+    }
+
 
     /**
      * Checks if the ID is above zero.

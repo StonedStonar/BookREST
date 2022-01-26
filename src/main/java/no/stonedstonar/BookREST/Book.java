@@ -1,6 +1,9 @@
 package no.stonedstonar.BookREST;
 
 
+import no.stonedstonar.BookREST.exceptions.CouldNotAddAuthorException;
+import no.stonedstonar.BookREST.exceptions.CouldNotRemoveAuthorException;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,12 +18,22 @@ public class Book {
 
     private String title;
 
-    private LinkedList<Integer> authors;
+    private LinkedList<Long> authors;
 
     private int year;
 
     private int numberOfPages;
 
+    /**
+     * Makes a basic book with all the fields set to a default invalid value.
+     */
+    public Book(){
+        this.ID = 0;
+        this.title = "";
+        this.authors = new LinkedList<>();
+        this.numberOfPages = 0;
+        this.year = Integer.MIN_VALUE;
+    }
     /**
       * Makes an instance of the Books class.
       * @param ID the ID the book has.
@@ -29,7 +42,7 @@ public class Book {
       * @param year the year of the book.
       * @param numberOfPages the amount of pages in the book.
       */
-    public Book(long ID, String title, List<Integer> authors, int year, int numberOfPages){
+    public Book(long ID, String title, List<Long> authors, int year, int numberOfPages){
         checkID(ID);
         checkTitle(title);
         checkNumberOfPages(numberOfPages);
@@ -39,6 +52,51 @@ public class Book {
         this.title = title;
         this.numberOfPages = numberOfPages;
         this.authors.addAll(authors);
+    }
+
+    /**
+     * Adds an author to the book.
+     * @param authorID the ID of the author to add.
+     * @throws CouldNotAddAuthorException gets thrown if the author could not be added.
+     */
+    public void addAuthor(long authorID) throws CouldNotAddAuthorException {
+        checkAuthorID(authorID);
+        if (!authors.contains(authorID)){
+            authors.add(authorID);
+        }else {
+            throw new CouldNotAddAuthorException("The author with the ID " + authorID + " is already a part of this book.");
+        }
+    }
+
+    /**
+     * Checks if the input author is a part of this book.
+     * @param authorID the authors ID.
+     * @return <code>true</code> if the author is already in this book.
+     *         <code>false</code> if the author is not already in this book.
+     */
+    public boolean checkIfAuthorIsPartOfBook(long authorID){
+        checkAuthorID(authorID);
+        return authors.stream().anyMatch(number -> number == authorID);
+    }
+
+    /**
+     * Removes an authors ID from this book.
+     * @param authorID the ID of the author.
+     * @throws CouldNotRemoveAuthorException gets thrown if the author could not be removed.
+     */
+    public void removeAuthor(long authorID) throws CouldNotRemoveAuthorException {
+        checkAuthorID(authorID);
+        if (!authors.remove(authorID)){
+            throw new CouldNotRemoveAuthorException("The author with the ID " + authorID + "is not a part of this book.");
+        }
+    }
+
+    /**
+     * Gets the list with all the authors ID's.
+     * @return a list with all the authors ID's.
+     */
+    public List<Long> getAuthors(){
+        return authors;
     }
 
     /**
@@ -106,6 +164,14 @@ public class Book {
     public void setNumberOfPages(int numberOfPages) {
         checkNumberOfPages(numberOfPages);
         this.numberOfPages = numberOfPages;
+    }
+
+    /**
+     * Checks if the author ID is above zero.
+     * @param authorID the author ID.
+     */
+    private void checkAuthorID(long authorID){
+        checkIfLongIsAboveZero(authorID, "authorID");
     }
 
     /**
