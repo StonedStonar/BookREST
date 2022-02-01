@@ -2,19 +2,15 @@ package no.stonedstonar.BookREST;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import no.stonedstonar.BookREST.exceptions.*;
-import org.apache.coyote.Response;
-import org.apache.tomcat.util.json.JSONParser;
-import org.springframework.core.annotation.AliasFor;
+import io.swagger.annotations.ApiOperation;
+import no.stonedstonar.BookREST.model.exceptions.*;
+import no.stonedstonar.BookREST.model.Book;
+import no.stonedstonar.BookREST.model.BookRegister;
+import no.stonedstonar.BookREST.model.RegisterTestData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.RequestScope;
 
-import javax.management.DescriptorKey;
-import javax.websocket.server.PathParam;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +20,7 @@ import java.util.Optional;
  * @author Steinar Hjelle Midthus
  */
 @RestController
+@CrossOrigin
 @RequestMapping("/books")
 public class BookController {
 
@@ -55,6 +52,9 @@ public class BookController {
      * @return a book that matches that description.
      * @throws CouldNotGetBookException gets thrown if the book could not be found.
      */
+    @ApiOperation(value = "Finds the book with ID",
+            notes = "Provide an ID to look up for a specific book.",
+            response = Book.class)
     @GetMapping("/{id}")
     public Book getBookById(@PathVariable long id) throws CouldNotGetBookException {
         return bookRegister.getBook(id);
