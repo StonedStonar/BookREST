@@ -1,8 +1,8 @@
-package no.stonedstonar.BookREST;
+package no.stonedstonar.BookREST.model;
 
-import no.stonedstonar.BookREST.exceptions.CouldNotAddAuthorException;
-import no.stonedstonar.BookREST.exceptions.CouldNotGetAuthorException;
-import no.stonedstonar.BookREST.exceptions.CouldNotRemoveAuthorException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +65,8 @@ public class AuthorRegister {
             throw new CouldNotGetAuthorException("The author with the ID " + authorID + " could not be found in the register.");
         }
     }
+
+
 
     /**
      * Checks if the author is null.

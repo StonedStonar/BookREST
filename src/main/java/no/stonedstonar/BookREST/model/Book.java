@@ -1,8 +1,8 @@
-package no.stonedstonar.BookREST;
+package no.stonedstonar.BookREST.model;
 
 
-import no.stonedstonar.BookREST.exceptions.CouldNotAddAuthorException;
-import no.stonedstonar.BookREST.exceptions.CouldNotRemoveAuthorException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +34,7 @@ public class Book {
         this.numberOfPages = 0;
         this.year = Integer.MIN_VALUE;
     }
+
     /**
       * Makes an instance of the Books class.
       * @param ID the ID the book has.

@@ -1,9 +1,9 @@
-package no.stonedstonar.BookREST;
+package no.stonedstonar.BookREST.model;
 
 
-import no.stonedstonar.BookREST.exceptions.CouldNotAddBookException;
-import no.stonedstonar.BookREST.exceptions.CouldNotGetBookException;
-import no.stonedstonar.BookREST.exceptions.CouldNotRemoveBookException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotAddBookException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotGetBookException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveBookException;
 
 import java.util.ArrayList;
 import java.util.List;

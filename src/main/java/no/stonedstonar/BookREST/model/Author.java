@@ -1,4 +1,4 @@
-package no.stonedstonar.BookREST;
+package no.stonedstonar.BookREST.model;
 /**
  *
  * @version 0.1

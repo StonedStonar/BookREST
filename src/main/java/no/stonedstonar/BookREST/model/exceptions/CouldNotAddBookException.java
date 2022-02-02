@@ -1,4 +1,4 @@
-package no.stonedstonar.BookREST.exceptions;
+package no.stonedstonar.BookREST.model.exceptions;
 
 import java.io.Serializable;
 
