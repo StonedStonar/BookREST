@@ -48,8 +48,8 @@ public class Company {
     }
 
     /**
-     *
-     * @param companyName
+     * Changes the company name to the input name.
+     * @param companyName the new company name.
      */
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
