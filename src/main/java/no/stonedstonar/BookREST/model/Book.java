@@ -8,17 +8,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * Represents what a basic book should hold of information.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
 public class Book {
 
-    private long ID;
+    private long isbn;
 
     private String title;
 
-    private LinkedList<Long> authors;
+    private final LinkedList<Long> authors;
 
     private int year;
 
@@ -28,7 +28,7 @@ public class Book {
      * Makes a basic book with all the fields set to a default invalid value.
      */
     public Book(){
-        this.ID = 0;
+        this.isbn = 0;
         this.title = "";
         this.authors = new LinkedList<>();
         this.numberOfPages = 0;
@@ -37,18 +37,18 @@ public class Book {
 
     /**
       * Makes an instance of the Books class.
-      * @param ID the ID the book has.
+      * @param isbn the ISBN the book has.
       * @param authors a list with all the authors of this book with their ID's.
       * @param title the title of the book.
       * @param year the year of the book.
       * @param numberOfPages the amount of pages in the book.
       */
-    public Book(long ID, String title, List<Long> authors, int year, int numberOfPages){
-        checkID(ID);
+    public Book(long isbn, String title, List<Long> authors, int year, int numberOfPages){
+        checkISBN(isbn);
         checkTitle(title);
         checkNumberOfPages(numberOfPages);
         this.authors = new LinkedList<>();
-        this.ID = ID;
+        this.isbn = isbn;
         this.year = year;
         this.title = title;
         this.numberOfPages = numberOfPages;
@@ -104,17 +104,17 @@ public class Book {
      * Gets the ID of the book.
      * @return the ID
      */
-    public long getID() {
-        return ID;
+    public long getISBN() {
+        return isbn;
     }
 
     /**
      * Sets the ID to a new value.
-     * @param ID the new ID.
+     * @param isbn the new ISBN.
      */
-    public void setID(long ID) {
-        checkID(ID);
-        this.ID = ID;
+    public void setISBN(long isbn) {
+        checkISBN(isbn);
+        this.isbn = isbn;
     }
 
     /**
@@ -189,6 +189,14 @@ public class Book {
      */
     private void checkNumberOfPages(int numberOfPages){
         checkIfLongIsAboveZero((long) numberOfPages, "number of pages");
+    }
+
+    /**
+     * Checks if the ID is above zero.
+     * @param ID the ID to check.
+     */
+    private void checkISBN(long ID){
+        checkIfLongIsAboveZero(ID, "ISBN");
     }
 
     /**

@@ -1,0 +1,24 @@
+CREATE TABLE book(
+	bookID int AUTO_INCREMENT,
+	title VARCHAR(255) NOT NULL,
+	numberOfPages int NOT NULL,
+	yearPublished int NOT NULL,
+	PRIMARY KEY(bookID)
+);
+
+
+CREATE TABLE author(
+	authorID int AUTO_INCREMENT,
+	firstName VARCHAR(255) NOT NULL,
+	lastName varChar(255) NOT NULL,
+	birthYear int NOT NULL,
+	PRIMARY KEY(authorID)
+);
+
+CREATE TABLE authorsOfBook(
+	authorID int,
+	bookID int,
+	CONSTRAINT authorIDCon FOREIGN KEY(authorID) REFERENCES author(authorID),
+	CONSTRAINT bookIDCon FOREIGN KEY(bookID) REFERENCES book(bookID),
+	CONSTRAINT checkIFIsInTable UNIQUE(bookID, authorID)
+);
