@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.Book;
-import no.stonedstonar.BookREST.model.BookRegister;
+import no.stonedstonar.BookREST.model.NormalBookRegister;
 import no.stonedstonar.BookREST.model.RegisterTestData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +24,13 @@ import java.util.Optional;
 @RequestMapping("/books")
 public class BookController {
 
-    private BookRegister bookRegister;
+    private NormalBookRegister normalBookRegister;
     /**
       * Makes an instance of the BookController class.
       */
     public BookController() throws CouldNotAddBookException {
-        bookRegister = new BookRegister();
-        RegisterTestData.addBooksToRegister(bookRegister);
+        normalBookRegister = new NormalBookRegister();
+        RegisterTestData.addBooksToRegister(normalBookRegister);
     }
 
     /**
@@ -40,9 +40,9 @@ public class BookController {
     @GetMapping
     public List<Book> getBooks(@RequestParam(value = "authorID", required = false) Optional<Long> optionalAuthorID){
         if (optionalAuthorID.isEmpty()){
-            return bookRegister.getBookList();
+            return normalBookRegister.getBookList();
         }else {
-            return bookRegister.getAllBooksOfAuthorID(optionalAuthorID.get());
+            return normalBookRegister.getAllBooksOfAuthorID(optionalAuthorID.get());
         }
     }
 
@@ -57,7 +57,7 @@ public class BookController {
             response = Book.class)
     @GetMapping("/{id}")
     public Book getBookById(@PathVariable long id) throws CouldNotGetBookException {
-        return bookRegister.getBook(id);
+        return normalBookRegister.getBook(id);
     }
 
     /**
@@ -70,7 +70,7 @@ public class BookController {
     public void postBook(@RequestBody String body) throws JsonProcessingException, CouldNotAddBookException {
         ObjectMapper objectMapper = new ObjectMapper();
         Book book = objectMapper.readValue(body, Book.class);
-        bookRegister.addBook(book);
+        normalBookRegister.addBook(book);
     }
 
     /**
@@ -83,7 +83,7 @@ public class BookController {
     public void changeBook(@RequestBody String body) throws JsonProcessingException, CouldNotGetBookException {
         ObjectMapper objectMapper = new ObjectMapper();
         Book newDetails = objectMapper.readValue(body, Book.class);
-        Book bookToChange = bookRegister.getBook(newDetails.getID());
+        Book bookToChange = normalBookRegister.getBook(newDetails.getISBN());
         String title = newDetails.getTitle();
         int year = newDetails.getYear();
         int pages = newDetails.getNumberOfPages();
@@ -124,8 +124,8 @@ public class BookController {
      */
     @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable long id) throws CouldNotGetBookException, CouldNotRemoveBookException {
-        Book book = bookRegister.getBook(id);
-        bookRegister.removeBook(book);
+        Book book = normalBookRegister.getBook(id);
+        normalBookRegister.removeBook(book);
     }
 
     /**

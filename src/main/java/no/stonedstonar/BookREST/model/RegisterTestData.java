@@ -15,11 +15,11 @@ public class RegisterTestData {
 
     /**
      * Adds predefined books to a register.
-     * @param bookRegister the book register to fill.
+     * @param normalBookRegister the book register to fill.
      * @throws CouldNotAddBookException gets thrown if a book could not be added.
      */
-    public static void addBooksToRegister(BookRegister bookRegister) throws CouldNotAddBookException {
-        checkIfObjectIsNull(bookRegister, "book register");
+    public static void addBooksToRegister(NormalBookRegister normalBookRegister) throws CouldNotAddBookException {
+        checkIfObjectIsNull(normalBookRegister, "book register");
         List<Long> authors = new ArrayList<>();
         List<Long> authors2 = new ArrayList<>();
         List<Long> authors3 = new ArrayList<>();
@@ -31,11 +31,11 @@ public class RegisterTestData {
         authors3.add(4L);
         authors4.add(5L);
 
-        bookRegister.addBook(new Book(1, "Snømannen", authors,2007, 438));
-        bookRegister.addBook(new Book(2, "Kniv", authors,2019, 519));
-        bookRegister.addBook(new Book(3, "Lars Monsen - mitt liv", authors2, 2020, 246));
-        bookRegister.addBook(new Book(4, "Verden ifølge Vinni", authors3, 2021, 236));
-        bookRegister.addBook(new Book(5, "Min skyld - en historie om frigjøring", authors4, 2021, 239));
+        normalBookRegister.addBook(new Book(1, "Snømannen", authors,2007, 438));
+        normalBookRegister.addBook(new Book(2, "Kniv", authors,2019, 519));
+        normalBookRegister.addBook(new Book(3, "Lars Monsen - mitt liv", authors2, 2020, 246));
+        normalBookRegister.addBook(new Book(4, "Verden ifølge Vinni", authors3, 2021, 236));
+        normalBookRegister.addBook(new Book(5, "Min skyld - en historie om frigjøring", authors4, 2021, 239));
     }
 
     /**
