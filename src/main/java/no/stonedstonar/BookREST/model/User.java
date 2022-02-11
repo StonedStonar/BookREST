@@ -21,7 +21,7 @@ public class User {
 
     private String eMail;
 
-    private LinkedList<Address> addresses;
+    private final LinkedList<Address> addresses;
 
     /**
      * Makes an instance of the User class.
