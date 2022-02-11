@@ -7,7 +7,6 @@ import no.stonedstonar.BookREST.model.RegisterTestData;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
