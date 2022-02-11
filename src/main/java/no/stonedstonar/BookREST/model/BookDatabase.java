@@ -1,5 +1,8 @@
 package no.stonedstonar.BookREST.model;
 
+import no.stonedstonar.BookREST.model.exceptions.CouldNotGetBookException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveBookException;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +14,7 @@ import java.util.List;
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
-public class BookDatabase {
+public class BookDatabase implements BookRegister{
 
     private Connection connection;
 
@@ -37,6 +40,12 @@ public class BookDatabase {
     }
 
 
+    @Override
+    public void addBook(Book book) {
+
+    }
+
+    @Override
     public void addBookWithDetails(String title, Collection<Long> authors, int year, int numberOfPages){
        checkString(title, "title");
        checkIfObjectIsNull(authors, "authors");
@@ -55,6 +64,31 @@ public class BookDatabase {
        }catch (SQLException exception) {
            exception.printStackTrace();
        }
+    }
+
+    @Override
+    public void removeBook(Book book) throws CouldNotRemoveBookException {
+
+    }
+
+    @Override
+    public void removeBookByID(long ID) throws CouldNotRemoveBookException {
+
+    }
+
+    @Override
+    public List<Book> getAllBooksOfAuthorID(long authorID) {
+        return null;
+    }
+
+    @Override
+    public Book getBook(long bookID) throws CouldNotGetBookException {
+        return null;
+    }
+
+    @Override
+    public List<Book> getBookList() {
+        return null;
     }
 
     /**

@@ -20,6 +20,7 @@ public interface BookRegister {
      */
     void addBook(Book book);
 
+
     /**
      * Adds a new book to the register.
      * @param title the title of the book.
