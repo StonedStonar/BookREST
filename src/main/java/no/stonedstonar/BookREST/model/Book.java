@@ -24,6 +24,8 @@ public class Book {
 
     private int numberOfPages;
 
+    private long publisherID;
+
     /**
      * Makes a basic book with all the fields set to a default invalid value.
      */
@@ -42,17 +44,20 @@ public class Book {
       * @param title the title of the book.
       * @param year the year of the book.
       * @param numberOfPages the amount of pages in the book.
+     *  @param publisherID the ID of the publisher.
       */
-    public Book(long isbn, String title, List<Long> authors, int year, int numberOfPages){
+    public Book(long isbn, String title, List<Long> authors, int year, int numberOfPages, long publisherID){
         checkISBN(isbn);
         checkTitle(title);
         checkNumberOfPages(numberOfPages);
+        checkPublisherID(publisherID);
         this.authors = new LinkedList<>();
         this.isbn = isbn;
         this.year = year;
         this.title = title;
         this.numberOfPages = numberOfPages;
         this.authors.addAll(authors);
+        this.publisherID = publisherID;
     }
 
     /**
@@ -67,6 +72,22 @@ public class Book {
         }else {
             throw new CouldNotAddAuthorException("The author with the ID " + authorID + " is already a part of this book.");
         }
+    }
+
+    /**
+     * Gets the publishers ID.
+     * @return the ID the publisher has.
+     */
+    public long getPublisherID() {
+        return publisherID;
+    }
+
+    /**
+     * Sets the publisher ID to a new value.
+     * @param publisherID the publisher ID.
+     */
+    public void setPublisherID(long publisherID) {
+        this.publisherID = publisherID;
     }
 
     /**
@@ -181,6 +202,14 @@ public class Book {
      */
     private void checkTitle(String title){
         checkString(title, "title");
+    }
+
+    /**
+     * Checks if the publisher ID is above zero.
+     * @param publisherID the publisher ID to check.
+     */
+    private void checkPublisherID(long publisherID){
+        checkIfLongIsAboveZero(publisherID, "publisherID");
     }
 
     /**

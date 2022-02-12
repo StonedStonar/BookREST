@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.Book;
-import no.stonedstonar.BookREST.model.NormalBookRegister;
+import no.stonedstonar.BookREST.model.normalRegisters.NormalBookRegister;
 import no.stonedstonar.BookREST.model.RegisterTestData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

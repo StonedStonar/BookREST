@@ -1,5 +1,9 @@
 package no.stonedstonar.BookREST.model;
 
+import no.stonedstonar.BookREST.model.exceptions.CouldNotAddCompanyException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotGetCompanyException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveCompanyException;
+
 import java.util.List;
 
 /**
@@ -12,26 +16,23 @@ public interface CompanyRegister {
     /**
      * Adds a new company to the register.
      * @param company the company you want to add.
+     * @throws CouldNotAddCompanyException gets thrown if the company is already added.
      */
-    void addCompany(Company company);
-
-    /**
-     * Adds a new company to the register.
-     * @param companyName the new company's name.
-     */
-    void addCompanyWithDetails(String companyName);
+    void addCompany(Company company) throws CouldNotAddCompanyException;
 
     /**
      * Removes a company with the matching ID.
      * @param companyID the ID of the company.
+     * @throws CouldNotRemoveCompanyException gets thrown if the company could not be removed.
      */
-    void removeCompanyWithID(long companyID);
+    void removeCompanyWithID(long companyID) throws CouldNotRemoveCompanyException;
 
     /**
      * Gets the company with the matching ID.
      * @param companyID the company ID.
+     * @throws CouldNotGetCompanyException gets thrown when a company could not be found with that ID.
      */
-    void getCompanyWithID(long companyID);
+    void getCompanyWithID(long companyID) throws CouldNotGetCompanyException;
 
     /**
      * Gets a list with all the companies in the register.

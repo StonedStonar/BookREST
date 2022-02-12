@@ -17,19 +17,9 @@ public interface BookRegister {
     /**
      * Adds a new book to the register.
      * @param book the book you want to add.
-     */
-    void addBook(Book book);
-
-
-    /**
-     * Adds a new book to the register.
-     * @param title the title of the book.
-     * @param authors the list with the authors id's.
-     * @param year the year the book was published.
-     * @param numberOfPages the amount of pages the book has.
      * @throws  CouldNotAddBookException gets thrown if the book could not be added.
      */
-    void addBookWithDetails(String title, Collection<Long> authors, int year, int numberOfPages) throws CouldNotAddBookException;
+    void addBook(Book book) throws CouldNotAddBookException;
 
     /**
      * Removes a book from the register.

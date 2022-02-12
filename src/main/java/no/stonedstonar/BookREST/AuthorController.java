@@ -2,7 +2,7 @@ package no.stonedstonar.BookREST;
 
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.Author;
-import no.stonedstonar.BookREST.model.AuthorRegister;
+import no.stonedstonar.BookREST.model.normalRegisters.NormalAuthorRegister;
 import no.stonedstonar.BookREST.model.RegisterTestData;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
 import org.springframework.web.bind.annotation.*;
@@ -19,24 +19,24 @@ import java.util.List;
 @RequestMapping("/authors")
 public class AuthorController {
 
-    private AuthorRegister authorRegister;
+    private NormalAuthorRegister normalAuthorRegister;
 
     /**
       * Makes an instance of the AuthorController class.
       */
     public AuthorController() throws CouldNotAddAuthorException {
-        authorRegister = new AuthorRegister();
-        RegisterTestData.addAuthorsToRegister(authorRegister);
+        normalAuthorRegister = new NormalAuthorRegister();
+        RegisterTestData.addAuthorsToRegister(normalAuthorRegister);
     }
 
     @GetMapping
     public List<Author> getAuthors(){
-        return authorRegister.getAuthorList();
+        return normalAuthorRegister.getAuthorList();
     }
 
     @GetMapping("/{id}")
     public Author getAuthorWithID(@PathVariable long id) throws CouldNotGetAuthorException {
-        return authorRegister.getAuthorById(id);
+        return normalAuthorRegister.getAuthorById(id);
     }
     
     /**

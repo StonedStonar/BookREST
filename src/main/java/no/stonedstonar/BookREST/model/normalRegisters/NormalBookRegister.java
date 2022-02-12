@@ -1,11 +1,14 @@
-package no.stonedstonar.BookREST.model;
+package no.stonedstonar.BookREST.model.normalRegisters;
 
 
+import no.stonedstonar.BookREST.model.Book;
+import no.stonedstonar.BookREST.model.BookRegister;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveBookException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +17,7 @@ import java.util.Optional;
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
-public class NormalBookRegister {
+public class NormalBookRegister implements BookRegister {
 
     private List<Book> bookList;
 
@@ -25,11 +28,7 @@ public class NormalBookRegister {
         bookList = new ArrayList<>();
     }
 
-    /**
-     * Adds a book to the register.
-     * @param book the book you want to add.
-     * @throws CouldNotAddBookException gets thrown if the book is already in the register.
-     */
+    @Override
     public void addBook(Book book) throws CouldNotAddBookException {
         checkBook(book);
         if (bookList.stream().noneMatch(book2 -> book2.getISBN() == book.getISBN())){
@@ -39,11 +38,7 @@ public class NormalBookRegister {
         }
     }
 
-    /**
-     * Removes a book from the register.
-     * @param book the book you want to remove.
-     * @throws CouldNotRemoveBookException gets thrown if a book could not be removed.
-     */
+    @Override
     public void removeBook(Book book) throws CouldNotRemoveBookException {
         checkBook(book);
         if (!bookList.remove(book)){
@@ -51,17 +46,18 @@ public class NormalBookRegister {
         }
     }
 
-    /**
-     * Gets all the books this authorID is a part of.
-     * @param authorID the author ID to check.
-     * @return a list with all the books this author is a part of.
-     */
+    @Override
+    public void removeBookByID(long ID) throws CouldNotRemoveBookException {
+
+    }
+
+    @Override
     public List<Book> getAllBooksOfAuthorID(long authorID){
         checkAuthorID(authorID);
         return bookList.stream().filter(book -> book.checkIfAuthorIsPartOfBook(authorID)).toList();
     }
 
-
+    @Override
     public Book getBook(long bookID) throws CouldNotGetBookException {
         checkID(bookID);
         Optional<Book> optionalBook = bookList.stream().filter(book -> book.getISBN() == bookID).findFirst();
