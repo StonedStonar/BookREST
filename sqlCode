@@ -1,14 +1,43 @@
+CREATE TABLE company(
+	companyID bigint,
+	companyName VARCHAR(255) NOT NULL,
+	PRIMARY KEY(companyID)
+);
+
+CREATE TABLE person(
+	personID bigint,
+	firstName VARCHAR(255) NOT NULL,
+	lastName VARCHAR(255) NOT NULL,
+	email VARCHAR(255) NOT NULL UNIQUE,
+	PRIMARY KEY(userID)
+);
+
+CREATE TABLE personAddress(
+	personID bigint,
+	streetName VARCHAR(255),
+	houseNumber int NOT NULL ,
+	houseLetter varChar(1),
+	houseFloor int,
+	apartmentNumber int,
+	postalCode int NOT NULL,
+	CONSTRAINT persinIDCon FOREIGN KEY(personID) REFERENCES person(personID)
+
+
+);
+
 CREATE TABLE book(
-	bookID int AUTO_INCREMENT,
+	isbn bigint UNIQUE,
 	title VARCHAR(255) NOT NULL,
 	numberOfPages int NOT NULL,
 	yearPublished int NOT NULL,
-	PRIMARY KEY(bookID)
+	publisherID bigint,
+	PRIMARY KEY(isbn),
+	CONSTRAINT publisherIDCon FOREIGN KEY(publisherID) REFERENCES company(companyID)
 );
 
 
 CREATE TABLE author(
-	authorID int AUTO_INCREMENT,
+	authorID bigint AUTO_INCREMENT,
 	firstName VARCHAR(255) NOT NULL,
 	lastName varChar(255) NOT NULL,
 	birthYear int NOT NULL,
@@ -16,9 +45,10 @@ CREATE TABLE author(
 );
 
 CREATE TABLE authorsOfBook(
-	authorID int,
-	bookID int,
+	authorID bigint,
+	isbn bigint,
 	CONSTRAINT authorIDCon FOREIGN KEY(authorID) REFERENCES author(authorID),
-	CONSTRAINT bookIDCon FOREIGN KEY(bookID) REFERENCES book(bookID),
-	CONSTRAINT checkIFIsInTable UNIQUE(bookID, authorID)
+	CONSTRAINT isbnCon FOREIGN KEY(isbn) REFERENCES book(isbn),
+	CONSTRAINT checkIFIsInTable UNIQUE(isbn, authorID)
 );
+
