@@ -20,12 +20,13 @@ public class AuthorDatabase implements AuthorRegister {
 
     /**
       * Makes an instance of the AuthorDatabase class.
+      * @param connection the connection to the database.
       */
     public AuthorDatabase(Connection connection){
         try {
             statement = connection.createStatement();
         }catch (Exception exception){
-
+            System.err.println(exception.getMessage());
         }
     }
 

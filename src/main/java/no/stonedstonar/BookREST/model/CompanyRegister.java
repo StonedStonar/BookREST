@@ -30,9 +30,10 @@ public interface CompanyRegister {
     /**
      * Gets the company with the matching ID.
      * @param companyID the company ID.
+     * @return the company with that ID.
      * @throws CouldNotGetCompanyException gets thrown when a company could not be found with that ID.
      */
-    void getCompanyWithID(long companyID) throws CouldNotGetCompanyException;
+    Company getCompanyWithID(long companyID) throws CouldNotGetCompanyException;
 
     /**
      * Gets a list with all the companies in the register.

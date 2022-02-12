@@ -1,4 +1,4 @@
-package no.stonedstonar.BookREST;
+package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

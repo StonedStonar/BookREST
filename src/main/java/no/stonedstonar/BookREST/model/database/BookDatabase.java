@@ -5,6 +5,7 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotAddBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveBookException;
 
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.*;
 
@@ -40,12 +41,13 @@ public class BookDatabase implements BookRegister {
     //"jdbc:mysql://localhost:3306/bookREST", "root", "SzzSacbkbachw"
     /**
       * Makes an instance of the BookDatabase class.
+      * @param connection the connection to the database.
       */
     public BookDatabase(Connection connection){
         try {
             statement = connection.createStatement();
         }catch (Exception exception){
-            System.out.println(exception.getMessage());
+            System.err.println(exception.getMessage());
         }
     }
 
@@ -83,8 +85,17 @@ public class BookDatabase implements BookRegister {
 
     @Override
     public List<Book> getAllBooksOfAuthorID(long authorID) {
-
-        return null;
+        List<Book> bookList = new LinkedList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT isbn FROM authorsofbook WHERE authorID = " + authorID + ";");
+            while (resultSet.next()){
+                Book book = getBook(resultSet.getLong("isbn"));
+                bookList.add(book);
+            }
+        } catch (SQLException | CouldNotGetBookException exception) {
+            System.err.println("Something has gone wrong in getting books of author.");
+        }
+        return bookList;
     }
 
     @Override

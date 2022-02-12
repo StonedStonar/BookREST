@@ -1,4 +1,4 @@
-package no.stonedstonar.BookREST;
+package no.stonedstonar.BookREST.controllers;
 
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.Author;

@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Represents a basic user object that can hold all the details needed for an user.
+ * Represents a basic user object that can hold all the details needed for a user.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
@@ -28,16 +28,16 @@ public class User {
      * @param firstName the first name of the borrower.
      * @param lastName the last name of the borrower.
      * @param eMail the email of the user.
-     * @param address the address of the user.
      */
-    public User(String firstName, String lastName, String eMail, Address address){
+    public User(long userID, String firstName, String lastName, String eMail){
         checkFirstName(firstName);
         checkLastName(lastName);
-        checkAddress(address);
+        checkUserID(userID);
         addresses = new LinkedList<>();
-        addresses.add(address);
         this.firstName = firstName;
         this.lastName = lastName;
+        this.eMail = eMail;
+        this.userID = userID;
     }
 
     /**
