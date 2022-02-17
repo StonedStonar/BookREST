@@ -4,7 +4,6 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddCompanyException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetCompanyException;
-import no.stonedstonar.BookREST.model.normalRegisters.NormalAuthorRegister;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package no.stonedstonar.BookREST.model;
 /**
- *
+ * Represents a branch of the library.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
