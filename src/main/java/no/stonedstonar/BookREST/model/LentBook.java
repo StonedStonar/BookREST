@@ -12,7 +12,7 @@ public class LentBook {
 
     private long branchID;
 
-    private long bookID;
+    private long branchBookID;
 
     private long userID;
 
@@ -20,29 +20,27 @@ public class LentBook {
 
     private LocalDate dueDate;
 
-    private LocalDate returnedDate;
-
     /**
      * Makes an instance of the LentBook class.
      * @param branchID the ID of the branch this book is lent from.
-     * @param bookID the bookID of the lent book.
+     * @param branchBookID the bookID of the lent book.
      * @param userID the users ID.
      * @param lentDate the date this book was lent.
      * @param dueDate the date this book is supposed to be delivered.
      */
-    public LentBook(long branchID, long bookID, long userID, LocalDate lentDate, LocalDate dueDate){
-        setDetails(branchID, bookID, userID, lentDate, dueDate);
+    public LentBook(long branchID, long branchBookID, long userID, LocalDate lentDate, LocalDate dueDate){
+        setDetails(branchID, branchBookID, userID, lentDate, dueDate);
     }
 
     /**
      * Makes an instance of the LentBook class. This book has set lent date to today.
      * @param branchID the ID of the branch this book is lent from.
-     * @param bookID the bookID of the lent book.
+     * @param branchBookID the bookID of the lent book.
      * @param userID the users ID.
      * @param dueDate the date this book is supposed to be delivered.
      */
-    public LentBook(long branchID, long bookID, long userID, LocalDate dueDate){
-        setDetails(branchID, bookID, userID, LocalDate.now(), dueDate);
+    public LentBook(long branchID, long branchBookID, long userID, LocalDate dueDate){
+        setDetails(branchID, branchBookID, userID, LocalDate.now(), dueDate);
     }
 
     /**
@@ -65,7 +63,7 @@ public class LentBook {
         this.dueDate = dueDate;
         this.lentDate = lentDate;
         this.branchID = branchID;
-        this.bookID = bookID;
+        this.branchBookID = bookID;
         this.userID = userID;
     }
 
@@ -81,8 +79,8 @@ public class LentBook {
      * Gets the id of the book.
      * @return the ID of the book.
      */
-    public long getBookID() {
-        return bookID;
+    public long getBranchBookID() {
+        return branchBookID;
     }
 
     /**
@@ -103,30 +101,10 @@ public class LentBook {
 
     /**
      * Gets the due date of this book.
-     * @return the dudate of this book.
+     * @return the due date of this book.
      */
     public LocalDate getDueDate(){
         return dueDate;
-    }
-
-    /**
-     * Gets the date this book was returned. Returns null if the book is not returned.
-     * @return the date this book was returned.
-     */
-    public LocalDate getReturnedDate() {
-        return returnedDate;
-    }
-
-    /**
-     * Sets the date this book was returned.
-     * @param returnedDate the date this book was returned.
-     */
-    public void setReturnedDate(LocalDate returnedDate){
-        checkIfObjectIsNull(returnedDate, "returned date");
-        if (returnedDate.isBefore(lentDate)){
-            throw new DateTimeException("The book cannot be returned ");
-        }
-        this.returnedDate = returnedDate;
     }
 
     /**
@@ -134,7 +112,7 @@ public class LentBook {
      * @param number the number to check.
      * @param prefix the prefix the error should have.
      */
-    private void checkIfLongIsAboveZero(long number, String prefix){
+    protected void checkIfLongIsAboveZero(long number, String prefix){
         if (number <= 0){
             throw new IllegalArgumentException("The " + prefix + " must be above zero.");
         }
@@ -145,7 +123,7 @@ public class LentBook {
      * @param object the object you want to check.
      * @param error the error message the exception should have.
      */
-    private void checkIfObjectIsNull(Object object, String error){
+    protected void checkIfObjectIsNull(Object object, String error){
        if (object == null){
            throw new IllegalArgumentException("The " + error + " cannot be null.");
        }
