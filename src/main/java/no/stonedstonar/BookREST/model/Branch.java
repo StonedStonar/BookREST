@@ -6,11 +6,72 @@ package no.stonedstonar.BookREST.model;
  */
 public class Branch {
 
+    private final long branchID;
+
+    private String branchName;
+
     /**
-      * Makes an instance of the Branch class.
-      */
-    public Branch(){
-    
+     * Makes an instance of the Branch class.
+     * @param branchID the branch id this branch should have.
+     * @param branchName the name of the branch.
+     */
+    public Branch(long branchID, String branchName){
+        checkIfBranchIDIsValid(branchID);
+        checkIfBranchNameIsValid(branchName);
+        this.branchID = branchID;
+        this.branchName = branchName;
+    }
+
+    /**
+     * Gets the branchID of this branch.
+     * @return the branch ID.
+     */
+    public long getBranchID() {
+        return branchID;
+    }
+
+    /**
+     * Gets the branch's name.
+     * @return the branchID.
+     */
+    public String getBranchName() {
+        return branchName;
+    }
+
+    /**
+     * Sets the branch name to a new value.
+     * @param branchName the new branch name.
+     */
+    public void setBranchName(String branchName) {
+        checkIfBranchNameIsValid(branchName);
+        this.branchName = branchName;
+    }
+
+    /**
+     * Checks if a branch name is not null.
+     * @param branchName the branch name to check.
+     */
+    private void checkIfBranchNameIsValid(String branchName){
+        checkString(branchName, "branch name");
+    }
+
+    /**
+     * Checks if the branch ID is above zero.
+     * @param branchID the branchID to check.
+     */
+    private void checkIfBranchIDIsValid(long branchID){
+        checkIfLongIsAboveZero(branchID, "branchID");
+    }
+
+    /**
+     * Checks if the input long is above zero.
+     * @param number the number to check.
+     * @param prefix the prefix the error should have.
+     */
+    private void checkIfLongIsAboveZero(long number, String prefix){
+        if (number <= 0){
+            throw new IllegalArgumentException("The " + prefix + " must be above zero.");
+        }
     }
     
     /**

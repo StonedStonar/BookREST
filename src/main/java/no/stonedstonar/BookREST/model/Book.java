@@ -217,7 +217,7 @@ public class Book {
      * @param numberOfPages the numberofpages to check.
      */
     private void checkNumberOfPages(int numberOfPages){
-        checkIfLongIsAboveZero((long) numberOfPages, "number of pages");
+        checkIfLongIsAboveZero(numberOfPages, "number of pages");
     }
 
     /**

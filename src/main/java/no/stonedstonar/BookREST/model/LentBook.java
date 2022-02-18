@@ -12,8 +12,6 @@ public class LentBook {
 
     private long branchID;
 
-    private long branchBookID;
-
     private long userID;
 
     private LocalDate lentDate;
@@ -22,13 +20,12 @@ public class LentBook {
 
     /**
      * Makes an instance of the LentBook class.
-     * @param branchID the ID of the branch this book is lent from.
      * @param branchBookID the bookID of the lent book.
      * @param userID the users ID.
      * @param lentDate the date this book was lent.
      * @param dueDate the date this book is supposed to be delivered.
      */
-    public LentBook(long branchID, long branchBookID, long userID, LocalDate lentDate, LocalDate dueDate){
+    public LentBook(long branchBookID, long userID, LocalDate lentDate, LocalDate dueDate){
         setDetails(branchID, branchBookID, userID, lentDate, dueDate);
     }
 

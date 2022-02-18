@@ -6,15 +6,18 @@ package no.stonedstonar.BookREST.model;
  */
 public class BranchBook {
 
-    private long branchBookID;
+    private final long branchBookID;
 
-    private long isbn;
+    private final long isbn;
 
-    private long branchID;
+    private final long branchID;
 
     /**
-      * Makes an instance of the BranchBook class.
-      */
+     * Makes an instance of the BranchBook class.
+     * @param branchBookID the branch book id.
+     * @param isbn the books ISBN code.
+     * @param branchID the branch ID.
+     */
     public BranchBook(long branchBookID, long isbn, long branchID){
         checkIfLongIsAboveZero(branchBookID, "branch book id");
         checkIfLongIsAboveZero(isbn, "ISBN");
