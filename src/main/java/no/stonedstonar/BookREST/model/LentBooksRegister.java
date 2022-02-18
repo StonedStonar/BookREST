@@ -3,7 +3,7 @@ package no.stonedstonar.BookREST.model;
 import java.util.List;
 
 /**
- * Represents a lent books register.
+ * Represents a register for lent books.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
@@ -53,7 +53,7 @@ public interface LentBooksRegister {
      * Gets all the books that are due in a certain branch.
      * @param userId the id of the user.
      * @param branchID the id of the branch.
-     * @return
+     * @return the list with all the books for this user.
      */
-    LentBook getAllDueBooksForUserInBranch(long userId, long branchID);
+    List<LentBook> getAllDueBooksForUserInBranch(long userId, long branchID);
 }
