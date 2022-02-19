@@ -10,7 +10,7 @@ import java.time.LocalDate;
  */
 public class LentBook {
 
-    private long branchID;
+    private long branchBookID;
 
     private long userID;
 
@@ -26,30 +26,27 @@ public class LentBook {
      * @param dueDate the date this book is supposed to be delivered.
      */
     public LentBook(long branchBookID, long userID, LocalDate lentDate, LocalDate dueDate){
-        setDetails(branchID, branchBookID, userID, lentDate, dueDate);
+        setDetails(branchBookID, userID, lentDate, dueDate);
     }
 
     /**
      * Makes an instance of the LentBook class. This book has set lent date to today.
-     * @param branchID the ID of the branch this book is lent from.
      * @param branchBookID the bookID of the lent book.
      * @param userID the users ID.
      * @param dueDate the date this book is supposed to be delivered.
      */
-    public LentBook(long branchID, long branchBookID, long userID, LocalDate dueDate){
-        setDetails(branchID, branchBookID, userID, LocalDate.now(), dueDate);
+    public LentBook(long branchBookID, long userID, LocalDate dueDate){
+        setDetails(branchBookID, userID, LocalDate.now(), dueDate);
     }
 
     /**
-     * Setst the details of the book.
-     * @param branchID the ID of the branch this book is lent from.
+     * Sets the details of the book.
      * @param bookID the bookID of the lent book.
      * @param userID the users ID.
      * @param lentDate the date this book was lent.
      * @param dueDate the date this book is supposed to be returned.
      */
-    private void setDetails(long branchID, long bookID, long userID, LocalDate lentDate, LocalDate dueDate){
-        checkIfLongIsAboveZero(branchID, "branchID");
+    private void setDetails(long bookID, long userID, LocalDate lentDate, LocalDate dueDate){
         checkIfLongIsAboveZero(bookID, "bookID");
         checkIfLongIsAboveZero(userID, "userID");
         checkIfObjectIsNull(dueDate, "due date");
@@ -59,17 +56,8 @@ public class LentBook {
         }
         this.dueDate = dueDate;
         this.lentDate = lentDate;
-        this.branchID = branchID;
         this.branchBookID = bookID;
         this.userID = userID;
-    }
-
-    /**
-     * Gets the ID of the branch this book is lent out from.
-     * @return the branch id this book belongs to.
-     */
-    public long getBranchID() {
-        return branchID;
     }
 
     /**

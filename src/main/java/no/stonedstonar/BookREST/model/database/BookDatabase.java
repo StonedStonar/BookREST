@@ -1,42 +1,22 @@
 package no.stonedstonar.BookREST.model.database;
 
+import no.stonedstonar.BookREST.RegisterTestData;
 import no.stonedstonar.BookREST.model.*;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveBookException;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.*;
 
 /**
- *
+ * Represents an interface to the database for books.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
 public class BookDatabase implements BookRegister {
 
     private Statement statement;
-
-    public static void main(String[] args) {
-        try {
-            Connection connection = connection = DriverManager.getConnection("jdbc:mysql://192.168.1.10:3306/bookREST", "dekstop", "SzzSacbkbachw");
-            BookRegister bookRegister = new BookDatabase(connection);
-            AuthorRegister authorRegister = new AuthorDatabase(connection);
-            CompanyRegister companyRegister = new CompanyDatabase(connection);
-            try {
-                RegisterTestData.addAuthorsToRegister(authorRegister);
-                RegisterTestData.addCompaniesToRegister(companyRegister);
-                RegisterTestData.addBooksToRegister(bookRegister);
-            }catch (Exception exception){
-                System.out.println("Failed to add test data.");
-                System.out.println(exception.getMessage());
-            }
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
-
-    }
 
     //"jdbc:mysql://localhost:3306/bookREST", "root", "SzzSacbkbachw"
     /**

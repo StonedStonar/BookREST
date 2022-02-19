@@ -1,9 +1,8 @@
-package no.stonedstonar.BookREST.model;
+package no.stonedstonar.BookREST;
 
-import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
-import no.stonedstonar.BookREST.model.exceptions.CouldNotAddBookException;
-import no.stonedstonar.BookREST.model.exceptions.CouldNotAddCompanyException;
-import no.stonedstonar.BookREST.model.exceptions.CouldNotGetCompanyException;
+import no.stonedstonar.BookREST.model.*;
+import no.stonedstonar.BookREST.model.database.LibraryDatabase;
+import no.stonedstonar.BookREST.model.exceptions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +40,25 @@ public class RegisterTestData {
     }
 
     /**
+     * Adds a predefined amount of branch books to the register.
+     * @param branchBookRegister the branch book register to add to.
+     * @throws DuplicateObjectException gets thrown if the branch book is already in the system.
+     */
+    public static void addBranchBooksToRegister(BranchBookRegister branchBookRegister) throws DuplicateObjectException {
+        checkIfObjectIsNull(branchBookRegister, "branch book register");
+        int amount = 1;
+        for (int i = 1; i < 4; i++){
+            branchBookRegister.addBranchBook(new BranchBook(amount, 9788202562939L, i));
+            branchBookRegister.addBranchBook(new BranchBook(amount + 1 , 9788202713461L, i));
+            branchBookRegister.addBranchBook(new BranchBook(amount + 2, 9788203192128L, i));
+            branchBookRegister.addBranchBook(new BranchBook(amount + 3, 9788203364181L, i));
+            branchBookRegister.addBranchBook(new BranchBook(amount + 4, 9788234702235L ,i));
+            amount += 5;
+        }
+
+    }
+
+    /**
      * Adds all the predefined authors to an author register.
      * @param authorRegister the author register to add to.
      * @throws CouldNotAddAuthorException gets thrown if one author could not be added.
@@ -64,6 +82,30 @@ public class RegisterTestData {
         companyRegister.addCompany(new Company(1, "Aschehoug"));
         companyRegister.addCompany(new Company(2, "Cappelen Damm"));
         companyRegister.addCompany(new Company(3, "Strawberry Publishing"));
+    }
+
+    /**
+     * Adds a predefined amount of users to the register.
+     * @param userRegister the user register to add to.
+     * @throws CouldNotAddUserException gets thrown if one of the users could not be added.
+     */
+    public static void addUsersToRegister(UserRegister userRegister) throws CouldNotAddUserException {
+        checkIfObjectIsNull(userRegister, "userregister");
+        userRegister.addUser(new User(1, "Bjarne", "Bjarnesen", "bjarne@bjarne.com"));
+        userRegister.addUser(new User(2, "Leif", "Lofsen", "leif@gmail.com"));
+        userRegister.addUser(new User(3, "Tbone", "Lavar", "t@gmail.com"));
+    }
+
+    /**
+     * Adds a preset amount of branches to the library database.
+     * @param libraryDatabase the library database to add to.
+     * @throws DuplicateObjectException gets thrown if the branch is already added to the database.
+     */
+    public static void addBranchesToLibrary(LibraryDatabase libraryDatabase) throws DuplicateObjectException {
+        checkIfObjectIsNull(libraryDatabase, "library database");
+        libraryDatabase.addNewBranch(new Branch(1, "Oslo"));
+        libraryDatabase.addNewBranch(new Branch(2, "Ålesund"));
+        libraryDatabase.addNewBranch(new Branch(3, "Trondheim"));
     }
     
     /**

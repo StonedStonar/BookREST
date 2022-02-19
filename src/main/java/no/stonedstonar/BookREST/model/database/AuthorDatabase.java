@@ -10,7 +10,7 @@ import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 
 /**
- *
+ * Represents a author interface to a database.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */

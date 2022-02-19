@@ -14,15 +14,14 @@ public class ReturnedLentBook extends LentBook {
 
     /**
      * Makes an instance of the ReturnedLentBook class.
-     * @param branchID the ID of the branch this book is lent from.
      * @param bookID the bookID of the lent book.
      * @param userID the users ID.
      * @param lentDate the date this book was lent.
      * @param dueDate the date this book is supposed to be delivered.
      * @param returnedDate the date this book was returned.
      */
-    public ReturnedLentBook(long branchID, long bookID, long userID, LocalDate lentDate, LocalDate dueDate, LocalDate returnedDate){
-        super(branchID, bookID, userID, lentDate, dueDate);
+    public ReturnedLentBook(long bookID, long userID, LocalDate lentDate, LocalDate dueDate, LocalDate returnedDate){
+        super(bookID, userID, lentDate, dueDate);
         checkReturnedDate(returnedDate);
         this.returnedDate = returnedDate;
     }
@@ -33,7 +32,7 @@ public class ReturnedLentBook extends LentBook {
      * @param returnedDate the date this book was returned.
      */
     public ReturnedLentBook(LentBook lentBook, LocalDate returnedDate){
-        super(lentBook.getBranchID(), lentBook.getBranchBookID(), lentBook.getUserID(), lentBook.getLentDate(), lentBook.getDueDate());
+        super(lentBook.getBranchBookID(), lentBook.getUserID(), lentBook.getLentDate(), lentBook.getDueDate());
         checkReturnedDate(returnedDate);
 
         this.returnedDate = returnedDate;

@@ -1,5 +1,8 @@
 package no.stonedstonar.BookREST.model;
 
+import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
+import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
+
 import java.util.List;
 
 /**
@@ -12,14 +15,16 @@ public interface LentBooksLog{
     /**
      * Adds a returned book to the system.
      * @param returnedLentBook the returned book.
+     * @throws DuplicateObjectException gets thrown if the returned book is already in the register.
      */
-    void addReturnedLentBook(ReturnedLentBook returnedLentBook);
+    void addReturnedLentBook(ReturnedLentBook returnedLentBook) throws DuplicateObjectException;
 
     /**
      * Removes a returned book from the system.
      * @param returnedLentBook the book you want to remove.
+     * @throws RemoveObjectException gets thrown if the returned lent book could not be removed.
      */
-    void removeReturnedLentBook(ReturnedLentBook returnedLentBook);
+    void removeReturnedLentBook(ReturnedLentBook returnedLentBook) throws RemoveObjectException;
 
     /**
      * Gets all the times the book with this ID has been lent.

@@ -16,13 +16,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * Represents a user interface to a database.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
 public class UserDatabase implements UserRegister {
 
     private Statement statement;
+
     /**
       * Makes an instance of the UserDatabase class.
       * @param connection the connection to the database.

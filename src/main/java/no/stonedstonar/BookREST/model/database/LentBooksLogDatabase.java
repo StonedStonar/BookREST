@@ -10,7 +10,7 @@ import java.sql.Statement;
 import java.util.List;
 
 /**
- *
+ * Represents a lent books log interface to a database.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */

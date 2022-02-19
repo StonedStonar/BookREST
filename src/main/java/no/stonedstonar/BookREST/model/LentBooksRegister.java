@@ -1,5 +1,8 @@
 package no.stonedstonar.BookREST.model;
 
+import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
+import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
+
 import java.util.List;
 
 /**
@@ -12,14 +15,16 @@ public interface LentBooksRegister {
     /**
      * Adds a lent book to the register.
      * @param lentBook the book to add to the system.
+     * @throws DuplicateObjectException gets thrown if the lent book is already in the system.
      */
-    void addLentBook(LentBook lentBook);
+    void addLentBook(LentBook lentBook) throws DuplicateObjectException;
 
     /**
      * Removes a lent book from the system.
      * @param lentBook the lent book to remove.
+     * @throws RemoveObjectException gets thrown if the lent book could not be removed.
      */
-    void removeLentBook(LentBook lentBook);
+    void removeLentBook(LentBook lentBook) throws RemoveObjectException;
 
     /**
      * Gets all the due books for the whole library.
@@ -48,12 +53,4 @@ public interface LentBooksRegister {
      * @return a list with all the books for the user.
      */
     List<LentBook> getAllDueBooksForUser(long userID);
-
-    /**
-     * Gets all the books that are due in a certain branch.
-     * @param userId the id of the user.
-     * @param branchID the id of the branch.
-     * @return the list with all the books for this user.
-     */
-    List<LentBook> getAllDueBooksForUserInBranch(long userId, long branchID);
 }

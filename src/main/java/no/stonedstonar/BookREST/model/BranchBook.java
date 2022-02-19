@@ -1,6 +1,6 @@
 package no.stonedstonar.BookREST.model;
 /**
- *
+ * Represents a book in a branch. This book holds the ISBN to the original copy of the book.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */

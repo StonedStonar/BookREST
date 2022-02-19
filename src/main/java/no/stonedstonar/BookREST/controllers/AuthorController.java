@@ -3,7 +3,7 @@ package no.stonedstonar.BookREST.controllers;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.Author;
 import no.stonedstonar.BookREST.model.normalRegisters.NormalAuthorRegister;
-import no.stonedstonar.BookREST.model.RegisterTestData;
+import no.stonedstonar.BookREST.RegisterTestData;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
 import org.springframework.web.bind.annotation.*;
 

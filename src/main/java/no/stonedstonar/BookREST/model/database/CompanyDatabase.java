@@ -14,7 +14,7 @@ import java.sql.Statement;
 import java.util.List;
 
 /**
- *
+ * Represents a interface to a database with companies.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
