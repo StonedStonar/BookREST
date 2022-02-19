@@ -3,12 +3,16 @@ package no.stonedstonar.BookREST.model.database;
 import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.LentBooksRegister;
 import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
+import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 import org.apache.tomcat.jni.Local;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,8 +46,13 @@ public class LentBookDatabase implements LentBooksRegister {
     }
 
     @Override
-    public void removeLentBook(LentBook lentBook) {
+    public void removeLentBook(LentBook lentBook) throws RemoveObjectException {
         checkLentBook(lentBook);
+        try {
+            statement.executeUpdate("DELETE FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID());
+        } catch (SQLException exception) {
+            throw new RemoveObjectException("The lent book with branchbookID and userID " + lentBook.getBranchBookID() + " "  + lentBook.getUserID() + " could not be found.");
+        }
     }
 
     @Override
@@ -64,7 +73,27 @@ public class LentBookDatabase implements LentBooksRegister {
 
     @Override
     public List<LentBook> getAllDueBooksForUser(long userID) {
-        return null;
+        checkIfLongIsAboveZero(userID, "user id");
+        List<LentBook> lentBooks = new ArrayList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE personID = " + userID + ";");
+            while (resultSet.next()){
+                lentBooks.add(makeLentBookFromSQLStatement(resultSet));
+            }
+        } catch (SQLException exception) {
+
+        }
+        return lentBooks;
+    }
+
+    /**
+     * Makes a lent book from the input sql statement.
+     * @param resultSet the result set containing the lent book.
+     * @return the lent book from the result set.
+     * @throws SQLException gets thrown if the result set is empty.
+     */
+    private LentBook makeLentBookFromSQLStatement(ResultSet resultSet) throws SQLException {
+        return new LentBook(resultSet.getLong("branchBookID"), resultSet.getLong("userID"), resultSet.getDate("lentDate").toLocalDate(), resultSet.getDate("dueDate").toLocalDate());
     }
 
     /**
@@ -82,6 +111,17 @@ public class LentBookDatabase implements LentBooksRegister {
      */
     private String makeSQLString(String statement){
         return "\"" + statement + "\"";
+    }
+
+    /**
+     * Checks if the input long is above zero.
+     * @param number the number to check.
+     * @param prefix the prefix the error should have.
+     */
+    private void checkIfLongIsAboveZero(long number, String prefix){
+        if (number <= 0){
+            throw new IllegalArgumentException("The " + prefix + " must be above zero.");
+        }
     }
 
     /**

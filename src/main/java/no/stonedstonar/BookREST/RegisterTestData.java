@@ -4,6 +4,7 @@ import no.stonedstonar.BookREST.model.*;
 import no.stonedstonar.BookREST.model.database.LibraryDatabase;
 import no.stonedstonar.BookREST.model.exceptions.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,11 @@ public class RegisterTestData {
         bookRegister.addBook(new Book(9788202562939L, "Lars Monsen - mitt liv", authors2, 2020, 246, 2));
         bookRegister.addBook(new Book(9788234702235L, "Verden ifølge Vinni", authors3, 2021, 236, 3));
         bookRegister.addBook(new Book(9788202713461L, "Min skyld - en historie om frigjøring", authors4, 2021, 239, 2));
+    }
+
+    public static void addLentBooksToRegister(LentBooksRegister lentBooksRegister){
+        checkIfObjectIsNull(lentBooksRegister, "lent books register");
+        lentBooksRegister.addLentBook(new LentBook(1, 1, LocalDate.now(),));
     }
 
     /**
