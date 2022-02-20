@@ -3,6 +3,7 @@ package no.stonedstonar.BookREST;
 import no.stonedstonar.BookREST.model.*;
 import no.stonedstonar.BookREST.model.database.LibraryDatabase;
 import no.stonedstonar.BookREST.model.exceptions.*;
+import org.apache.tomcat.jni.Local;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -40,9 +41,18 @@ public class RegisterTestData {
         bookRegister.addBook(new Book(9788202713461L, "Min skyld - en historie om frigjøring", authors4, 2021, 239, 2));
     }
 
-    public static void addLentBooksToRegister(LentBooksRegister lentBooksRegister){
+    /**
+     *
+     * @param lentBooksRegister
+     * @throws DuplicateObjectException
+     */
+    public static void addLentBooksToRegister(LentBooksRegister lentBooksRegister) throws DuplicateObjectException {
         checkIfObjectIsNull(lentBooksRegister, "lent books register");
-        lentBooksRegister.addLentBook(new LentBook(1, 1, LocalDate.now(),));
+        lentBooksRegister.addLentBook(new LentBook(1, 1, LocalDate.now(), LocalDate.now().plusDays(1)));
+        lentBooksRegister.addLentBook(new LentBook(2, 1, LocalDate.now().minusDays(4), LocalDate.now().minusDays(1)));
+        lentBooksRegister.addLentBook(new LentBook(7, 1, LocalDate.now().minusDays(14), LocalDate.now().minusDays(10)));
+        lentBooksRegister.addLentBook(new LentBook(11, 2, LocalDate.now(), LocalDate.now().plusDays(15)));
+
     }
 
     /**

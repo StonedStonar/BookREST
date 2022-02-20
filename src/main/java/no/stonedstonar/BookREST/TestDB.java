@@ -8,7 +8,6 @@ import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.LocalDate;
 
 /**
  *
@@ -19,7 +18,20 @@ public class TestDB {
 
 
     public static void main(String[] args) {
-        System.out.println(LocalDate.now().toString());
+        makeTestLentBooks();
+    }
+
+
+    private static void makeTestLentBooks(){
+        try{
+            Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.1.10:3306/bookREST", "dekstop", "SzzSacbkbachw");
+            LentBooksRegister lentBooksRegister = new LentBookDatabase(connection);
+            RegisterTestData.addLentBooksToRegister(lentBooksRegister);
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        } catch (DuplicateObjectException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void makeTestBranchBooks(){

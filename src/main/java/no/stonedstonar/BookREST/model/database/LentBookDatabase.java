@@ -4,9 +4,7 @@ import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.LentBooksRegister;
 import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
-import org.apache.tomcat.jni.Local;
 
-import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a interface for lent books to a database.
+ * Represents an interface for lent books to a database.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
@@ -39,7 +37,10 @@ public class LentBookDatabase implements LentBooksRegister {
     public void addLentBook(LentBook lentBook) throws DuplicateObjectException {
         checkLentBook(lentBook);
         try {
-            statement.executeUpdate("INSERT INTO lentbook(branchBookID, personID, lentDate, dueDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString())  + "," + makeSQLString(lentBook.getDueDate().toString()) +  ")");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID() + ";");
+            if (!resultSet.next()) {
+                statement.executeUpdate("INSERT INTO lentbook(branchBookID, personID, lentDate, dueDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + ")");
+            }
         } catch (SQLException exception) {
             throw new DuplicateObjectException("The lent book with book and userID " + lentBook.getBranchBookID() + " " + lentBook.getUserID());
         }
@@ -53,11 +54,23 @@ public class LentBookDatabase implements LentBooksRegister {
         } catch (SQLException exception) {
             throw new RemoveObjectException("The lent book with branchbookID and userID " + lentBook.getBranchBookID() + " "  + lentBook.getUserID() + " could not be found.");
         }
+        try {
+            statement.execute("INSERT INTO lentbook(branchBookID, personID, lentDate, dueDate, returnedDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + "," + makeSQLString(LocalDate.now().toString()) + ")");
+        }catch (SQLException exception){
+            throw new RemoveObjectException("The lent book could not be added to the log.");
+        }
     }
 
     @Override
     public List<LentBook> getAllDueBooks() {
-        return null;
+        List<LentBook> lentBooks;
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE dueDate <= curdate();");
+            lentBooks = makeLentBooksFormResultSet(resultSet);
+        } catch (SQLException exception) {
+            lentBooks = new ArrayList<>();
+        }
+        return lentBooks;
     }
 
     @Override
@@ -71,17 +84,30 @@ public class LentBookDatabase implements LentBooksRegister {
         return null;
     }
 
+
     @Override
     public List<LentBook> getAllDueBooksForUser(long userID) {
         checkIfLongIsAboveZero(userID, "user id");
-        List<LentBook> lentBooks = new ArrayList<>();
+        List<LentBook> lentBooks;
         try {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE personID = " + userID + ";");
-            while (resultSet.next()){
-                lentBooks.add(makeLentBookFromSQLStatement(resultSet));
-            }
+            lentBooks = makeLentBooksFormResultSet(resultSet);
         } catch (SQLException exception) {
+            lentBooks = new ArrayList<>();
+        }
+        return lentBooks;
+    }
 
+    /**
+     * Makes lent books form result set.
+     * @param resultSet the result set with all the lent books.
+     * @return a list with all the lent books in them.
+     * @throws SQLException if the set is empty.
+     */
+    private List<LentBook> makeLentBooksFormResultSet(ResultSet resultSet) throws SQLException {
+        List<LentBook> lentBooks = new ArrayList<>();
+        while (resultSet.next()){
+            lentBooks.add(makeLentBookFromSQLStatement(resultSet));
         }
         return lentBooks;
     }

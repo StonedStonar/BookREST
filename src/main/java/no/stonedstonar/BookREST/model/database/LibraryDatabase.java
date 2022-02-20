@@ -103,8 +103,6 @@ public class LibraryDatabase {
         }
     }
 
-
-    
     /**
      * Checks if a string is of a valid format or not.
      * @param stringToCheck the string you want to check.
