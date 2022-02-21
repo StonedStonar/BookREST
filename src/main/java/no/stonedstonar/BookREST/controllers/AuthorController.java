@@ -1,12 +1,15 @@
 package no.stonedstonar.BookREST.controllers;
 
+import no.stonedstonar.BookREST.model.AuthorRegister;
+import no.stonedstonar.BookREST.model.JdbcConnection;
+import no.stonedstonar.BookREST.model.database.AuthorDatabase;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.Author;
-import no.stonedstonar.BookREST.model.normalRegisters.NormalAuthorRegister;
-import no.stonedstonar.BookREST.RegisterTestData;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -19,24 +22,31 @@ import java.util.List;
 @RequestMapping("/authors")
 public class AuthorController {
 
-    private NormalAuthorRegister normalAuthorRegister;
+    private final JdbcConnection jdbcConnection;
+
+    private AuthorRegister authorRegister;
 
     /**
       * Makes an instance of the AuthorController class.
-      */
-    public AuthorController() throws CouldNotAddAuthorException {
-        normalAuthorRegister = new NormalAuthorRegister();
-        RegisterTestData.addAuthorsToRegister(normalAuthorRegister);
+     * @param jdbcConnection
+     */
+    public AuthorController(JdbcConnection jdbcConnection) throws CouldNotAddAuthorException {
+        this.jdbcConnection = jdbcConnection;
+        try {
+            authorRegister = new AuthorDatabase(this.jdbcConnection.connect());
+        }catch (SQLException exception){
+            System.err.println("Could not connect the database.");
+        }
     }
 
     @GetMapping
     public List<Author> getAuthors(){
-        return normalAuthorRegister.getAuthorList();
+        return authorRegister.getAuthorList();
     }
 
     @GetMapping("/{id}")
     public Author getAuthorWithID(@PathVariable long id) throws CouldNotGetAuthorException {
-        return normalAuthorRegister.getAuthorById(id);
+        return authorRegister.getAuthorById(id);
     }
     
     /**

@@ -66,6 +66,7 @@ public class LibraryDatabase {
         checkIfLongIsAboveZero(branchID, "branch id");
         try {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM branch WHERE branchID = " + branchID + ";");
+            resultSet.next();
             Branch branch = getBranchFromSql(resultSet);
             return branch;
         } catch (SQLException exception) {

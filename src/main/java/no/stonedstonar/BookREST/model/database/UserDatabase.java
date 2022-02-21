@@ -71,6 +71,7 @@ public class UserDatabase implements UserRegister {
         try {
             ResultSet userSet = statement.executeQuery("SELECT * FROM person WHERE personID = " + userID + ";");
             ResultSet addressSet = statement.executeQuery("SELECT * FROM personAddress WHERE personID = " + userID + ";");
+            userSet.next();
             return makeSQLIntoUser(userSet, addressSet);
         } catch (SQLException exception) {
             throw new CouldNotGetUserException("The user with the id " + userID + " could not be found in the database.");

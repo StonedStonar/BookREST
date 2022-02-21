@@ -83,16 +83,21 @@ public class BookDatabase implements BookRegister {
         checkIfBookID(bookID);
         try {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM book WHERE isbn = " + bookID + ";");
-            ResultSet authorSet = statement.executeQuery("SELECT authorID FROM authorsofbook WHERE isbn == " + bookID + ";");
-            return makeSqlStatementIntoBook(resultSet, authorSet);
+            resultSet.next();
+            return makeSqlStatementIntoBook(resultSet);
         } catch (SQLException exception) {
             throw new CouldNotGetBookException("Could not get book with isbn " + bookID + ".");
         }
     }
 
-    private Book makeSqlStatementIntoBook(ResultSet bookResultSet, ResultSet authorResult) throws SQLException {
-        List<Long> autuhorIDs = getAuthorsIDs(authorResult);
-        return new Book(bookResultSet.getLong("isbn"), bookResultSet.getString("title"), autuhorIDs, bookResultSet.getInt("yearPublished"), bookResultSet.getInt("numberOfPages"), bookResultSet.getLong("publisherID"));
+    private Book makeSqlStatementIntoBook(ResultSet bookResultSet) throws SQLException {
+        String title = bookResultSet.getString("title");
+        long isbn = bookResultSet.getLong("isbn");
+        int yearPublihsed = bookResultSet.getInt("yearPublished");
+        int numberOfPages = bookResultSet.getInt("numberOfPages");
+        long publisherID = bookResultSet.getLong("publisherID");
+        List<Long> autuhorIDs = getAuthorsIDs(statement.executeQuery("SELECT * FROM authorsofbook WHERE isbn = " + isbn + ";"));
+        return new Book(isbn, title, autuhorIDs, yearPublihsed, numberOfPages,publisherID);
     }
 
     /**
@@ -139,7 +144,18 @@ public class BookDatabase implements BookRegister {
 
     @Override
     public List<Book> getBookList() {
-        return null;
+        List<Book> booksList = new LinkedList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM book");
+            resultSet.getFetchSize();
+            while (resultSet.next()){
+                booksList.add(makeSqlStatementIntoBook(resultSet));
+            }
+        } catch (SQLException exception) {
+            exception.getMessage();
+            booksList.clear();
+        }
+        return booksList;
     }
 
     /**

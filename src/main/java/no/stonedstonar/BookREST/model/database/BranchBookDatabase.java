@@ -54,6 +54,7 @@ public class BranchBookDatabase implements BranchBookRegister {
         checkIfLongIsAboveZero(branchBookID, "branch book id");
         try {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM branchbook WHERE branchBookID = " + branchBookID + ";");
+            resultSet.next();
             BranchBook branchBook = makeSQLIntoBranchBook(resultSet);
             return branchBook;
         } catch (SQLException exception) {

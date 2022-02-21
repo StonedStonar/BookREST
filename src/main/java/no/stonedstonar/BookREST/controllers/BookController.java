@@ -3,14 +3,17 @@ package no.stonedstonar.BookREST.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
+import no.stonedstonar.BookREST.model.BookRegister;
+import no.stonedstonar.BookREST.model.JdbcConnection;
+import no.stonedstonar.BookREST.model.database.BookDatabase;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.Book;
-import no.stonedstonar.BookREST.model.normalRegisters.NormalBookRegister;
-import no.stonedstonar.BookREST.RegisterTestData;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,13 +27,21 @@ import java.util.Optional;
 @RequestMapping("/books")
 public class BookController {
 
-    private NormalBookRegister normalBookRegister;
+    private final JdbcConnection jdbcConnection;
+
+    private BookRegister bookRegister;
+
     /**
       * Makes an instance of the BookController class.
-      */
-    public BookController() throws CouldNotAddBookException {
-        normalBookRegister = new NormalBookRegister();
-        RegisterTestData.addBooksToRegister(normalBookRegister);
+     * @param jdbcConnection
+     */
+    public BookController(JdbcConnection jdbcConnection) {
+        this.jdbcConnection = jdbcConnection;
+        try {
+            bookRegister = new BookDatabase(this.jdbcConnection.connect());
+        }catch (SQLException exception){
+            System.err.println("Could not connect the database.");
+        }
     }
 
     /**
@@ -40,9 +51,9 @@ public class BookController {
     @GetMapping
     public List<Book> getBooks(@RequestParam(value = "authorID", required = false) Optional<Long> optionalAuthorID){
         if (optionalAuthorID.isEmpty()){
-            return normalBookRegister.getBookList();
+            return bookRegister.getBookList();
         }else {
-            return normalBookRegister.getAllBooksOfAuthorID(optionalAuthorID.get());
+            return bookRegister.getAllBooksOfAuthorID(optionalAuthorID.get());
         }
     }
 
@@ -57,7 +68,7 @@ public class BookController {
             response = Book.class)
     @GetMapping("/{id}")
     public Book getBookById(@PathVariable long id) throws CouldNotGetBookException {
-        return normalBookRegister.getBook(id);
+        return bookRegister.getBook(id);
     }
 
     /**
@@ -70,7 +81,7 @@ public class BookController {
     public void postBook(@RequestBody String body) throws JsonProcessingException, CouldNotAddBookException {
         ObjectMapper objectMapper = new ObjectMapper();
         Book book = objectMapper.readValue(body, Book.class);
-        normalBookRegister.addBook(book);
+        bookRegister.addBook(book);
     }
 
     /**
@@ -83,7 +94,7 @@ public class BookController {
     public void changeBook(@RequestBody String body) throws JsonProcessingException, CouldNotGetBookException {
         ObjectMapper objectMapper = new ObjectMapper();
         Book newDetails = objectMapper.readValue(body, Book.class);
-        Book bookToChange = normalBookRegister.getBook(newDetails.getISBN());
+        Book bookToChange = bookRegister.getBook(newDetails.getISBN());
         String title = newDetails.getTitle();
         int year = newDetails.getYear();
         int pages = newDetails.getNumberOfPages();
@@ -124,8 +135,8 @@ public class BookController {
      */
     @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable long id) throws CouldNotGetBookException, CouldNotRemoveBookException {
-        Book book = normalBookRegister.getBook(id);
-        normalBookRegister.removeBook(book);
+        Book book = bookRegister.getBook(id);
+        bookRegister.removeBook(book);
     }
 
     /**

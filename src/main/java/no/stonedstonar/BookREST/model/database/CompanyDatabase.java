@@ -59,6 +59,7 @@ public class CompanyDatabase implements CompanyRegister {
         checkCompanyID(companyID);
         try {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM company WHERE companyID = " + companyID + ";");
+            resultSet.next();
             return makeSQLIntoCompany(resultSet);
         } catch (SQLException exception) {
             throw new CouldNotGetCompanyException("The company with the id " + companyID + " could not be found in the system.");

@@ -4,6 +4,8 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
 
+import java.util.List;
+
 /**
  * Represents a basic overview on what a author register should have of methods.
  * @version 0.1
@@ -32,4 +34,10 @@ public interface AuthorRegister {
      * @throws CouldNotGetAuthorException gets thrown if the author could not be found.
      */
     Author getAuthorById(long authorID) throws CouldNotGetAuthorException;
+
+    /**
+     * Gets the whole list of authors.
+     * @return a list with all the authors.
+     */
+    List<Author> getAuthorList();
 }

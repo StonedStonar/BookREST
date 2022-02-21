@@ -17,7 +17,7 @@ import java.util.Optional;
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
-public class NormalBookRegister implements BookRegister {
+public class NormalBookRegister implements no.stonedstonar.BookREST.model.BookRegister {
 
     private List<Book> bookList;
 
