@@ -5,6 +5,7 @@ import no.stonedstonar.BookREST.model.database.LibraryDatabase;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import org.apache.tomcat.jni.Local;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,17 @@ public class RegisterTestData {
         bookRegister.addBook(new Book(9788202562939L, "Lars Monsen - mitt liv", authors2, 2020, 246, 2));
         bookRegister.addBook(new Book(9788234702235L, "Verden ifølge Vinni", authors3, 2021, 236, 3));
         bookRegister.addBook(new Book(9788202713461L, "Min skyld - en historie om frigjøring", authors4, 2021, 239, 2));
+    }
+
+    /**
+     * Adds predefined returned book to register.
+     * @param lentBooksLog the lent books log to add to.
+     * @throws SQLException gets thrown if the connection to the SQL database is not stable.
+     * @throws DuplicateObjectException gets thrown if the returned book is already in the register.
+     */
+    public static void addReturnedBooksToRegister(LentBooksLog lentBooksLog) throws SQLException, DuplicateObjectException {
+        lentBooksLog.addReturnedLentBook(new ReturnedLentBook(1, 1, LocalDate.now().minusDays(3), LocalDate.now(), LocalDate.now()));
+        lentBooksLog.addReturnedLentBook(new ReturnedLentBook(5, 2, LocalDate.now().minusDays(7), LocalDate.now().minusDays(4), LocalDate.now().minusDays(3)));
     }
 
     /**
@@ -107,9 +119,9 @@ public class RegisterTestData {
      */
     public static void addUsersToRegister(UserRegister userRegister) throws CouldNotAddUserException {
         checkIfObjectIsNull(userRegister, "userregister");
-        userRegister.addUser(new User(1, "Bjarne", "Bjarnesen", "bjarne@bjarne.com"));
-        userRegister.addUser(new User(2, "Leif", "Lofsen", "leif@gmail.com"));
-        userRegister.addUser(new User(3, "Tbone", "Lavar", "t@gmail.com"));
+        userRegister.addUser(new User(1, "Bjarne", "Bjarnesen", "bjarne@bjarne.com", "pas"));
+        userRegister.addUser(new User(2, "Leif", "Lofsen", "leif@gmail.com", "password"));
+        userRegister.addUser(new User(3, "Tbone", "Lavar", "t@gmail.com", "pp"));
     }
 
     /**

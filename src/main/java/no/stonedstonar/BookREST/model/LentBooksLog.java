@@ -3,6 +3,7 @@ package no.stonedstonar.BookREST.model;
 import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public interface LentBooksLog{
      * @param returnedLentBook the returned book.
      * @throws DuplicateObjectException gets thrown if the returned book is already in the register.
      */
-    void addReturnedLentBook(ReturnedLentBook returnedLentBook) throws DuplicateObjectException;
+    void addReturnedLentBook(ReturnedLentBook returnedLentBook) throws DuplicateObjectException, SQLException;
 
     /**
      * Removes a returned book from the system.
@@ -32,5 +33,11 @@ public interface LentBooksLog{
      * @param branchID the branch ID this book belongs to.
      * @return all the different times this book has been lent.
      */
-    List<LentBook> getAllTheTimesBookHasBeenLent(long bookID, long branchID);
+    List<ReturnedLentBook> getAllTheTimesBookHasBeenLent(long bookID, long branchID) throws SQLException;
+
+    /**
+     * Gets all the lent books that are in the log.
+     * @return a list with all the lent books
+     */
+    List<ReturnedLentBook> getAllReturnedBooks() throws SQLException;
 }

@@ -15,6 +15,5 @@ public class DuplicateObjectException extends Exception implements Serializable 
      */
     public DuplicateObjectException(String message) {
         super(message);
-
     }
 }

@@ -79,13 +79,12 @@ public class CompanyController {
 
     /**
      * Adds a company to the register.
-     * @param body the body of the request.
+     * @param company the company to add.
      * @throws JsonProcessingException gets thrown when the JSON format is invalid.
      * @throws CouldNotAddCompanyException gets thrown if the company could not be added.
      */
     @PostMapping
-    public void postCompany(@RequestBody String body) throws JsonProcessingException, CouldNotAddCompanyException {
-        Company company = objectMapper.readValue(body, Company.class);
+    public void postCompany(@RequestBody Company company) throws JsonProcessingException, CouldNotAddCompanyException {
         companyRegister.addCompany(company);
     }
 

@@ -1,4 +1,7 @@
 package no.stonedstonar.BookREST.model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  *
  * @version 0.1
@@ -21,6 +24,7 @@ public class Author {
       * @param lastName the last name of the author.
       * @param birthYear the birth year of the author.
       */
+    @JsonCreator
     public Author(long ID, String firstName, String lastName, int birthYear){
         checkFirstName(firstName);
         checkLastName(lastName);

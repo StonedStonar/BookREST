@@ -1,5 +1,6 @@
 package no.stonedstonar.BookREST.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAddressException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAddressException;
 
@@ -25,12 +26,14 @@ public class User {
 
     private String password;
 
+
     /**
      * Makes an instance of the User class.
      * @param firstName the first name of the borrower.
      * @param lastName the last name of the borrower.
      * @param eMail the email of the user.
      */
+    @JsonCreator
     public User(long userID, String firstName, String lastName, String eMail, String password){
         checkFirstName(firstName);
         checkLastName(lastName);
@@ -42,6 +45,14 @@ public class User {
         this.eMail = eMail;
         this.userID = userID;
         this.password = password;
+    }
+
+    /**
+     * Gets the password of the user.
+     * @return the password of the user.
+     */
+    public String getPassword(){
+        return password;
     }
 
     /**

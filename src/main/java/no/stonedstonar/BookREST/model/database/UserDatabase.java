@@ -37,7 +37,7 @@ public class UserDatabase implements UserRegister {
     public void addUser(User user) throws CouldNotAddUserException {
         checkUser(user);
         try {
-            statement.executeUpdate("INSERT INTO person(personID, firstName, lastName, email) VALUES(" + user.getUserID() + "," + makeSQLString(user.getFirstName()) + "," + makeSQLString(user.getLastName()) + "," + makeSQLString(user.getEMail()) + ");");
+            statement.executeUpdate("INSERT INTO person(personID, firstName, lastName, email, pass) VALUES(" + user.getUserID() + "," + makeSQLString(user.getFirstName()) + "," + makeSQLString(user.getLastName()) + "," + makeSQLString(user.getEMail()) + "," +makeSQLString(user.getPassword()) + ");");
             List<Address> addressList = user.getAllAddresses();
             for (Address address : addressList){
                 try {
@@ -57,6 +57,7 @@ public class UserDatabase implements UserRegister {
         checkUser(user);
         try {
             statement.executeUpdate("DELETE FROM person WHERE personID = " + user.getUserID() + ";");
+            statement.executeUpdate("DELETE FROM personaddress WHERE personID = " + user.getUserID() + ";");
         } catch (SQLException exception) {
             throw new CouldNotRemoveUserException("The user with the userID " + user.getUserID() + " could not be removed from the system.");
         }
@@ -80,7 +81,7 @@ public class UserDatabase implements UserRegister {
         checkString(password, "password");
         User user;
         try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM user WHERE email = " + email + ";");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM person WHERE email = " + makeSQLString(email) + ";");
             user = makeSQLIntoUser(resultSet);
             if (!user.checkIfPasswordIsCorrect(password)){
                 throw new CouldNotLoginToUser("The passwords does not match on this user.");
@@ -112,10 +113,10 @@ public class UserDatabase implements UserRegister {
         }
 
         Statement statement2 = makeStatement();
-        ResultSet addressSet = statement2.executeQuery("SELECT * FROM personAddress WHERE personID = " + resultSet.getInt("userID") + ";");
+        ResultSet addressSet = statement2.executeQuery("SELECT * FROM personAddress WHERE personID = " + resultSet.getInt("personID") + ";");
 
         List<Address> addresses = makeSQLIntoAddress(addressSet);
-        User user = new User(resultSet.getLong("userID"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getString("email"), resultSet.getString("pass"));
+        User user = new User(resultSet.getLong("personID"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getString("email"), resultSet.getString("pass"));
         addresses.forEach(address -> {
             try {
                 user.addAddress(address);
