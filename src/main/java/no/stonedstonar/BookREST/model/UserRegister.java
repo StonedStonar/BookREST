@@ -2,6 +2,7 @@ package no.stonedstonar.BookREST.model;
 
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddUserException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetUserException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotLoginToUser;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveUserException;
 
 /**
@@ -32,5 +33,15 @@ public interface UserRegister {
      * @return
      */
     User getUserById(long userID) throws CouldNotGetUserException;
+
+    /**
+     * Gets the user if the input password matches the set password.
+     * @param email the email of the user.
+     * @param password the password of the user.
+     * @return the user that matches that email and password.
+     * @throws CouldNotGetUserException gets thrown if the user could not be found.
+     * @throws CouldNotLoginToUser gets thrown if the passwords does not match.
+     */
+    User loginToUser(String email, String password) throws CouldNotGetUserException, CouldNotLoginToUser;
 
 }

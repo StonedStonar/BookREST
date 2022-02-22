@@ -23,21 +23,25 @@ public class User {
 
     private final LinkedList<Address> addresses;
 
+    private String password;
+
     /**
      * Makes an instance of the User class.
      * @param firstName the first name of the borrower.
      * @param lastName the last name of the borrower.
      * @param eMail the email of the user.
      */
-    public User(long userID, String firstName, String lastName, String eMail){
+    public User(long userID, String firstName, String lastName, String eMail, String password){
         checkFirstName(firstName);
         checkLastName(lastName);
         checkUserID(userID);
+        checkPassword(password);
         addresses = new LinkedList<>();
         this.firstName = firstName;
         this.lastName = lastName;
         this.eMail = eMail;
         this.userID = userID;
+        this.password = password;
     }
 
     /**
@@ -64,6 +68,34 @@ public class User {
         if (!addresses.remove(address)){
             throw new CouldNotRemoveAddressException("The input address does not belong to this user.");
         }
+    }
+
+    /**
+     * Checks if the password is correct to the set password. This is case-sensitive.
+     * @param password the password to try.
+     * @return <code>true</code> if the passwords match.
+     *         <code>false</code> if the passwords does not match.
+     */
+    public boolean checkIfPasswordIsCorrect(String password){
+        checkPassword(password);
+        return this.password.equals(password);
+    }
+
+    /**
+     * Changes the password if the input is correct.
+     * @param newPassword the new password of the user.
+     * @param oldPassword the old password of the user.
+     * @return <code>true</code> if the password was changed.
+     *         <code>false</code> if the password was not changed.
+     */
+    public boolean changePassword(String newPassword, String oldPassword){
+        checkPassword(newPassword);
+        checkPassword(oldPassword);
+        boolean valid = checkIfPasswordIsCorrect(oldPassword);
+        if (valid){
+            this.password = newPassword;
+        }
+        return valid;
     }
 
     /**
@@ -155,6 +187,14 @@ public class User {
         if (number <= 0){
             throw new IllegalArgumentException("The " + prefix + " must be above zero.");
         }
+    }
+
+    /**
+     * Checks if the input password is not null and empty.
+     * @param password the password to check.
+     */
+    private void checkPassword(String password){
+        checkString(password, "password");
     }
 
 

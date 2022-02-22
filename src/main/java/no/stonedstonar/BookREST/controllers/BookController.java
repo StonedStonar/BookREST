@@ -140,6 +140,15 @@ public class BookController {
     }
 
     /**
+     * Handles a invalid JSON format request.
+     * @return the response accodring to exception.
+     */
+    @ExceptionHandler(JsonProcessingException.class)
+    public ResponseEntity<String> handleJsonFormatFault(){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Format on JSON file is invalid.");
+    }
+
+    /**
      * Handles the CouldNotGetBookException.
      * @param exception the exception that was thrown.
      * @return a response according to the exception.

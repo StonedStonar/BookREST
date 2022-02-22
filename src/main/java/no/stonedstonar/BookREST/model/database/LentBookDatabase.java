@@ -119,6 +119,9 @@ public class LentBookDatabase implements LentBooksRegister {
      * @throws SQLException gets thrown if the result set is empty.
      */
     private LentBook makeLentBookFromSQLStatement(ResultSet resultSet) throws SQLException {
+        if (resultSet.isBeforeFirst()){
+            resultSet.next();
+        }
         return new LentBook(resultSet.getLong("branchBookID"), resultSet.getLong("userID"), resultSet.getDate("lentDate").toLocalDate(), resultSet.getDate("dueDate").toLocalDate());
     }
 

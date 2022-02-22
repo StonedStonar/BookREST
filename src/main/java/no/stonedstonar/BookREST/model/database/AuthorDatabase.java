@@ -58,7 +58,6 @@ public class AuthorDatabase implements AuthorRegister {
     public Author getAuthorById(long authorID) throws CouldNotGetAuthorException {
         try {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM author WHERE authorID = " + authorID +  ";");
-            resultSet.next();
             return makeSQLIntoAuthor(resultSet);
         } catch (SQLException exception) {
             throw new CouldNotGetAuthorException("The author with the ID " + authorID + " is not in the system." );
@@ -86,6 +85,9 @@ public class AuthorDatabase implements AuthorRegister {
      * @throws SQLException gets thrown if the author could not be made.
      */
     private Author makeSQLIntoAuthor(ResultSet resultSet) throws SQLException {
+        if (resultSet.isBeforeFirst()){
+            resultSet.next();
+        }
         return new Author(resultSet.getLong("authorID"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getInt("birthYear"));
     }
 

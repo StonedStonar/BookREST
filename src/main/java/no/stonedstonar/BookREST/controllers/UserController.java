@@ -1,8 +1,14 @@
 package no.stonedstonar.BookREST.controllers;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import no.stonedstonar.BookREST.model.CompanyRegister;
+import no.stonedstonar.BookREST.model.JdbcConnection;
+import no.stonedstonar.BookREST.model.User;
+import no.stonedstonar.BookREST.model.UserRegister;
+import no.stonedstonar.BookREST.model.database.UserDatabase;
+import org.springframework.web.bind.annotation.*;
+
+import java.sql.SQLException;
 
 /**
  *
@@ -11,15 +17,35 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @CrossOrigin
-@RequestMapping("/company")
+@RequestMapping("/user")
 public class UserController {
+
+    private final JdbcConnection jdbcConnection;
+
+    private UserRegister userRegister;
+
+    private ObjectMapper objectMapper;
 
     /**
       * Makes an instance of the UserController class.
       */
-    public UserController(){
-    
+    public UserController(JdbcConnection jdbcConnection){
+        this.jdbcConnection = jdbcConnection;
+        try {
+            userRegister = new UserDatabase(jdbcConnection.connect());
+        }catch (SQLException exception){
+            System.err.println("Could not connect the database.");
+        }
+        this.objectMapper = new ObjectMapper();
     }
+
+    @GetMapping
+    public User loginToUser(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password){
+        checkString();
+
+    }
+
+
     
     /**
      * Checks if a string is of a valid format or not.

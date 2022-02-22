@@ -66,7 +66,6 @@ public class LibraryDatabase {
         checkIfLongIsAboveZero(branchID, "branch id");
         try {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM branch WHERE branchID = " + branchID + ";");
-            resultSet.next();
             Branch branch = getBranchFromSql(resultSet);
             return branch;
         } catch (SQLException exception) {
@@ -81,6 +80,9 @@ public class LibraryDatabase {
      * @throws SQLException gets thrown if the result set is empty.
      */
     private Branch getBranchFromSql(ResultSet resultSet) throws SQLException {
+        if (resultSet.isBeforeFirst()){
+            resultSet.next();
+        }
         return new Branch(resultSet.getLong("branchID"), resultSet.getString("branchName"));
     }
 

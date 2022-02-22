@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -59,7 +60,6 @@ public class CompanyDatabase implements CompanyRegister {
         checkCompanyID(companyID);
         try {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM company WHERE companyID = " + companyID + ";");
-            resultSet.next();
             return makeSQLIntoCompany(resultSet);
         } catch (SQLException exception) {
             throw new CouldNotGetCompanyException("The company with the id " + companyID + " could not be found in the system.");
@@ -68,7 +68,16 @@ public class CompanyDatabase implements CompanyRegister {
 
     @Override
     public List<Company> getAllCompanies() {
-        return null;
+        List<Company> companies = new LinkedList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM company;");
+            while (resultSet.next()){
+                companies.add(makeSQLIntoCompany(resultSet));
+            }
+        }catch (SQLException exception){
+            exception.printStackTrace();
+        }
+        return companies;
     }
 
     /**
@@ -78,6 +87,9 @@ public class CompanyDatabase implements CompanyRegister {
      * @throws SQLException gets thrown if the resultset is empty.
      */
     private Company makeSQLIntoCompany(ResultSet resultSet) throws SQLException {
+        if (resultSet.isBeforeFirst()){
+            resultSet.next();
+        }
         return new Company(resultSet.getLong("companyID"), resultSet.getString("companyName"));
     }
 

@@ -3,10 +3,7 @@ package no.stonedstonar.BookREST.model.database;
 import no.stonedstonar.BookREST.model.Address;
 import no.stonedstonar.BookREST.model.User;
 import no.stonedstonar.BookREST.model.UserRegister;
-import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAddressException;
-import no.stonedstonar.BookREST.model.exceptions.CouldNotAddUserException;
-import no.stonedstonar.BookREST.model.exceptions.CouldNotGetUserException;
-import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveUserException;
+import no.stonedstonar.BookREST.model.exceptions.*;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -69,25 +66,56 @@ public class UserDatabase implements UserRegister {
     public User getUserById(long userID) throws CouldNotGetUserException {
         checkUserID(userID);
         try {
+
             ResultSet userSet = statement.executeQuery("SELECT * FROM person WHERE personID = " + userID + ";");
-            ResultSet addressSet = statement.executeQuery("SELECT * FROM personAddress WHERE personID = " + userID + ";");
-            userSet.next();
-            return makeSQLIntoUser(userSet, addressSet);
+            return makeSQLIntoUser(userSet);
         } catch (SQLException exception) {
             throw new CouldNotGetUserException("The user with the id " + userID + " could not be found in the database.");
         }
     }
 
+    @Override
+    public User loginToUser(String email, String password) throws CouldNotGetUserException, CouldNotLoginToUser {
+        checkString(email, "email");
+        checkString(password, "password");
+        User user;
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM user WHERE email = " + email + ";");
+            user = makeSQLIntoUser(resultSet);
+            if (!user.checkIfPasswordIsCorrect(password)){
+                throw new CouldNotLoginToUser("The passwords does not match on this user.");
+            }
+        }catch (SQLException exception){
+            user = null;
+        }
+        return user;
+    }
+
+    /**
+     * Makes a new statement to execute querys on.
+     * @return a new statement to execute querys on.
+     * @throws SQLException gets thrown if the connection to the database is closed.
+     */
+    private Statement makeStatement() throws SQLException {
+        return statement.getConnection().createStatement();
+    }
+
     /**
      * Makes result set into a user object.
      * @param resultSet the user result set.
-     * @param addressSet the address result set.
      * @return the user.
      * @throws SQLException gets thrown if one of the result set is empty.
      */
-    private User makeSQLIntoUser(ResultSet resultSet, ResultSet addressSet) throws SQLException {
+    private User makeSQLIntoUser(ResultSet resultSet) throws SQLException {
+        if (resultSet.isBeforeFirst()){
+            resultSet.next();
+        }
+
+        Statement statement2 = makeStatement();
+        ResultSet addressSet = statement2.executeQuery("SELECT * FROM personAddress WHERE personID = " + resultSet.getInt("userID") + ";");
+
         List<Address> addresses = makeSQLIntoAddress(addressSet);
-        User user = new User(resultSet.getLong("userID"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getString("email"));
+        User user = new User(resultSet.getLong("userID"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getString("email"), resultSet.getString("pass"));
         addresses.forEach(address -> {
             try {
                 user.addAddress(address);
@@ -147,6 +175,18 @@ public class UserDatabase implements UserRegister {
     private void checkIfLongIsAboveZero(long number, String prefix){
         if (number <= 0){
             throw new IllegalArgumentException("The " + prefix + " must be above zero.");
+        }
+    }
+
+    /**
+     * Checks if a string is of a valid format or not.
+     * @param stringToCheck the string you want to check.
+     * @param errorPrefix the error the exception should have if the string is invalid.
+     */
+    private void checkString(String stringToCheck, String errorPrefix){
+        checkIfObjectIsNull(stringToCheck, errorPrefix);
+        if (stringToCheck.isEmpty()){
+            throw new IllegalArgumentException("The " + errorPrefix + " cannot be empty.");
         }
     }
 
