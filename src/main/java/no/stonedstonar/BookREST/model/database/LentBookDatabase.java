@@ -25,90 +25,94 @@ public class LentBookDatabase implements LentBooksRegister {
 
     /**
       * Makes an instance of the LentBookDatabase class.
+      * @param connection the connection to the database.
+      * @throws SQLException gets thrown if the connection to the DB could not be made.
       */
-    public LentBookDatabase(Connection connection){
-        try {
-            this.statement = connection.createStatement();
-        } catch (SQLException exception) {
-            exception.printStackTrace();
+    public LentBookDatabase(Connection connection) throws SQLException {
+        this.statement = connection.createStatement();
+    }
+
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
+    @Override
+    public void addLentBook(LentBook lentBook) throws DuplicateObjectException, SQLException {
+        checkLentBook(lentBook);
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID() + ";");
+        if (!resultSet.next()) {
+            statement.executeUpdate("INSERT INTO lentbook(branchBookID, personID, lentDate, dueDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + ")");
+        }else {
+            throw new DuplicateObjectException("The lent book with branch book id " + lentBook.getBranchBookID() + " is already lent out to someone");
         }
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void addLentBook(LentBook lentBook) throws DuplicateObjectException {
+    public void removeLentBook(LentBook lentBook) throws RemoveObjectException, SQLException {
         checkLentBook(lentBook);
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID() + ";");
-            if (!resultSet.next()) {
-                statement.executeUpdate("INSERT INTO lentbook(branchBookID, personID, lentDate, dueDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + ")");
-            }else {
-                throw new DuplicateObjectException("The lent book with branch book id " + lentBook.getBranchBookID() + " is already lent out to someone");
-            }
-        } catch (SQLException exception) {
-            throw new DuplicateObjectException("The lent book with book and userID " + lentBook.getBranchBookID() + " " + lentBook.getUserID());
-        }
-    }
-
-    @Override
-    public void removeLentBook(LentBook lentBook) throws RemoveObjectException {
-        checkLentBook(lentBook);
-        try {
-            statement.executeUpdate("DELETE FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID());
-        } catch (SQLException exception) {
+        int amount = statement.executeUpdate("DELETE FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID());;
+        if (amount == 0){
             throw new RemoveObjectException("The lent book with branchbookID and userID " + lentBook.getBranchBookID() + " "  + lentBook.getUserID() + " could not be found.");
         }
-        try {
-            statement.execute("INSERT INTO lentbookslog(branchBookID, personID, lentDate, dueDate, returnedDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + "," + makeSQLString(LocalDate.now().toString()) + ")");
-        }catch (SQLException exception){
-            throw new RemoveObjectException("The lent book could not be added to the log.");
-        }
+        statement.execute("INSERT INTO lentbookslog(branchBookID, personID, lentDate, dueDate, returnedDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + "," + makeSQLString(LocalDate.now().toString()) + ")");
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public LentBook getLentBook(long branchBookID) throws GetObjectException {
+    public LentBook getLentBook(long branchBookID) throws GetObjectException, SQLException {
         checkIfLongIsAboveZero(branchBookID, "branch book id");
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBooks WHERE branchBookID = " + branchBookID);
-            return makeLentBookFromSQLStatement(resultSet);
-        }catch (SQLException sqlException){
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBooks WHERE branchBookID = " + branchBookID);
+        if (!resultSet.next()){
             throw new GetObjectException("Could not get lent book with book branch id " + branchBookID + ".");
         }
+        return makeLentBookFromSQLStatement(resultSet);
+
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void removeLentBookByBranchBookID(long branchBookID) throws RemoveObjectException {
+    public void removeLentBookByBranchBookID(long branchBookID) throws RemoveObjectException, SQLException, GetObjectException {
         checkIfLongIsAboveZero(branchBookID, "branch book ID");
-        try {
-            removeLentBook(getLentBook(branchBookID));
-        }catch (GetObjectException getObjectException){
-            throw new RemoveObjectException(getObjectException.getMessage());
-        }
+        removeLentBook(getLentBook(branchBookID));
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public List<LentBook> getAllDueBooks() {
+    public List<LentBook> getAllDueBooks() throws SQLException {
         List<LentBook> lentBooks;
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE dueDate <= curdate();");
-            lentBooks = makeLentBooksFormResultSet(resultSet);
-        } catch (SQLException exception) {
-            lentBooks = new ArrayList<>();
-        }
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE dueDate <= curdate();");
+        lentBooks = makeLentBooksFormResultSet(resultSet);
         return lentBooks;
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
     public List<LentBook> getAllDueBooksForBranch(long branchID, int amountOfDays) {
         return null;
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
     public List<LentBook> getAllBooksWithBranchID(long branchID) {
-        //Todo: Usikker på hvordan denne kan gjøres bra.
+
         return null;
     }
 
-
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
     public List<LentBook> getAllDueBooksForUser(long userID) {
         checkIfLongIsAboveZero(userID, "user id");

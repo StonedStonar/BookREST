@@ -20,58 +20,65 @@ public class BranchBookDatabase implements BranchBookRegister {
     private Statement statement;
     /**
       * Makes an instance of the BranchBookDatabase class.
+      * @param connection the connection to the database.
+      * @throws SQLException gets thrown if the connection to the DB could not be made.
       */
-    public BranchBookDatabase(Connection connection){
-        try {
-            statement = connection.createStatement();
-        }catch (Exception exception){
-            System.err.println(exception.getMessage());
-        }
+    public BranchBookDatabase(Connection connection) throws SQLException {
+        statement = connection.createStatement();
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void addBranchBook(BranchBook branchBook) throws DuplicateObjectException {
+    public void addBranchBook(BranchBook branchBook) throws DuplicateObjectException, SQLException {
         checkBranchBook(branchBook);
-        try {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM branchBook");
+        if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO branchbook(branchBookID, isbn, branchID) VALUES("+ branchBook.getBranchBookID() + " ," + branchBook.getIsbn() + " , " + branchBook.getBranchID() + ");");
-        }catch (SQLException exception){
+        }else {
             throw new DuplicateObjectException("The branch book with id " + branchBook.getBranchBookID() + " is already in the system.");
         }
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void removeBranchBook(BranchBook branchBook) throws RemoveObjectException {
+    public void removeBranchBook(BranchBook branchBook) throws RemoveObjectException, SQLException {
         checkBranchBook(branchBook);
-        try {
-            statement.executeUpdate("DELETE FROM branchbook WHERE branchbookID = " + branchBook.getBranchBookID() + ";");
-        }catch (SQLException exception){
+        int amount = statement.executeUpdate("DELETE FROM branchbook WHERE branchbookID = " + branchBook.getBranchBookID() + ";");
+        if (amount == 0){
             throw new RemoveObjectException("Could not remove branch book with id " + branchBook.getBranchBookID() + ".");
         }
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public BranchBook getBranchBook(long branchBookID) throws GetObjectException {
+    public BranchBook getBranchBook(long branchBookID) throws GetObjectException, SQLException {
         checkIfLongIsAboveZero(branchBookID, "branch book id");
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM branchbook WHERE branchBookID = " + branchBookID + ";");
-            BranchBook branchBook = makeSQLIntoBranchBook(resultSet);
-            return branchBook;
-        } catch (SQLException exception) {
+
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM branchbook WHERE branchBookID = " + branchBookID + ";");
+        if (!resultSet.next()){
             throw new GetObjectException("Could not get branch book with id " + branchBookID + ".");
         }
+        return makeSQLIntoBranchBook(resultSet);
+
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public List<BranchBook> getAllBranchBooksForBranchWithID(long branchID) {
+    public List<BranchBook> getAllBranchBooksForBranchWithID(long branchID) throws SQLException {
         checkIfLongIsAboveZero(branchID, "branch ID");
         List<BranchBook> branchBooks = new ArrayList<>();
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM branchBook WHERE branchID = " + branchID + ";");
-            while (resultSet.next()){
-                branchBooks.add(makeSQLIntoBranchBook(resultSet));
-            }
-        } catch (SQLException exception) {
 
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM branchBook WHERE branchID = " + branchID + ";");
+        while (resultSet.next()){
+            branchBooks.add(makeSQLIntoBranchBook(resultSet));
         }
         return branchBooks;
     }
@@ -87,15 +94,6 @@ public class BranchBookDatabase implements BranchBookRegister {
             resultSet.next();
         }
         return new BranchBook(resultSet.getLong("branchbookID"), resultSet.getLong("isbn"), resultSet.getLong("branchID"));
-    }
-
-    /**
-     * Makes a string into the format SQL needs for a string. The quotes is added. So hi turns into "hi".
-     * @param statement the statement you want to make into a string.
-     * @return a string with " around it.
-     */
-    private String makeSQLString(String statement){
-        return "\"" + statement + "\"";
     }
 
     /**

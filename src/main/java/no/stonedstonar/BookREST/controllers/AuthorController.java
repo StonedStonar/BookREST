@@ -34,9 +34,11 @@ public class AuthorController {
         this.jdbcConnection = jdbcConnection;
         try {
             authorRegister = new AuthorDatabase(this.jdbcConnection.connect());
+
         }catch (SQLException exception){
             System.err.println("Could not connect the database.");
         }
+
     }
 
     @GetMapping

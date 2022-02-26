@@ -19,86 +19,110 @@ public class BookDatabase implements BookRegister {
 
     private Statement statement;
 
-    //"jdbc:mysql://localhost:3306/bookREST", "root", "SzzSacbkbachw"
     /**
       * Makes an instance of the BookDatabase class.
       * @param connection the connection to the database.
+      * @throws SQLException gets thrown if the connection to the DB could not be made.
       */
-    public BookDatabase(Connection connection){
-        try {
-            statement = connection.createStatement();
-        }catch (Exception exception){
-            System.err.println(exception.getMessage());
-        }
+    public BookDatabase(Connection connection) throws SQLException {
+        statement = connection.createStatement();
     }
 
-
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void addBook(Book book) throws CouldNotAddBookException {
+    public void addBook(Book book) throws CouldNotAddBookException, SQLException {
         checkBook(book);
-        try {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM book WHERE ISBN = " + book.getISBN());
+        if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO book(isbn, title, yearPublished, numberOfPages, publisherID) VALUES(" + book.getISBN() + "," +  makeSQLString(book.getTitle()) + "," + book.getYear() + "," + book.getNumberOfPages() + "," + book.getPublisherID() + ");");
             Iterator<Long> it = book.getAuthors().iterator();
             while (it.hasNext()){
                 long authorID = it.next();
                 statement.executeUpdate("INSERT INTO authorsOfBook(authorID, isbn) VALUES(" + authorID + "," + book.getISBN() + ");");
             }
-        }catch (SQLException exception) {
+        }else {
             throw new CouldNotAddBookException("The book could not be added.");
         }
+
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void removeBook(Book book) throws CouldNotRemoveBookException {
+    public void removeBook(Book book) throws CouldNotRemoveBookException, SQLException {
         checkBook(book);
         removeBookByID(book.getISBN());
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void removeBookByID(long ID) throws CouldNotRemoveBookException {
+    public void removeBookByID(long ID) throws CouldNotRemoveBookException, SQLException {
         checkIfBookID(ID);
-        try {
-            statement.executeUpdate("DELETE FROM book WHERE isbn = " +  ID + ";");
-        }catch (SQLException exception) {
+        int amount = statement.executeUpdate("DELETE FROM book WHERE isbn = " +  ID + ";");
+        if (amount == 0){
             throw new CouldNotRemoveBookException("Could not remove the book with id " + ID + ".");
         }
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public List<Book> getAllBooksOfAuthorID(long authorID) {
+    public List<Book> getAllBooksOfAuthorID(long authorID) throws SQLException {
         List<Book> bookList = new LinkedList<>();
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT isbn FROM authorsofbook WHERE authorID = " + authorID + ";");
-            while (resultSet.next()){
-                Book book = getBook(resultSet.getLong("isbn"));
-                bookList.add(book);
-            }
-        } catch (SQLException | CouldNotGetBookException exception) {
-            System.err.println("Something has gone wrong in getting books of author.");
+        ResultSet resultSet = statement.executeQuery("SELECT isbn FROM authorsofbook WHERE authorID = " + authorID + ";");
+        while (resultSet.next()){
+            Book book = makeSqlStatementIntoBook(resultSet);
+            bookList.add(book);
         }
+
         return bookList;
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public Book getBook(long bookID) throws CouldNotGetBookException {
+    public Book getBook(long bookID) throws CouldNotGetBookException, SQLException {
         checkIfBookID(bookID);
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM book WHERE isbn = " + bookID + ";");
-            resultSet.next();
-            return makeSqlStatementIntoBook(resultSet, makeStatement());
-        } catch (SQLException exception) {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM book WHERE isbn = " + bookID + ";");
+        resultSet.next();
+        if (!resultSet.next()){
             throw new CouldNotGetBookException("Could not get book with isbn " + bookID + ".");
         }
+        return makeSqlStatementIntoBook(resultSet);
+
+
+
     }
 
     /**
-     *
-     * @param bookResultSet
-     * @param statementAuthor
-     * @return
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
+    @Override
+    public List<Book> getBookList() throws SQLException {
+        List<Book> booksList = new LinkedList<>();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM book");
+        while (resultSet.next()){
+            if (!resultSet.isAfterLast()){
+                booksList.add(makeSqlStatementIntoBook(resultSet));
+            }
+        }
+        return booksList;
+    }
+
+    /**
+     * Makes a sql statement into a book.
+     * @param bookResultSet the result set with the book.
+     * @return a complete book with all its details.
      * @throws SQLException gets thrown if the result set is empty or the connection to the database is closed.
      */
-    private Book makeSqlStatementIntoBook(ResultSet bookResultSet, Statement statementAuthor) throws SQLException {
+    private Book makeSqlStatementIntoBook(ResultSet bookResultSet) throws SQLException {
         if(bookResultSet.isBeforeFirst()){
             bookResultSet.next();
         }
@@ -107,7 +131,7 @@ public class BookDatabase implements BookRegister {
         int yearPublihsed = bookResultSet.getInt("yearPublished");
         int numberOfPages = bookResultSet.getInt("numberOfPages");
         long publisherID = bookResultSet.getLong("publisherID");
-        List<Long> autuhorIDs = getAuthorsIDs(statementAuthor.executeQuery("SELECT * FROM authorsOfBook WHERE isbn = " + isbn + ";"));
+        List<Long> autuhorIDs = getAuthorsIDs(makeStatement().executeQuery("SELECT * FROM authorsOfBook WHERE isbn = " + isbn + ";"));
         return new Book(isbn, title, autuhorIDs, yearPublihsed, numberOfPages,publisherID);
     }
 
@@ -160,23 +184,6 @@ public class BookDatabase implements BookRegister {
      */
     private void checkBook(Book bookToCheck){
         checkIfObjectIsNull(bookToCheck, "book");
-    }
-
-    @Override
-    public List<Book> getBookList() {
-        List<Book> booksList = new LinkedList<>();
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM book");
-            while (resultSet.next()){
-                if (!resultSet.isAfterLast()){
-                    booksList.add(makeSqlStatementIntoBook(resultSet, makeStatement()));
-                }
-            }
-        } catch (SQLException exception) {
-            exception.getMessage();
-            booksList.clear();
-        }
-        return booksList;
     }
 
     /**

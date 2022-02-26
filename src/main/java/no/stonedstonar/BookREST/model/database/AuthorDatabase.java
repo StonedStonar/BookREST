@@ -24,56 +24,60 @@ public class AuthorDatabase implements AuthorRegister {
     /**
       * Makes an instance of the AuthorDatabase class.
       * @param connection the connection to the database.
+      * @throws SQLException gets thrown if the connection to the DB could not be made.
       */
-    public AuthorDatabase(Connection connection){
-        try {
-            statement = connection.createStatement();
-        }catch (Exception exception){
-            System.err.println(exception.getMessage());
-        }
+    public AuthorDatabase(Connection connection) throws SQLException {
+        statement = connection.createStatement();
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void addAuthor(Author author) throws CouldNotAddAuthorException {
+    public void addAuthor(Author author) throws CouldNotAddAuthorException, SQLException {
         checkAuthor(author);
-        try {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM author WERE authorID = " + author.getID());
+        if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO author(authorID, firstName, lastName, birthYear) VALUES (" + author.getID()  + "," +  makeSQLString(author.getFirstName()) + "," + makeSQLString(author.getLastName()) + "," + author.getBirthYear() + ")");
-        } catch (SQLException exception) {
+        }else {
             throw new CouldNotAddAuthorException("The author with the id " + author.getID() + " is already in the system.");
         }
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void removeAuthor(Author author) throws CouldNotRemoveAuthorException {
+    public void removeAuthor(Author author) throws CouldNotRemoveAuthorException, SQLException {
         checkAuthor(author);
-        try {
-            statement.executeUpdate("DELETE FROM author WHERE authorID = " + author.getID());
-
-        } catch (SQLException exception) {
+        int amount = statement.executeUpdate("DELETE FROM author WHERE authorID = " + author.getID());
+        if (amount == 0){
             throw new CouldNotRemoveAuthorException("The author with the id " + author.getID() + " is not in the system.");
         }
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public Author getAuthorById(long authorID) throws CouldNotGetAuthorException {
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM author WHERE authorID = " + authorID +  ";");
-            return makeSQLIntoAuthor(resultSet);
-        } catch (SQLException exception) {
+    public Author getAuthorById(long authorID) throws CouldNotGetAuthorException, SQLException {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM author WHERE authorID = " + authorID +  ";");
+        if (!resultSet.next()){
             throw new CouldNotGetAuthorException("The author with the ID " + authorID + " is not in the system." );
         }
+        return makeSQLIntoAuthor(resultSet);
+
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public List<Author> getAuthorList() {
+    public List<Author> getAuthorList() throws SQLException {
         List<Author> authors = new LinkedList<>();
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM author;");
-            while (resultSet.next()){
-                authors.add(makeSQLIntoAuthor(resultSet));
-            }
-        }catch (SQLException exception){
-            authors.clear();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM author;");
+        while (resultSet.next()){
+            authors.add(makeSQLIntoAuthor(resultSet));
         }
         return authors;
     }

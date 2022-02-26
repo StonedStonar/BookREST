@@ -26,56 +26,61 @@ public class CompanyDatabase implements CompanyRegister {
     /**
       * Makes an instance of the CompanyDatabase class.
       * @param connection the connection to the database.
+      * @throws SQLException gets thrown if the connection to the DB could not be made.
       */
-    public CompanyDatabase(Connection connection){
-        try {
-            statement = connection.createStatement();
-        }catch (Exception exception){
-            System.err.println(exception.getMessage());
-        }
+    public CompanyDatabase(Connection connection) throws SQLException {
+        statement = connection.createStatement();
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void addCompany(Company company) throws CouldNotAddCompanyException {
+    public void addCompany(Company company) throws CouldNotAddCompanyException, SQLException {
         checkCompany(company);
-        try {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM company WHERE companyID = " + company.getCompanyName());
+        if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO company(companyID, companyName) VALUES(" + company.getCompanyID() + "," + makeSQLString(company.getCompanyName())+ ");");
-        } catch (SQLException exception) {
+        }else {
             throw new CouldNotAddCompanyException("The company with the id " + company.getCompanyID() + " is already in the system." );
         }
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public void removeCompanyWithID(long companyID) throws CouldNotRemoveCompanyException {
+    public void removeCompanyWithID(long companyID) throws CouldNotRemoveCompanyException, SQLException {
         checkCompanyID(companyID);
-        try {
-            statement.executeUpdate("DELETE FROM company WHERE companyID = " + companyID + ";");
-        } catch (SQLException exception) {
+        int amount = statement.executeUpdate("DELETE FROM company WHERE companyID = " + companyID + ";");
+        if (amount == 0){
             throw new CouldNotRemoveCompanyException("The company with the id " + companyID + " could not be found.");
         }
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public Company getCompanyWithID(long companyID) throws CouldNotGetCompanyException {
+    public Company getCompanyWithID(long companyID) throws CouldNotGetCompanyException, SQLException {
         checkCompanyID(companyID);
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM company WHERE companyID = " + companyID + ";");
-            return makeSQLIntoCompany(resultSet);
-        } catch (SQLException exception) {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM company WHERE companyID = " + companyID + ";");
+        if (!resultSet.next()){
             throw new CouldNotGetCompanyException("The company with the id " + companyID + " could not be found in the system.");
         }
+        return makeSQLIntoCompany(resultSet);
+
     }
 
+    /**
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     */
     @Override
-    public List<Company> getAllCompanies() {
+    public List<Company> getAllCompanies() throws SQLException {
         List<Company> companies = new LinkedList<>();
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM company;");
-            while (resultSet.next()){
-                companies.add(makeSQLIntoCompany(resultSet));
-            }
-        }catch (SQLException exception){
-            exception.printStackTrace();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM company;");
+        while (resultSet.next()){
+            companies.add(makeSQLIntoCompany(resultSet));
         }
         return companies;
     }

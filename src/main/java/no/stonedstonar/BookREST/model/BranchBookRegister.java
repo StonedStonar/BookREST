@@ -4,6 +4,7 @@ import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
 import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -18,14 +19,14 @@ public interface BranchBookRegister {
      * @param branchBook the branch book to add.
      * @throws DuplicateObjectException gets thrown if the branch book with the same ID is already in the register.
      */
-    void addBranchBook(BranchBook branchBook) throws DuplicateObjectException;
+    void addBranchBook(BranchBook branchBook) throws DuplicateObjectException, SQLException;
 
     /**
      * Removes a branch book from the system.
      * @param branchBook the branch book to remove.
      * @throws RemoveObjectException gets thrown if the branch book could not be removed.
      */
-    void removeBranchBook(BranchBook branchBook) throws RemoveObjectException;
+    void removeBranchBook(BranchBook branchBook) throws RemoveObjectException, SQLException;
 
     /**
      * Gets a branch book.
@@ -33,12 +34,12 @@ public interface BranchBookRegister {
      * @return the branch book that matches the ID.
      * @throws GetObjectException gets thrown if there is no book with that branch book id in the system.
      */
-    BranchBook getBranchBook(long branchBookID) throws GetObjectException;
+    BranchBook getBranchBook(long branchBookID) throws GetObjectException, SQLException;
 
     /**
      * Gets all the branch books for the branch with the input ID.
      * @param branchID the branch ID.
      * @return a list with all the books for the branch.
      */
-    List<BranchBook> getAllBranchBooksForBranchWithID(long branchID);
+    List<BranchBook> getAllBranchBooksForBranchWithID(long branchID) throws SQLException;
 }

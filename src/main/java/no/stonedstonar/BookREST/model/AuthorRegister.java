@@ -4,6 +4,7 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -18,14 +19,14 @@ public interface AuthorRegister {
      * @param author the author to add.
      * @throws CouldNotAddAuthorException gets thrown if the author is already in the register.
      */
-    void addAuthor(Author author) throws CouldNotAddAuthorException;
+    void addAuthor(Author author) throws CouldNotAddAuthorException, SQLException;
 
     /**
      * Removes an author from the register.
      * @param author the author to remove.
      * @throws CouldNotRemoveAuthorException gets thrown if the author could not be removed form the register.
      */
-    void removeAuthor(Author author) throws CouldNotRemoveAuthorException;
+    void removeAuthor(Author author) throws CouldNotRemoveAuthorException, SQLException;
 
     /**
      * Gets an author by its ID.
@@ -33,11 +34,11 @@ public interface AuthorRegister {
      * @return a author that has that ID.
      * @throws CouldNotGetAuthorException gets thrown if the author could not be found.
      */
-    Author getAuthorById(long authorID) throws CouldNotGetAuthorException;
+    Author getAuthorById(long authorID) throws CouldNotGetAuthorException, SQLException;
 
     /**
      * Gets the whole list of authors.
      * @return a list with all the authors.
      */
-    List<Author> getAuthorList();
+    List<Author> getAuthorList() throws SQLException;
 }

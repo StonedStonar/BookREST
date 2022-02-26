@@ -4,6 +4,7 @@ import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
 import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -18,14 +19,14 @@ public interface LentBooksRegister {
      * @param lentBook the book to add to the system.
      * @throws DuplicateObjectException gets thrown if the lent book is already in the system.
      */
-    void addLentBook(LentBook lentBook) throws DuplicateObjectException;
+    void addLentBook(LentBook lentBook) throws DuplicateObjectException, SQLException;
 
     /**
      * Removes a lent book from the system.
      * @param lentBook the lent book to remove.
      * @throws RemoveObjectException gets thrown if the lent book could not be removed.
      */
-    void removeLentBook(LentBook lentBook) throws RemoveObjectException;
+    void removeLentBook(LentBook lentBook) throws RemoveObjectException, SQLException;
 
     /**
      * Gets a lent book with branch id.
@@ -33,20 +34,20 @@ public interface LentBooksRegister {
      * @return the lent book that matches the branch book id.
      * @throws GetObjectException gets thrown if the lent book could not be located.
      */
-    LentBook getLentBook(long branchBookID) throws GetObjectException;
+    LentBook getLentBook(long branchBookID) throws GetObjectException, SQLException;
 
     /**
      * Removes a lent book with branch book id.
      * @param branchBookID the branch book id to remove.
      * @throws RemoveObjectException gets thrown if the book could not be removed.
      */
-    void removeLentBookByBranchBookID(long branchBookID) throws RemoveObjectException;
+    void removeLentBookByBranchBookID(long branchBookID) throws RemoveObjectException, SQLException, GetObjectException;
 
     /**
      * Gets all the due books for the whole library.
      * @return a list with all the due books.
      */
-    List<LentBook> getAllDueBooks();
+    List<LentBook> getAllDueBooks() throws SQLException;
 
     /**
      * Gets all due books for a branch.
