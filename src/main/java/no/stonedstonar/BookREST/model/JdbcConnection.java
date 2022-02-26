@@ -15,14 +15,8 @@ import java.sql.SQLException;
 @Component
 public class JdbcConnection {
 
-    @Value("${db.ip}")
-    private String ip;
-
-    @Value("${db.port}")
-    private int port;
-
-    @Value("${db.name}")
-    private String databaseName;
+    @Value("${db.address}")
+    private String address;
 
     @Value("${db.user}")
     private String user;
@@ -44,8 +38,7 @@ public class JdbcConnection {
      */
     public Connection connect() throws SQLException {
         if (connection == null || connection.isClosed()){
-            connection = DriverManager.getConnection("jdbc:mysql://" + ip +":" + port  + "/" + databaseName, user
-                    , password);
+            connection = DriverManager.getConnection(address, user, password);
         }
         return connection;
     }

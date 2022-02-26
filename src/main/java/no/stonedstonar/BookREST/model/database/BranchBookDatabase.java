@@ -33,9 +33,10 @@ public class BranchBookDatabase implements BranchBookRegister {
     @Override
     public void addBranchBook(BranchBook branchBook) throws DuplicateObjectException, SQLException {
         checkBranchBook(branchBook);
+
         ResultSet resultSet = statement.executeQuery("SELECT * FROM branchBook");
         if (!resultSet.next()){
-            statement.executeUpdate("INSERT INTO branchbook(branchBookID, isbn, branchID) VALUES("+ branchBook.getBranchBookID() + " ," + branchBook.getIsbn() + " , " + branchBook.getBranchID() + ");");
+            statement.executeUpdate("INSERT INTO branchBook(branchBookID, isbn, branchID) VALUES("+ branchBook.getBranchBookID() + " ," + branchBook.getIsbn() + " , " + branchBook.getBranchID() + ");");
         }else {
             throw new DuplicateObjectException("The branch book with id " + branchBook.getBranchBookID() + " is already in the system.");
         }
@@ -47,7 +48,7 @@ public class BranchBookDatabase implements BranchBookRegister {
     @Override
     public void removeBranchBook(BranchBook branchBook) throws RemoveObjectException, SQLException {
         checkBranchBook(branchBook);
-        int amount = statement.executeUpdate("DELETE FROM branchbook WHERE branchbookID = " + branchBook.getBranchBookID() + ";");
+        int amount = statement.executeUpdate("DELETE FROM branchBook WHERE branchbookID = " + branchBook.getBranchBookID() + ";");
         if (amount == 0){
             throw new RemoveObjectException("Could not remove branch book with id " + branchBook.getBranchBookID() + ".");
         }

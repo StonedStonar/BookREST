@@ -6,6 +6,7 @@ import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
 import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,7 +41,7 @@ public class LentBookDatabase implements LentBooksRegister {
         checkLentBook(lentBook);
         ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID() + ";");
         if (!resultSet.next()) {
-            statement.executeUpdate("INSERT INTO lentbook(branchBookID, personID, lentDate, dueDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + ")");
+            statement.executeUpdate("INSERT INTO lentBook(branchBookID, personID, lentDate, dueDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + ")");
         }else {
             throw new DuplicateObjectException("The lent book with branch book id " + lentBook.getBranchBookID() + " is already lent out to someone");
         }
@@ -52,6 +53,7 @@ public class LentBookDatabase implements LentBooksRegister {
     @Override
     public void removeLentBook(LentBook lentBook) throws RemoveObjectException, SQLException {
         checkLentBook(lentBook);
+
         int amount = statement.executeUpdate("DELETE FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID());;
         if (amount == 0){
             throw new RemoveObjectException("The lent book with branchbookID and userID " + lentBook.getBranchBookID() + " "  + lentBook.getUserID() + " could not be found.");
@@ -88,8 +90,10 @@ public class LentBookDatabase implements LentBooksRegister {
     @Override
     public List<LentBook> getAllDueBooks() throws SQLException {
         List<LentBook> lentBooks;
+
         ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE dueDate <= curdate();");
         lentBooks = makeLentBooksFormResultSet(resultSet);
+
         return lentBooks;
     }
 
@@ -105,9 +109,12 @@ public class LentBookDatabase implements LentBooksRegister {
      * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     @Override
-    public List<LentBook> getAllBooksWithBranchID(long branchID) {
-
-        return null;
+    public List<LentBook> getAllBooksWithBranchID(long branchID) throws SQLException {
+        ResultSet resultSet = statement.executeQuery("SELECT *\n" +
+                "FROM lentBook\n" +
+                "JOIN branchBook USING(branchBookID)\n" +
+                "WHERE branchID = " + branchID + ";");
+        return makeLentBooksFormResultSet(resultSet);
     }
 
     /**

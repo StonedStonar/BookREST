@@ -40,7 +40,7 @@ public class LentBooksLogDatabase implements LentBooksLog {
     @Override
     public void addReturnedLentBook(ReturnedLentBook returnedLentBook) throws SQLException {
         checkReturnedBook(returnedLentBook);
-        statement.executeUpdate("INSERT INTO lentbookslog(branchBookID, personID, lentDate, dueDate, returnedDate) " +
+        statement.executeUpdate("INSERT INTO lentBooksLog(branchBookID, personID, lentDate, dueDate, returnedDate) " +
                     "VALUES(" + returnedLentBook.getBranchBookID() + "," + returnedLentBook.getUserID() + ","+
                     makeSQLString(returnedLentBook.getLentDate().toString()) + "," + makeSQLString(returnedLentBook.getDueDate().toString()) + ","
                     + makeSQLString(returnedLentBook.getReturnedDate().toString())+ " );");
@@ -60,7 +60,7 @@ public class LentBooksLogDatabase implements LentBooksLog {
      */
     @Override
     public List<ReturnedLentBook> getAllTheTimesBookHasBeenLent(long branchBookID, long branchID) throws SQLException {
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbookslog WHERE branchBookID = " + branchBookID + " AND branchID = " + branchBookID + ";");
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBooksLog WHERE branchBookID = " + branchBookID + " AND branchID = " + branchBookID + ";");
         return makeReturnedLentBooksList(resultSet);
     }
 
@@ -69,7 +69,7 @@ public class LentBooksLogDatabase implements LentBooksLog {
      */
     @Override
     public List<ReturnedLentBook> getAllReturnedBooks() throws SQLException {
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbookslog");
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBooksLog");
         return makeReturnedLentBooksList(resultSet);
     }
 

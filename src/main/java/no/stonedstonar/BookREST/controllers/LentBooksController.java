@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import no.stonedstonar.BookREST.model.JdbcConnection;
 import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.LentBooksRegister;
-import no.stonedstonar.BookREST.model.ReturnedLentBook;
 import no.stonedstonar.BookREST.model.database.LentBookDatabase;
 import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
@@ -48,7 +47,7 @@ public class LentBooksController {
      * @return a list with all the books.
      */
     @GetMapping
-    public List<LentBook> getLentBooks(@RequestParam(value = "branchID", required = false) Optional<Long> branchID){
+    public List<LentBook> getLentBooks(@RequestParam(value = "branchID", required = false) Optional<Long> branchID) throws SQLException {
         List<LentBook> returnedLentBooks;
         if (branchID.isEmpty()){
             returnedLentBooks = lentBooksRegister.getAllDueBooks();
@@ -64,7 +63,7 @@ public class LentBooksController {
      * @throws DuplicateObjectException gets thrown if the branch book id is already lent out.
      */
     @PostMapping
-    public void addLentBook(@RequestBody LentBook lentBook) throws DuplicateObjectException {
+    public void addLentBook(@RequestBody LentBook lentBook) throws DuplicateObjectException, SQLException {
         lentBooksRegister.addLentBook(lentBook);
     }
 
@@ -74,8 +73,7 @@ public class LentBooksController {
      * @throws RemoveObjectException gets thrown if the lent book could not be found.
      */
     @DeleteMapping
-    public void removeLentBook(@RequestParam(value = "branchBookID") long branchBookID) throws RemoveObjectException {
-        //Todo: Fiks det slik at man kan bestemme datoen den skal være returnert.
+    public void removeLentBook(@RequestParam(value = "branchBookID") long branchBookID) throws RemoveObjectException, SQLException, GetObjectException {
         lentBooksRegister.removeLentBookByBranchBookID(branchBookID);
     }
 
@@ -107,6 +105,16 @@ public class LentBooksController {
     @ExceptionHandler(RemoveObjectException.class)
     public ResponseEntity<String> handleRemoveObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    /**
+     * Handles a sql exception.
+     * @param exception the exception to handle.
+     * @return a response based on the exception.
+     */
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<String> handleSQLException(Exception exception){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to mysql server.");
     }
 
     /**

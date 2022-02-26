@@ -50,11 +50,21 @@ public class LibraryController {
         return libraryDatabase.getAllBranches();
     }
 
+    /**
+     * Adds a branch to the system.
+     * @param branch the branch to add.
+     * @throws DuplicateObjectException gets thrown if the branch with that ID is already in the system.
+     */
     @PostMapping
     public void addBranch(@RequestBody Branch branch) throws DuplicateObjectException {
         libraryDatabase.addNewBranch(branch);
     }
 
+    /**
+     * Deletes a branch from the system.
+     * @param branchID the branch to remove.
+     * @throws RemoveObjectException gets thrown if the object could not be removed.
+     */
     @DeleteMapping
     public void deleteBranch(@RequestParam(value = "branchID") long branchID) throws RemoveObjectException {
         libraryDatabase.removeBranchWithID(branchID);
