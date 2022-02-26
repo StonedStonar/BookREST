@@ -6,6 +6,7 @@ import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
 import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,9 +39,11 @@ public class LentBookDatabase implements LentBooksRegister {
     public void addLentBook(LentBook lentBook) throws DuplicateObjectException {
         checkLentBook(lentBook);
         try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID() + ";");
+
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBook WHERE branchBookID = " + lentBook.getBranchBookID() + ";");
+
             if (!resultSet.next()) {
-                statement.executeUpdate("INSERT INTO lentbook(branchBookID, personID, lentDate, dueDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + ")");
+                statement.executeUpdate("INSERT INTO lentBook(branchBookID, personID, lentDate, dueDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + ")");
             }else {
                 throw new DuplicateObjectException("The lent book with branch book id " + lentBook.getBranchBookID() + " is already lent out to someone");
             }
@@ -53,12 +56,12 @@ public class LentBookDatabase implements LentBooksRegister {
     public void removeLentBook(LentBook lentBook) throws RemoveObjectException {
         checkLentBook(lentBook);
         try {
-            statement.executeUpdate("DELETE FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID());
+            statement.executeUpdate("DELETE FROM lentBook WHERE branchBookID = " + lentBook.getBranchBookID());
         } catch (SQLException exception) {
             throw new RemoveObjectException("The lent book with branchbookID and userID " + lentBook.getBranchBookID() + " "  + lentBook.getUserID() + " could not be found.");
         }
         try {
-            statement.execute("INSERT INTO lentbookslog(branchBookID, personID, lentDate, dueDate, returnedDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + "," + makeSQLString(LocalDate.now().toString()) + ")");
+            statement.execute("INSERT INTO lentBooksLog(branchBookID, personID, lentDate, dueDate, returnedDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + "," + makeSQLString(LocalDate.now().toString()) + ")");
         }catch (SQLException exception){
             throw new RemoveObjectException("The lent book could not be added to the log.");
         }
@@ -89,7 +92,7 @@ public class LentBookDatabase implements LentBooksRegister {
     public List<LentBook> getAllDueBooks() {
         List<LentBook> lentBooks;
         try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE dueDate <= curdate();");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBook WHERE dueDate <= curdate();");
             lentBooks = makeLentBooksFormResultSet(resultSet);
         } catch (SQLException exception) {
             lentBooks = new ArrayList<>();
@@ -103,9 +106,12 @@ public class LentBookDatabase implements LentBooksRegister {
     }
 
     @Override
-    public List<LentBook> getAllBooksWithBranchID(long branchID) {
-        //Todo: Usikker på hvordan denne kan gjøres bra.
-        return null;
+    public List<LentBook> getAllBooksWithBranchID(long branchID) throws SQLException {
+        ResultSet resultSet = statement.executeQuery("SELECT *\n" +
+                "FROM lentBook\n" +
+                "JOIN branchBook USING(branchBookID)\n" +
+                "WHERE branchID = " + branchID + ";");
+        return makeLentBooksFormResultSet(resultSet);
     }
 
 

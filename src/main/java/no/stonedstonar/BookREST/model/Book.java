@@ -1,6 +1,5 @@
 package no.stonedstonar.BookREST.model;
 
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;

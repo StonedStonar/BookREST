@@ -8,12 +8,14 @@ import no.stonedstonar.BookREST.model.JdbcConnection;
 import no.stonedstonar.BookREST.model.database.BookDatabase;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.Book;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +39,7 @@ public class BookController {
      */
     public BookController(JdbcConnection jdbcConnection) {
         this.jdbcConnection = jdbcConnection;
+        LocalDate.now().plusYears(2).getYear();
         try {
             bookRegister = new BookDatabase(this.jdbcConnection.connect());
         }catch (SQLException exception){

@@ -6,7 +6,6 @@ import no.stonedstonar.BookREST.model.database.AuthorDatabase;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.Author;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;

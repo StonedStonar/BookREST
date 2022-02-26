@@ -4,6 +4,7 @@ import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
 import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -61,7 +62,7 @@ public interface LentBooksRegister {
      * @param branchID the branchID.
      * @return a list of all the lent books
      */
-    List<LentBook> getAllBooksWithBranchID(long branchID);
+    List<LentBook> getAllBooksWithBranchID(long branchID) throws SQLException;
 
     /**
      * Gets all the books that are due for the user.

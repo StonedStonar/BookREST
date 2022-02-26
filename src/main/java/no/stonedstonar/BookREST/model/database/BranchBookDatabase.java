@@ -1,5 +1,6 @@
 package no.stonedstonar.BookREST.model.database;
 
+import no.stonedstonar.BookREST.model.Book;
 import no.stonedstonar.BookREST.model.BranchBook;
 import no.stonedstonar.BookREST.model.BranchBookRegister;
 import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
@@ -8,6 +9,7 @@ import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -17,6 +19,12 @@ import java.util.List;
  */
 public class BranchBookDatabase implements BranchBookRegister {
 
+    public static void main(String[] args) {
+        String word = "hei";
+        String word2 = "hei";
+
+        System.out.println(word == word2);
+    }
     private Statement statement;
     /**
       * Makes an instance of the BranchBookDatabase class.
@@ -33,8 +41,9 @@ public class BranchBookDatabase implements BranchBookRegister {
     public void addBranchBook(BranchBook branchBook) throws DuplicateObjectException {
         checkBranchBook(branchBook);
         try {
-            statement.executeUpdate("INSERT INTO branchbook(branchBookID, isbn, branchID) VALUES("+ branchBook.getBranchBookID() + " ," + branchBook.getIsbn() + " , " + branchBook.getBranchID() + ");");
+            statement.executeUpdate("INSERT INTO branchBook(branchBookID, isbn, branchID) VALUES("+ branchBook.getBranchBookID() + " ," + branchBook.getIsbn() + " , " + branchBook.getBranchID() + ");");
         }catch (SQLException exception){
+            System.err.println("Faen");
             throw new DuplicateObjectException("The branch book with id " + branchBook.getBranchBookID() + " is already in the system.");
         }
     }
