@@ -23,24 +23,24 @@ public class LibraryDatabase {
 
     /**
       * Makes an instance of the LibraryDatabase class.
+      * @param connection the connection for this database
+      * @throws SQLException gets thrown if the connection to the DB could not be made.
       */
-    public LibraryDatabase(Connection connection){
-        try {
-            statement = connection.createStatement();
-        }catch (Exception exception){
-            System.err.println(exception.getMessage());
-        }
+    public LibraryDatabase(Connection connection) throws SQLException {
+        statement = connection.createStatement();
     }
 
     /**
      * Adds a new branch to the library.
      * @param branch the new branch.
      * @throws DuplicateObjectException gets thrown if the object could not be added.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
-    public void addNewBranch(Branch branch) throws DuplicateObjectException {
-        try {
+    public void addNewBranch(Branch branch) throws DuplicateObjectException, SQLException {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM branch WHERE branchID = " + branch.getBranchID());
+        if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO branch(branchID, branchName) VALUES(" + branch.getBranchID() + " ," + makeSQLString(branch.getBranchName()) + ");");
-        } catch (SQLException exception) {
+        }else {
             throw new DuplicateObjectException("There is a branch with " + branch.getBranchID() + "already in the system.");
         }
     }
@@ -49,8 +49,9 @@ public class LibraryDatabase {
      * Removes a branch from this library.
      * @param branch the branch you want to remove.
      * @throws RemoveObjectException gets thrown if the branch could not be removed.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
-    public void removeBranch(Branch branch) throws RemoveObjectException {
+    public void removeBranch(Branch branch) throws RemoveObjectException, SQLException {
         removeBranchWithID(branch.getBranchID());
     }
 
@@ -58,11 +59,11 @@ public class LibraryDatabase {
      * Removes a branch with its id.
      * @param branchID the branch id.
      * @throws RemoveObjectException gets thrown if the branch could not be located.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
-    public void removeBranchWithID(long branchID) throws RemoveObjectException {
-        try {
-            statement.executeUpdate("DELETE FROM branch WHERE branchID = " + branchID + ";");
-        } catch (SQLException exception) {
+    public void removeBranchWithID(long branchID) throws RemoveObjectException, SQLException {
+        int amount = statement.executeUpdate("DELETE FROM branch WHERE branchID = " + branchID + ";");
+        if (amount == 0){
             throw new RemoveObjectException("Could not remove branch with branchID " + branchID + ".");
         }
     }
@@ -96,16 +97,18 @@ public class LibraryDatabase {
      * @param branchID the ID of the branch.
      * @return a branch that matches that ID.
      * @throws GetObjectException gets thrown if no branch with that ID can be located.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
-    public Branch getBranchWithID(long branchID) throws GetObjectException {
+    public Branch getBranchWithID(long branchID) throws GetObjectException, SQLException {
         checkIfLongIsAboveZero(branchID, "branch id");
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM branch WHERE branchID = " + branchID + ";");
-            Branch branch = getBranchFromSql(resultSet);
-            return branch;
-        } catch (SQLException exception) {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM branch WHERE branchID = " + branchID + ";");
+        if (resultSet.next()){
+            return getBranchFromSql(resultSet);
+        }else {
             throw new GetObjectException("Could not get branch with branchID " + branchID + ".");
         }
+
+
     }
 
     /**

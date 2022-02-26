@@ -1,11 +1,7 @@
 package no.stonedstonar.BookREST.controllers;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import no.stonedstonar.BookREST.model.CompanyRegister;
-import no.stonedstonar.BookREST.model.JdbcConnection;
+import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.User;
 import no.stonedstonar.BookREST.model.UserRegister;
 import no.stonedstonar.BookREST.model.database.UserDatabase;
@@ -16,7 +12,6 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveUserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.spring.web.json.Json;
 
 import java.sql.SQLException;
 
@@ -34,8 +29,6 @@ public class UserController {
 
     private UserRegister userRegister;
 
-    private ObjectMapper objectMapper;
-
     /**
       * Makes an instance of the UserController class.
       */
@@ -44,9 +37,8 @@ public class UserController {
         try {
             userRegister = new UserDatabase(jdbcConnection.connect());
         }catch (SQLException exception){
-            System.err.println("Could not connect the database.");
+            System.err.println("Could not connect the user database.");
         }
-        this.objectMapper = new ObjectMapper();
     }
 
     /**
@@ -58,19 +50,19 @@ public class UserController {
      * @throws CouldNotGetUserException gets thrown if there is no user with that email.
      */
     @GetMapping
-    public User loginToUser(@RequestParam(value = "email") String email, @RequestParam(value = "password") String password) throws CouldNotLoginToUser, CouldNotGetUserException {
+    public User loginToUser(@RequestParam(value = "email") String email, @RequestParam(value = "password") String password) throws CouldNotLoginToUser, CouldNotGetUserException, SQLException {
         checkString(email, "email");
         checkString(password, "password");
         return userRegister.loginToUser(email, password);
     }
 
     @PostMapping
-    public void addUser(@RequestBody User user) throws CouldNotAddUserException {
+    public void addUser(@RequestBody User user) throws CouldNotAddUserException, SQLException {
         userRegister.addUser(user);
     }
 
     @DeleteMapping("/{userID}")
-    public void deleteUser(@RequestParam(value = "email") String email, @RequestParam(value = "password") String password) throws CouldNotLoginToUser, CouldNotGetUserException, CouldNotRemoveUserException {
+    public void deleteUser(@RequestParam(value = "email") String email, @RequestParam(value = "password") String password) throws CouldNotLoginToUser, CouldNotGetUserException, CouldNotRemoveUserException, SQLException {
         checkString(password, "password");
         checkString(email, "email");
         User user = userRegister.loginToUser(email, password);
@@ -116,6 +108,16 @@ public class UserController {
     @ExceptionHandler(CouldNotRemoveUserException.class)
     public ResponseEntity<String> handleRemoveException(Exception exception){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    /**
+     * Handles a sql exception.
+     * @param exception the exception to handle.
+     * @return a response based on the exception.
+     */
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<String> handleSQLException(Exception exception){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to mysql server.");
     }
 
     

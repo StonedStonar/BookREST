@@ -51,6 +51,7 @@ public class Address {
      * @param houseNumber the house number.
      * @param postalCode the postal code of the area.
      */
+    @JsonCreator
     public Address(String streetName, int houseNumber, int postalCode){
         checkStreetName(streetName);
         checkHouseNumber(houseNumber);

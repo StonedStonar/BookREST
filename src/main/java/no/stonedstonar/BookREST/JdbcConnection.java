@@ -1,4 +1,4 @@
-package no.stonedstonar.BookREST.model;
+package no.stonedstonar.BookREST;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

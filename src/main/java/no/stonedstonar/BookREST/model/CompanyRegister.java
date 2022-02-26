@@ -18,6 +18,7 @@ public interface CompanyRegister {
      * Adds a new company to the register.
      * @param company the company you want to add.
      * @throws CouldNotAddCompanyException gets thrown if the company is already added.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     void addCompany(Company company) throws CouldNotAddCompanyException, SQLException;
 
@@ -25,6 +26,7 @@ public interface CompanyRegister {
      * Removes a company with the matching ID.
      * @param companyID the ID of the company.
      * @throws CouldNotRemoveCompanyException gets thrown if the company could not be removed.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     void removeCompanyWithID(long companyID) throws CouldNotRemoveCompanyException, SQLException;
 
@@ -33,12 +35,14 @@ public interface CompanyRegister {
      * @param companyID the company ID.
      * @return the company with that ID.
      * @throws CouldNotGetCompanyException gets thrown when a company could not be found with that ID.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     Company getCompanyWithID(long companyID) throws CouldNotGetCompanyException, SQLException;
 
     /**
      * Gets a list with all the companies in the register.
      * @return list with all the companies.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     List<Company> getAllCompanies() throws SQLException;
 }

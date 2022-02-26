@@ -32,13 +32,10 @@ public class CompanyDatabase implements CompanyRegister {
         statement = connection.createStatement();
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void addCompany(Company company) throws CouldNotAddCompanyException, SQLException {
         checkCompany(company);
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM company WHERE companyID = " + company.getCompanyName());
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM company WHERE companyID = " + company.getCompanyID());
         if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO company(companyID, companyName) VALUES(" + company.getCompanyID() + "," + makeSQLString(company.getCompanyName())+ ");");
         }else {
@@ -46,9 +43,7 @@ public class CompanyDatabase implements CompanyRegister {
         }
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
+
     @Override
     public void removeCompanyWithID(long companyID) throws CouldNotRemoveCompanyException, SQLException {
         checkCompanyID(companyID);
@@ -58,9 +53,6 @@ public class CompanyDatabase implements CompanyRegister {
         }
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public Company getCompanyWithID(long companyID) throws CouldNotGetCompanyException, SQLException {
         checkCompanyID(companyID);
@@ -72,9 +64,6 @@ public class CompanyDatabase implements CompanyRegister {
 
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public List<Company> getAllCompanies() throws SQLException {
         List<Company> companies = new LinkedList<>();

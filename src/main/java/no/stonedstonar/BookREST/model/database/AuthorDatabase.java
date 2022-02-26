@@ -6,8 +6,6 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
 
-import javax.swing.plaf.nimbus.State;
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,13 +28,10 @@ public class AuthorDatabase implements AuthorRegister {
         statement = connection.createStatement();
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void addAuthor(Author author) throws CouldNotAddAuthorException, SQLException {
         checkAuthor(author);
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM author WERE authorID = " + author.getID());
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM author WHERE authorID = " + author.getID());
         if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO author(authorID, firstName, lastName, birthYear) VALUES (" + author.getID()  + "," +  makeSQLString(author.getFirstName()) + "," + makeSQLString(author.getLastName()) + "," + author.getBirthYear() + ")");
         }else {
@@ -44,9 +39,6 @@ public class AuthorDatabase implements AuthorRegister {
         }
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void removeAuthor(Author author) throws CouldNotRemoveAuthorException, SQLException {
         checkAuthor(author);
@@ -56,9 +48,7 @@ public class AuthorDatabase implements AuthorRegister {
         }
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
+
     @Override
     public Author getAuthorById(long authorID) throws CouldNotGetAuthorException, SQLException {
         ResultSet resultSet = statement.executeQuery("SELECT * FROM author WHERE authorID = " + authorID +  ";");
@@ -69,9 +59,6 @@ public class AuthorDatabase implements AuthorRegister {
 
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public List<Author> getAuthorList() throws SQLException {
         List<Author> authors = new LinkedList<>();

@@ -1,7 +1,7 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.stonedstonar.BookREST.model.JdbcConnection;
+import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.LentBooksRegister;
 import no.stonedstonar.BookREST.model.database.LentBookDatabase;
@@ -37,7 +37,7 @@ public class LentBooksController {
         try {
             lentBooksRegister = new LentBookDatabase(jdbcConnection.connect());
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            System.err.println("Could not connect the lent books database.");
         }
     }
 

@@ -1,5 +1,11 @@
 package no.stonedstonar.BookREST.controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.sql.SQLException;
+
 /**
  * @author Steinar Hjelle Midthus
  * @version 0.1
@@ -11,6 +17,16 @@ public class ReturnedBookController {
      */
     public ReturnedBookController() {
 
+    }
+
+    /**
+     * Handles SQL exception that happens when the connection to the database is terminated.
+     * @param exception the exception.
+     * @return the response according to the exception.
+     */
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<String> handleSQLException(Exception exception){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to the SQL server.");
     }
 
     /**

@@ -1,11 +1,13 @@
 package no.stonedstonar.BookREST.controllers;
 
 import no.stonedstonar.BookREST.model.AuthorRegister;
-import no.stonedstonar.BookREST.model.JdbcConnection;
+import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.database.AuthorDatabase;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.Author;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -35,19 +37,29 @@ public class AuthorController {
             authorRegister = new AuthorDatabase(this.jdbcConnection.connect());
 
         }catch (SQLException exception){
-            System.err.println("Could not connect the database.");
+            System.err.println("Could not connect the author database.");
         }
 
     }
 
     @GetMapping
-    public List<Author> getAuthors(){
+    public List<Author> getAuthors() throws SQLException {
         return authorRegister.getAuthorList();
     }
 
     @GetMapping("/{id}")
-    public Author getAuthorWithID(@PathVariable long id) throws CouldNotGetAuthorException {
+    public Author getAuthorWithID(@PathVariable long id) throws CouldNotGetAuthorException, SQLException {
         return authorRegister.getAuthorById(id);
+    }
+
+    /**
+     * Handles a sql exception.
+     * @param exception the exception to handle.
+     * @return a response based on the exception.
+     */
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<String> handleSQLException(Exception exception){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to mysql server.");
     }
     
     /**

@@ -2,7 +2,7 @@ package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.stonedstonar.BookREST.model.Branch;
-import no.stonedstonar.BookREST.model.JdbcConnection;
+import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.database.LibraryDatabase;
 import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class LibraryController {
         try {
             libraryDatabase = new LibraryDatabase(jdbcConnection.connect());
         } catch (SQLException exception) {
-            System.err.println("Could not connect to database.");
+            System.err.println("Could not connect to library database.");
         }
     }
 
@@ -56,7 +55,7 @@ public class LibraryController {
      * @throws DuplicateObjectException gets thrown if the branch with that ID is already in the system.
      */
     @PostMapping
-    public void addBranch(@RequestBody Branch branch) throws DuplicateObjectException {
+    public void addBranch(@RequestBody Branch branch) throws DuplicateObjectException, SQLException {
         libraryDatabase.addNewBranch(branch);
     }
 
@@ -66,7 +65,7 @@ public class LibraryController {
      * @throws RemoveObjectException gets thrown if the object could not be removed.
      */
     @DeleteMapping
-    public void deleteBranch(@RequestParam(value = "branchID") long branchID) throws RemoveObjectException {
+    public void deleteBranch(@RequestParam(value = "branchID") long branchID) throws RemoveObjectException, SQLException {
         libraryDatabase.removeBranchWithID(branchID);
     }
 

@@ -25,18 +25,14 @@ public class LentBooksLogDatabase implements LentBooksLog {
 
     /**
       * Makes an instance of the LentBooksLogDatabase class.
+      * @param connection the connection to the database.
+      * @throws SQLException gets thrown if the connection could not be made.
       */
-    public LentBooksLogDatabase(Connection connection){
-        try {
-            this.statement = connection.createStatement();
-        } catch (SQLException exception) {
-            System.err.println("Could not connect to the database");
-        }
+    public LentBooksLogDatabase(Connection connection) throws SQLException {
+        this.statement = connection.createStatement();
     }
 
-    /**
-     * @throws SQLException gets thrown if the sql connection is terminated before results are done
-     */
+
     @Override
     public void addReturnedLentBook(ReturnedLentBook returnedLentBook) throws SQLException {
         checkReturnedBook(returnedLentBook);
@@ -46,27 +42,18 @@ public class LentBooksLogDatabase implements LentBooksLog {
                     + makeSQLString(returnedLentBook.getReturnedDate().toString())+ " );");
     }
 
-    /**
-     * @throws SQLException gets thrown if the sql connection is terminated before results are done
-     */
     @Override
     public void removeReturnedLentBook(ReturnedLentBook returnedLentBook) {
         //Todo: Fiks dette så vi har en "ordreID" som kan trackes. Dermed kan vi slette loggen også.
 
     }
 
-    /**
-     * @throws SQLException gets thrown if the sql connection is terminated before results are done
-     */
     @Override
     public List<ReturnedLentBook> getAllTheTimesBookHasBeenLent(long branchBookID, long branchID) throws SQLException {
         ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBooksLog WHERE branchBookID = " + branchBookID + " AND branchID = " + branchBookID + ";");
         return makeReturnedLentBooksList(resultSet);
     }
 
-    /**
-     * @throws SQLException gets thrown if the sql connection is terminated before results are done
-     */
     @Override
     public List<ReturnedLentBook> getAllReturnedBooks() throws SQLException {
         ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBooksLog");

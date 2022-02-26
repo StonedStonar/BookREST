@@ -19,6 +19,7 @@ public interface BookRegister {
      * Adds a new book to the register.
      * @param book the book you want to add.
      * @throws  CouldNotAddBookException gets thrown if the book could not be added.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     void addBook(Book book) throws CouldNotAddBookException, SQLException;
 
@@ -26,6 +27,7 @@ public interface BookRegister {
      * Removes a book from the register.
      * @param book the book you want to remove.
      * @throws CouldNotRemoveBookException gets thrown if the book is not in the register.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     void removeBook(Book book) throws CouldNotRemoveBookException, SQLException;
 
@@ -33,6 +35,7 @@ public interface BookRegister {
      * Removes a book from the register with the bookID.
      * @param ID the ID of the book.
      * @throws CouldNotRemoveBookException gets thrown if the book is not in the register.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     void removeBookByID(long ID) throws CouldNotRemoveBookException, SQLException;
 
@@ -40,6 +43,7 @@ public interface BookRegister {
      * Gets all the books this author is a part of.
      * @param authorID the author's id.
      * @return the book that has this author as a part of it.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     List<Book> getAllBooksOfAuthorID(long authorID) throws SQLException;
 
@@ -48,12 +52,14 @@ public interface BookRegister {
      * @param bookID the bookID of the wanted book.
      * @return a book that matches the bookID
      * @throws CouldNotGetBookException gets thrown if the book could not be found.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     Book getBook(long bookID) throws CouldNotGetBookException, SQLException;
 
     /**
      * Gets a list of all the books in the register.
      * @return list with all the books in the register.
+     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
     List<Book> getBookList() throws SQLException;
 }

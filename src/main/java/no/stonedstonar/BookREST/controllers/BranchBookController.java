@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import no.stonedstonar.BookREST.RegisterTestData;
 import no.stonedstonar.BookREST.model.BranchBook;
 import no.stonedstonar.BookREST.model.BranchBookRegister;
-import no.stonedstonar.BookREST.model.JdbcConnection;
+import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.database.BranchBookDatabase;
 import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
 import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
@@ -36,14 +36,8 @@ public class BranchBookController {
         this.jdbcConnection = jdbcConnection;
         try {
             branchBookRegister = new BranchBookDatabase(jdbcConnection.connect());
-            if (branchBookRegister.getAllBranchBooksForBranchWithID(1).isEmpty()){
-                RegisterTestData.addBranchBooksToRegister(branchBookRegister);
-            }
-
         } catch (SQLException exception) {
-            System.err.println("Could not connect the database.");
-        }catch (DuplicateObjectException exception){
-            System.err.println("Could not add predefined branch books.");
+            System.err.println("Could not connect the branch book database.");
         }
     }
 
@@ -53,7 +47,7 @@ public class BranchBookController {
      * @return a list with all the branch books in that branch.
      */
     @GetMapping
-    public List<BranchBook> getBranchBooks(@RequestParam(value = "branchID") long branchId){
+    public List<BranchBook> getBranchBooks(@RequestParam(value = "branchID") long branchId) throws SQLException {
         return branchBookRegister.getAllBranchBooksForBranchWithID(branchId);
     }
 
@@ -63,7 +57,7 @@ public class BranchBookController {
      * @throws DuplicateObjectException gets thrown when the object could not be added.
      */
     @PostMapping
-    public void addBranchBook(@RequestBody BranchBook branchBook) throws DuplicateObjectException {
+    public void addBranchBook(@RequestBody BranchBook branchBook) throws DuplicateObjectException, SQLException {
         branchBookRegister.addBranchBook(branchBook);
     }
 
@@ -74,7 +68,7 @@ public class BranchBookController {
      * @throws GetObjectException gets thrown if the book could not be found.
      */
     @DeleteMapping("/{branchBookID}")
-    public void removeBranchBook(@PathVariable long branchBookID) throws RemoveObjectException, GetObjectException {
+    public void removeBranchBook(@PathVariable long branchBookID) throws RemoveObjectException, GetObjectException, SQLException {
         BranchBook branchBook = branchBookRegister.getBranchBook(branchBookID);
         branchBookRegister.removeBranchBook(branchBook);
     }
@@ -116,6 +110,16 @@ public class BranchBookController {
     @ExceptionHandler(JsonProcessingException.class)
     public ResponseEntity<String> handleJsonFormatFault(){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Format on JSON file is invalid.");
+    }
+
+    /**
+     * Handles a sql exception.
+     * @param exception the exception to handle.
+     * @return a response based on the exception.
+     */
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<String> handleSQLException(Exception exception){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to mysql server.");
     }
 
     /**

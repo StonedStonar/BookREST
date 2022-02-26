@@ -27,14 +27,11 @@ public class BranchBookDatabase implements BranchBookRegister {
         statement = connection.createStatement();
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void addBranchBook(BranchBook branchBook) throws DuplicateObjectException, SQLException {
         checkBranchBook(branchBook);
 
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM branchBook");
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM branchBook WHERE branchBookID = " + branchBook.getBranchBookID());
         if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO branchBook(branchBookID, isbn, branchID) VALUES("+ branchBook.getBranchBookID() + " ," + branchBook.getIsbn() + " , " + branchBook.getBranchID() + ");");
         }else {
@@ -42,9 +39,6 @@ public class BranchBookDatabase implements BranchBookRegister {
         }
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void removeBranchBook(BranchBook branchBook) throws RemoveObjectException, SQLException {
         checkBranchBook(branchBook);
@@ -54,9 +48,6 @@ public class BranchBookDatabase implements BranchBookRegister {
         }
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public BranchBook getBranchBook(long branchBookID) throws GetObjectException, SQLException {
         checkIfLongIsAboveZero(branchBookID, "branch book id");
@@ -69,9 +60,6 @@ public class BranchBookDatabase implements BranchBookRegister {
 
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public List<BranchBook> getAllBranchBooksForBranchWithID(long branchID) throws SQLException {
         checkIfLongIsAboveZero(branchID, "branch ID");
@@ -82,6 +70,11 @@ public class BranchBookDatabase implements BranchBookRegister {
             branchBooks.add(makeSQLIntoBranchBook(resultSet));
         }
         return branchBooks;
+    }
+
+    @Override
+    public boolean checkIfBranchBooksIsEmpty() throws SQLException {
+        return statement.executeQuery("SELECT * FROM branchBook").next();
     }
 
     /**

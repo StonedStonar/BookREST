@@ -24,72 +24,73 @@ public class UserDatabase implements UserRegister {
     /**
       * Makes an instance of the UserDatabase class.
       * @param connection the connection to the database.
+      * @throws SQLException gets thrown if the connection to the DB could not be made.
       */
-    public UserDatabase(Connection connection){
-        try {
-            statement = connection.createStatement();
-        }catch (Exception exception){
-            System.err.println(exception.getMessage());
-        }
+    public UserDatabase(Connection connection) throws SQLException {
+        statement = connection.createStatement();
     }
 
+
     @Override
-    public void addUser(User user) throws CouldNotAddUserException {
+    public void addUser(User user) throws CouldNotAddUserException, SQLException {
         checkUser(user);
-        try {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM person WHERE personID = " + user.getUserID());
+        if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO person(personID, firstName, lastName, email, pass) VALUES(" + user.getUserID() + "," + makeSQLString(user.getFirstName()) + "," + makeSQLString(user.getLastName()) + "," + makeSQLString(user.getEMail()) + "," +makeSQLString(user.getPassword()) + ");");
             List<Address> addressList = user.getAllAddresses();
             for (Address address : addressList){
-                try {
-                    statement.executeUpdate("INSERT INTO personAddress(personID, streetName, houseNumber, houseLetter, houseFloor, apartmentNumber, postalCode) VALUES( " + user.getUserID() + "," + makeSQLString(address.getStreetName()) + ","
-                            + address.getHouseNumber() + "," + makeSQLString(address.getHouseLetter() + "") + "," + address.getFloor() + "," + address.getApartmentNumber() + "," + address.getPostalCode() +" );");
-                }catch (SQLException exception){
-                    System.err.println("Could not add address " + address.toString());
-                }
+                statement.executeUpdate("INSERT INTO personAddress(personID, streetName, houseNumber, houseLetter, houseFloor, apartmentNumber, postalCode) VALUES( " + user.getUserID() + "," + makeSQLString(address.getStreetName()) + ","
+                        + address.getHouseNumber() + "," + makeSQLString(address.getHouseLetter() + "") + "," + address.getFloor() + "," + address.getApartmentNumber() + "," + address.getPostalCode() +" );");
             }
-        } catch (SQLException exception) {
+        }else {
             throw new CouldNotAddUserException("The user with the ID " + user.getUserID() + " is already in the system.");
         }
     }
 
+
     @Override
-    public void removeUser(User user) throws CouldNotRemoveUserException {
+    public void removeUser(User user) throws CouldNotRemoveUserException, SQLException {
         checkUser(user);
-        try {
-            statement.executeUpdate("DELETE FROM person WHERE personID = " + user.getUserID() + ";");
-            statement.executeUpdate("DELETE FROM personaddress WHERE personID = " + user.getUserID() + ";");
-        } catch (SQLException exception) {
+        int amount = statement.executeUpdate("DELETE FROM person WHERE personID = " + user.getUserID() + ";");
+        if (amount == 0){
             throw new CouldNotRemoveUserException("The user with the userID " + user.getUserID() + " could not be removed from the system.");
         }
+        statement.executeUpdate("DELETE FROM personaddress WHERE personID = " + user.getUserID() + ";");
+
     }
 
-    @Override
-    public User getUserById(long userID) throws CouldNotGetUserException {
-        checkUserID(userID);
-        try {
 
-            ResultSet userSet = statement.executeQuery("SELECT * FROM person WHERE personID = " + userID + ";");
-            return makeSQLIntoUser(userSet);
-        } catch (SQLException exception) {
+    @Override
+    public User getUserById(long userID) throws CouldNotGetUserException, SQLException {
+        checkUserID(userID);
+        ResultSet userSet = statement.executeQuery("SELECT * FROM person WHERE personID = " + userID + ";");
+        if (!userSet.next()){
             throw new CouldNotGetUserException("The user with the id " + userID + " could not be found in the database.");
         }
+        return makeSQLIntoUser(userSet);
+
     }
 
     @Override
-    public User loginToUser(String email, String password) throws CouldNotGetUserException, CouldNotLoginToUser {
+    public User loginToUser(String email, String password) throws CouldNotLoginToUser, CouldNotGetUserException, SQLException {
         checkString(email, "email");
         checkString(password, "password");
         User user;
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM person WHERE email = " + makeSQLString(email) + ";");
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM person WHERE email = " + makeSQLString(email) + ";");
+        if (resultSet.next()){
             user = makeSQLIntoUser(resultSet);
             if (!user.checkIfPasswordIsCorrect(password)){
                 throw new CouldNotLoginToUser("The passwords does not match on this user.");
             }
-        }catch (SQLException exception){
-            user = null;
+        }else {
+            throw new CouldNotGetUserException("The user with the email " + email + " could not be found in the database.");
         }
         return user;
+    }
+
+    @Override
+    public boolean checkIfRegisterHasUsers() throws SQLException {
+        return statement.executeQuery("SELECT * FROM person").next();
     }
 
     /**

@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import no.stonedstonar.BookREST.model.BookRegister;
-import no.stonedstonar.BookREST.model.JdbcConnection;
+import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.database.BookDatabase;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.Book;
-import org.apache.tomcat.jni.Local;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +41,7 @@ public class BookController {
         try {
             bookRegister = new BookDatabase(this.jdbcConnection.connect());
         }catch (SQLException exception){
-            System.err.println("Could not connect the database.");
+            System.err.println("Could not connect the book database.");
         }
     }
 
@@ -52,7 +50,7 @@ public class BookController {
      * @return all the books in the register.
      */
     @GetMapping
-    public List<Book> getBooks(@RequestParam(value = "authorID", required = false) Optional<Long> optionalAuthorID){
+    public List<Book> getBooks(@RequestParam(value = "authorID", required = false) Optional<Long> optionalAuthorID) throws SQLException {
         if (optionalAuthorID.isEmpty()){
             return bookRegister.getBookList();
         }else {
@@ -70,7 +68,7 @@ public class BookController {
             notes = "Provide an ID to look up for a specific book.",
             response = Book.class)
     @GetMapping("/{id}")
-    public Book getBookById(@PathVariable long id) throws CouldNotGetBookException {
+    public Book getBookById(@PathVariable long id) throws CouldNotGetBookException, SQLException {
         return bookRegister.getBook(id);
     }
 
@@ -81,7 +79,7 @@ public class BookController {
      * @throws CouldNotAddBookException gets thrown if the book could not be added.
      */
     @PostMapping
-    public void postBook(@RequestBody String body) throws JsonProcessingException, CouldNotAddBookException {
+    public void postBook(@RequestBody String body) throws JsonProcessingException, CouldNotAddBookException, SQLException {
         ObjectMapper objectMapper = new ObjectMapper();
         Book book = objectMapper.readValue(body, Book.class);
         bookRegister.addBook(book);
@@ -94,7 +92,7 @@ public class BookController {
      * @throws CouldNotGetBookException gets thrown if the target book could not be found.
      */
     @PutMapping
-    public void changeBook(@RequestBody String body) throws JsonProcessingException, CouldNotGetBookException {
+    public void changeBook(@RequestBody String body) throws JsonProcessingException, CouldNotGetBookException, SQLException {
         ObjectMapper objectMapper = new ObjectMapper();
         Book newDetails = objectMapper.readValue(body, Book.class);
         Book bookToChange = bookRegister.getBook(newDetails.getISBN());
@@ -129,6 +127,16 @@ public class BookController {
         });
     }
 
+    /**
+     * Handles a sql exception.
+     * @param exception the exception to handle.
+     * @return a response based on the exception.
+     */
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<String> handleSQLException(Exception exception){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to mysql server.");
+    }
+
 
     /**
      * Deletes a book from the book register.
@@ -137,7 +145,7 @@ public class BookController {
      * @throws CouldNotRemoveBookException gets thrown if the book could not be removed.
      */
     @DeleteMapping("/{id}")
-    public void deleteBook(@PathVariable long id) throws CouldNotGetBookException, CouldNotRemoveBookException {
+    public void deleteBook(@PathVariable long id) throws CouldNotGetBookException, CouldNotRemoveBookException, SQLException {
         Book book = bookRegister.getBook(id);
         bookRegister.removeBook(book);
     }

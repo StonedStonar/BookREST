@@ -28,13 +28,10 @@ public class BookDatabase implements BookRegister {
         statement = connection.createStatement();
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void addBook(Book book) throws CouldNotAddBookException, SQLException {
         checkBook(book);
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM book WHERE ISBN = " + book.getISBN());
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM book WHERE isbn = " + book.getISBN());
         if (!resultSet.next()){
             statement.executeUpdate("INSERT INTO book(isbn, title, yearPublished, numberOfPages, publisherID) VALUES(" + book.getISBN() + "," +  makeSQLString(book.getTitle()) + "," + book.getYear() + "," + book.getNumberOfPages() + "," + book.getPublisherID() + ");");
             Iterator<Long> it = book.getAuthors().iterator();
@@ -48,18 +45,12 @@ public class BookDatabase implements BookRegister {
 
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void removeBook(Book book) throws CouldNotRemoveBookException, SQLException {
         checkBook(book);
         removeBookByID(book.getISBN());
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void removeBookByID(long ID) throws CouldNotRemoveBookException, SQLException {
         checkIfBookID(ID);
@@ -69,9 +60,6 @@ public class BookDatabase implements BookRegister {
         }
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public List<Book> getAllBooksOfAuthorID(long authorID) throws SQLException {
         List<Book> bookList = new LinkedList<>();
@@ -84,9 +72,6 @@ public class BookDatabase implements BookRegister {
         return bookList;
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public Book getBook(long bookID) throws CouldNotGetBookException, SQLException {
         checkIfBookID(bookID);
@@ -101,9 +86,6 @@ public class BookDatabase implements BookRegister {
 
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public List<Book> getBookList() throws SQLException {
         List<Book> booksList = new LinkedList<>();

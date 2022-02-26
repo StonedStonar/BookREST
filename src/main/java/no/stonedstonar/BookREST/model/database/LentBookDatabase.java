@@ -33,9 +33,6 @@ public class LentBookDatabase implements LentBooksRegister {
         this.statement = connection.createStatement();
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void addLentBook(LentBook lentBook) throws DuplicateObjectException, SQLException {
         checkLentBook(lentBook);
@@ -47,9 +44,6 @@ public class LentBookDatabase implements LentBooksRegister {
         }
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void removeLentBook(LentBook lentBook) throws RemoveObjectException, SQLException {
         checkLentBook(lentBook);
@@ -61,13 +55,10 @@ public class LentBookDatabase implements LentBooksRegister {
         statement.execute("INSERT INTO lentbookslog(branchBookID, personID, lentDate, dueDate, returnedDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + "," + makeSQLString(LocalDate.now().toString()) + ")");
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public LentBook getLentBook(long branchBookID) throws GetObjectException, SQLException {
         checkIfLongIsAboveZero(branchBookID, "branch book id");
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBooks WHERE branchBookID = " + branchBookID);
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE branchBookID = " + branchBookID);
         if (!resultSet.next()){
             throw new GetObjectException("Could not get lent book with book branch id " + branchBookID + ".");
         }
@@ -75,18 +66,12 @@ public class LentBookDatabase implements LentBooksRegister {
 
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public void removeLentBookByBranchBookID(long branchBookID) throws RemoveObjectException, SQLException, GetObjectException {
         checkIfLongIsAboveZero(branchBookID, "branch book ID");
         removeLentBook(getLentBook(branchBookID));
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
     @Override
     public List<LentBook> getAllDueBooks() throws SQLException {
         List<LentBook> lentBooks;
@@ -97,39 +82,33 @@ public class LentBookDatabase implements LentBooksRegister {
         return lentBooks;
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
+
     @Override
     public List<LentBook> getAllDueBooksForBranch(long branchID, int amountOfDays) {
+        checkIfLongIsAboveZero(branchID, "branchid");
+        checkIfLongIsAboveZero(amountOfDays, "amount of days");
+
         return null;
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
+
     @Override
     public List<LentBook> getAllBooksWithBranchID(long branchID) throws SQLException {
         ResultSet resultSet = statement.executeQuery("SELECT *\n" +
-                "FROM lentBook\n" +
-                "JOIN branchBook USING(branchBookID)\n" +
+                "FROM lentbook\n" +
+                "JOIN branchbook USING(branchBookID)\n" +
                 "WHERE branchID = " + branchID + ";");
         return makeLentBooksFormResultSet(resultSet);
     }
 
-    /**
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
-     */
+
     @Override
-    public List<LentBook> getAllDueBooksForUser(long userID) {
+    public List<LentBook> getAllDueBooksForUser(long userID) throws SQLException {
         checkIfLongIsAboveZero(userID, "user id");
         List<LentBook> lentBooks;
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE personID = " + userID + ";");
-            lentBooks = makeLentBooksFormResultSet(resultSet);
-        } catch (SQLException exception) {
-            lentBooks = new ArrayList<>();
-        }
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBook WHERE personID = " + userID + ";");
+        lentBooks = makeLentBooksFormResultSet(resultSet);
+
         return lentBooks;
     }
 
