@@ -83,6 +83,9 @@ public class BranchBookDatabase implements BranchBookRegister {
      * @throws SQLException gets thrown if the branch book could not be made.
      */
     private BranchBook makeSQLIntoBranchBook(ResultSet resultSet) throws SQLException {
+        if (resultSet.isBeforeFirst()){
+            resultSet.next();
+        }
         return new BranchBook(resultSet.getLong("branchbookID"), resultSet.getLong("isbn"), resultSet.getLong("branchID"));
     }
 

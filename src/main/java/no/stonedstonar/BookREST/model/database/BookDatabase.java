@@ -6,6 +6,7 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotAddBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveBookException;
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.*;
 
@@ -83,16 +84,40 @@ public class BookDatabase implements BookRegister {
         checkIfBookID(bookID);
         try {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM book WHERE isbn = " + bookID + ";");
-            ResultSet authorSet = statement.executeQuery("SELECT authorID FROM authorsofbook WHERE isbn == " + bookID + ";");
-            return makeSqlStatementIntoBook(resultSet, authorSet);
+            resultSet.next();
+            return makeSqlStatementIntoBook(resultSet, makeStatement());
         } catch (SQLException exception) {
             throw new CouldNotGetBookException("Could not get book with isbn " + bookID + ".");
         }
     }
 
-    private Book makeSqlStatementIntoBook(ResultSet bookResultSet, ResultSet authorResult) throws SQLException {
-        List<Long> autuhorIDs = getAuthorsIDs(authorResult);
-        return new Book(bookResultSet.getLong("isbn"), bookResultSet.getString("title"), autuhorIDs, bookResultSet.getInt("yearPublished"), bookResultSet.getInt("numberOfPages"), bookResultSet.getLong("publisherID"));
+    /**
+     *
+     * @param bookResultSet
+     * @param statementAuthor
+     * @return
+     * @throws SQLException gets thrown if the result set is empty or the connection to the database is closed.
+     */
+    private Book makeSqlStatementIntoBook(ResultSet bookResultSet, Statement statementAuthor) throws SQLException {
+        if(bookResultSet.isBeforeFirst()){
+            bookResultSet.next();
+        }
+        String title = bookResultSet.getString("title");
+        long isbn = bookResultSet.getLong("isbn");
+        int yearPublihsed = bookResultSet.getInt("yearPublished");
+        int numberOfPages = bookResultSet.getInt("numberOfPages");
+        long publisherID = bookResultSet.getLong("publisherID");
+        List<Long> autuhorIDs = getAuthorsIDs(statementAuthor.executeQuery("SELECT * FROM authorsOfBook WHERE isbn = " + isbn + ";"));
+        return new Book(isbn, title, autuhorIDs, yearPublihsed, numberOfPages,publisherID);
+    }
+
+    /**
+     * Makes a new statement to execute querys on.
+     * @return a new statement to execute querys on.
+     * @throws SQLException gets thrown if the connection to the database is closed.
+     */
+    private Statement makeStatement() throws SQLException {
+        return statement.getConnection().createStatement();
     }
 
     /**
@@ -139,7 +164,19 @@ public class BookDatabase implements BookRegister {
 
     @Override
     public List<Book> getBookList() {
-        return null;
+        List<Book> booksList = new LinkedList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM book");
+            while (resultSet.next()){
+                if (!resultSet.isAfterLast()){
+                    booksList.add(makeSqlStatementIntoBook(resultSet, makeStatement()));
+                }
+            }
+        } catch (SQLException exception) {
+            exception.getMessage();
+            booksList.clear();
+        }
+        return booksList;
     }
 
     /**

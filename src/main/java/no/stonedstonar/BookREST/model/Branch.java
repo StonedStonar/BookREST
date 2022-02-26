@@ -1,4 +1,7 @@
 package no.stonedstonar.BookREST.model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  * Represents a branch of the library.
  * @version 0.1
@@ -15,6 +18,7 @@ public class Branch {
      * @param branchID the branch id this branch should have.
      * @param branchName the name of the branch.
      */
+    @JsonCreator
     public Branch(long branchID, String branchName){
         checkIfBranchIDIsValid(branchID);
         checkIfBranchNameIsValid(branchName);

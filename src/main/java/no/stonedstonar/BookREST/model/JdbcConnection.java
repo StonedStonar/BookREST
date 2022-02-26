@@ -1,4 +1,4 @@
-package no.stonedstonar.BookREST.model.database;
+package no.stonedstonar.BookREST.model;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,7 @@ public class JdbcConnection {
     /**
       * Makes an instance of the JdbcConnection class.
       */
-    private JdbcConnection(){
+    public JdbcConnection(){
 
     }
 

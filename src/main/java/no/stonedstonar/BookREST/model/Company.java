@@ -1,4 +1,7 @@
 package no.stonedstonar.BookREST.model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  * Represents a basic company with a name and some other deatils.
  * @version 0.1
@@ -15,6 +18,7 @@ public class Company {
       * @param companyID the ID of the company.
       * @param companyName the name of the company.
       */
+    @JsonCreator
     public Company(long companyID, String companyName){
         checkCompanyName(companyName);
         checkCompanyID(companyID);

@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
 import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
+import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
 import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 
 import java.util.List;
@@ -25,6 +26,21 @@ public interface LentBooksRegister {
      * @throws RemoveObjectException gets thrown if the lent book could not be removed.
      */
     void removeLentBook(LentBook lentBook) throws RemoveObjectException;
+
+    /**
+     * Gets a lent book with branch id.
+     * @param branchBookID the branch book id.
+     * @return the lent book that matches the branch book id.
+     * @throws GetObjectException gets thrown if the lent book could not be located.
+     */
+    LentBook getLentBook(long branchBookID) throws GetObjectException;
+
+    /**
+     * Removes a lent book with branch book id.
+     * @param branchBookID the branch book id to remove.
+     * @throws RemoveObjectException gets thrown if the book could not be removed.
+     */
+    void removeLentBookByBranchBookID(long branchBookID) throws RemoveObjectException;
 
     /**
      * Gets all the due books for the whole library.

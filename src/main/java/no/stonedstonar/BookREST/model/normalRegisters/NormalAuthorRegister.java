@@ -15,7 +15,7 @@ import java.util.Optional;
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
-public class NormalAuthorRegister implements AuthorRegister {
+public class NormalAuthorRegister implements no.stonedstonar.BookREST.model.AuthorRegister {
 
     private List<Author> authorList;
 

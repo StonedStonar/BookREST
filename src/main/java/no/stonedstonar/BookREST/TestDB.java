@@ -18,13 +18,25 @@ public class TestDB {
 
 
     public static void main(String[] args) {
-        makeTestLentBooks();
+        makeTestReturnedBooks();
     }
 
 
+    private static void makeTestReturnedBooks(){
+        try{
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookREST", "root", "SzzSacbkbachw");
+            LentBooksLog lentBooksLog = new LentBooksLogDatabase(connection);
+            RegisterTestData.addReturnedBooksToRegister(lentBooksLog);
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        } catch (DuplicateObjectException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static void makeTestLentBooks(){
         try{
-            Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.1.10:3306/bookREST", "dekstop", "SzzSacbkbachw");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookREST", "root", "SzzSacbkbachw");
             LentBooksRegister lentBooksRegister = new LentBookDatabase(connection);
             RegisterTestData.addLentBooksToRegister(lentBooksRegister);
         } catch (SQLException exception) {
@@ -36,7 +48,7 @@ public class TestDB {
 
     private static void makeTestBranchBooks(){
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.1.10:3306/bookREST", "dekstop", "SzzSacbkbachw");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookREST", "root", "SzzSacbkbachw");
             BranchBookRegister branchBookRegister = new BranchBookDatabase(connection);
             RegisterTestData.addBranchBooksToRegister(branchBookRegister);
         } catch (SQLException exception) {
@@ -48,7 +60,7 @@ public class TestDB {
 
     private static void makeTestBranches(){
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.1.10:3306/bookREST", "dekstop", "SzzSacbkbachw");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookREST", "root", "SzzSacbkbachw");
             LibraryDatabase libraryDatabase = new LibraryDatabase(connection);
             RegisterTestData.addBranchesToLibrary(libraryDatabase);
         } catch (SQLException exception) {
@@ -60,7 +72,7 @@ public class TestDB {
 
     private static void makeTestUsers(){
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.1.10:3306/bookREST", "dekstop", "SzzSacbkbachw");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookREST", "root", "SzzSacbkbachw");
             UserRegister userRegister = new UserDatabase(connection);
             RegisterTestData.addUsersToRegister(userRegister);
         }catch (SQLException exception) {
@@ -72,7 +84,7 @@ public class TestDB {
 
     private static void makeTestDatabaseFromBottom(){
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.1.10:3306/bookREST", "dekstop", "SzzSacbkbachw");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookREST", "root", "SzzSacbkbachw");
             BookRegister bookRegister = new BookDatabase(connection);
             AuthorRegister authorRegister = new AuthorDatabase(connection);
             CompanyRegister companyRegister = new CompanyDatabase(connection);

@@ -1,4 +1,7 @@
 package no.stonedstonar.BookREST.model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  * Represents a basic object that holds the address of someplace.
  * @version 0.1
@@ -27,6 +30,7 @@ public class Address {
      * @param apartmentNumber the apartment number.
      * @param postalCode the postal code of the area.
      */
+    @JsonCreator
     public Address(String streetName, int houseNumber, char houseLetter, int floor, int apartmentNumber, int postalCode){
         checkStreetName(streetName);
         checkHouseNumber(houseNumber);

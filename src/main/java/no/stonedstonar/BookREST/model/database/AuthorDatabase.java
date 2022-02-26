@@ -7,7 +7,10 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
 
 import javax.swing.plaf.nimbus.State;
+import javax.xml.transform.Result;
 import java.sql.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Represents a author interface to a database.
@@ -61,6 +64,20 @@ public class AuthorDatabase implements AuthorRegister {
         }
     }
 
+    @Override
+    public List<Author> getAuthorList() {
+        List<Author> authors = new LinkedList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM author;");
+            while (resultSet.next()){
+                authors.add(makeSQLIntoAuthor(resultSet));
+            }
+        }catch (SQLException exception){
+            authors.clear();
+        }
+        return authors;
+    }
+
     /**
      * Makes an SQL response into an author object.
      * @param resultSet the result set the author is in.
@@ -68,6 +85,9 @@ public class AuthorDatabase implements AuthorRegister {
      * @throws SQLException gets thrown if the author could not be made.
      */
     private Author makeSQLIntoAuthor(ResultSet resultSet) throws SQLException {
+        if (resultSet.isBeforeFirst()){
+            resultSet.next();
+        }
         return new Author(resultSet.getLong("authorID"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getInt("birthYear"));
     }
 

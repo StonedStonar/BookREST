@@ -1,5 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.time.DateTimeException;
 import java.time.LocalDate;
 
@@ -25,6 +27,7 @@ public class LentBook {
      * @param lentDate the date this book was lent.
      * @param dueDate the date this book is supposed to be delivered.
      */
+    @JsonCreator
     public LentBook(long branchBookID, long userID, LocalDate lentDate, LocalDate dueDate){
         setDetails(branchBookID, userID, lentDate, dueDate);
     }

@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
 
@@ -44,8 +45,9 @@ public class Book {
       * @param title the title of the book.
       * @param year the year of the book.
       * @param numberOfPages the amount of pages in the book.
-     *  @param publisherID the ID of the publisher.
+      *  @param publisherID the ID of the publisher.
       */
+    @JsonCreator
     public Book(long isbn, String title, List<Long> authors, int year, int numberOfPages, long publisherID){
         checkISBN(isbn);
         checkTitle(title);

@@ -1,4 +1,7 @@
 package no.stonedstonar.BookREST.model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  * Represents a book in a branch. This book holds the ISBN to the original copy of the book.
  * @version 0.1
@@ -18,6 +21,7 @@ public class BranchBook {
      * @param isbn the books ISBN code.
      * @param branchID the branch ID.
      */
+    @JsonCreator
     public BranchBook(long branchBookID, long isbn, long branchID){
         checkIfLongIsAboveZero(branchBookID, "branch book id");
         checkIfLongIsAboveZero(isbn, "ISBN");

@@ -3,6 +3,7 @@ package no.stonedstonar.BookREST.model.database;
 import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.LentBooksRegister;
 import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
+import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
 import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
 
 import java.sql.Connection;
@@ -40,6 +41,8 @@ public class LentBookDatabase implements LentBooksRegister {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM lentbook WHERE branchBookID = " + lentBook.getBranchBookID() + ";");
             if (!resultSet.next()) {
                 statement.executeUpdate("INSERT INTO lentbook(branchBookID, personID, lentDate, dueDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + ")");
+            }else {
+                throw new DuplicateObjectException("The lent book with branch book id " + lentBook.getBranchBookID() + " is already lent out to someone");
             }
         } catch (SQLException exception) {
             throw new DuplicateObjectException("The lent book with book and userID " + lentBook.getBranchBookID() + " " + lentBook.getUserID());
@@ -55,9 +58,30 @@ public class LentBookDatabase implements LentBooksRegister {
             throw new RemoveObjectException("The lent book with branchbookID and userID " + lentBook.getBranchBookID() + " "  + lentBook.getUserID() + " could not be found.");
         }
         try {
-            statement.execute("INSERT INTO lentbook(branchBookID, personID, lentDate, dueDate, returnedDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + "," + makeSQLString(LocalDate.now().toString()) + ")");
+            statement.execute("INSERT INTO lentbookslog(branchBookID, personID, lentDate, dueDate, returnedDate) VALUES(" + lentBook.getBranchBookID() + " , " + lentBook.getUserID() + "," + makeSQLString(lentBook.getLentDate().toString()) + "," + makeSQLString(lentBook.getDueDate().toString()) + "," + makeSQLString(LocalDate.now().toString()) + ")");
         }catch (SQLException exception){
             throw new RemoveObjectException("The lent book could not be added to the log.");
+        }
+    }
+
+    @Override
+    public LentBook getLentBook(long branchBookID) throws GetObjectException {
+        checkIfLongIsAboveZero(branchBookID, "branch book id");
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM lentBooks WHERE branchBookID = " + branchBookID);
+            return makeLentBookFromSQLStatement(resultSet);
+        }catch (SQLException sqlException){
+            throw new GetObjectException("Could not get lent book with book branch id " + branchBookID + ".");
+        }
+    }
+
+    @Override
+    public void removeLentBookByBranchBookID(long branchBookID) throws RemoveObjectException {
+        checkIfLongIsAboveZero(branchBookID, "branch book ID");
+        try {
+            removeLentBook(getLentBook(branchBookID));
+        }catch (GetObjectException getObjectException){
+            throw new RemoveObjectException(getObjectException.getMessage());
         }
     }
 
@@ -119,7 +143,10 @@ public class LentBookDatabase implements LentBooksRegister {
      * @throws SQLException gets thrown if the result set is empty.
      */
     private LentBook makeLentBookFromSQLStatement(ResultSet resultSet) throws SQLException {
-        return new LentBook(resultSet.getLong("branchBookID"), resultSet.getLong("userID"), resultSet.getDate("lentDate").toLocalDate(), resultSet.getDate("dueDate").toLocalDate());
+        if (resultSet.isBeforeFirst()){
+            resultSet.next();
+        }
+        return new LentBook(resultSet.getLong("branchBookID"), resultSet.getLong("personID"), resultSet.getDate("lentDate").toLocalDate(), resultSet.getDate("dueDate").toLocalDate());
     }
 
     /**

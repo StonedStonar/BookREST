@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Represents a class that is the "library"
@@ -49,11 +51,44 @@ public class LibraryDatabase {
      * @throws RemoveObjectException gets thrown if the branch could not be removed.
      */
     public void removeBranch(Branch branch) throws RemoveObjectException {
+        removeBranchWithID(branch.getBranchID());
+    }
+
+    /**
+     * Removes a branch with its id.
+     * @param branchID the branch id.
+     * @throws RemoveObjectException gets thrown if the branch could not be located.
+     */
+    public void removeBranchWithID(long branchID) throws RemoveObjectException {
         try {
-            statement.executeUpdate("DELETE FROM branch WHERE branchID = " + branch.getBranchID() + ";");
+            statement.executeUpdate("DELETE FROM branch WHERE branchID = " + branchID + ";");
         } catch (SQLException exception) {
-            throw new RemoveObjectException("Could not remove branch with branchID " + branch.getBranchID() + ".");
+            throw new RemoveObjectException("Could not remove branch with branchID " + branchID + ".");
         }
+    }
+
+    /**
+     * Gets all the branches of this library.
+     * @return a list with all the branches.
+     * @throws SQLException gets thrown if the connection to the database gets closed.
+     */
+    public List<Branch> getAllBranches() throws SQLException {
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM branch");
+        return makeSqlRequestIntoListWithBranches(resultSet);
+    }
+
+    /**
+     * Makes a sql result set into a list with branches.
+     * @param resultSet the sql result set with the branches.
+     * @return a list with branches.
+     * @throws SQLException gets thrown if the connection to the database gets closed.
+     */
+    private List<Branch> makeSqlRequestIntoListWithBranches(ResultSet resultSet) throws SQLException {
+        List<Branch> branches = new LinkedList<>();
+        while (resultSet.next()){
+            branches.add(getBranchFromSql(resultSet));
+        }
+        return branches;
     }
 
     /**
@@ -80,6 +115,9 @@ public class LibraryDatabase {
      * @throws SQLException gets thrown if the result set is empty.
      */
     private Branch getBranchFromSql(ResultSet resultSet) throws SQLException {
+        if (resultSet.isBeforeFirst()){
+            resultSet.next();
+        }
         return new Branch(resultSet.getLong("branchID"), resultSet.getString("branchName"));
     }
 
