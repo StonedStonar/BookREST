@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -29,13 +30,12 @@ public class AuthorController {
 
     /**
       * Makes an instance of the AuthorController class.
-     * @param jdbcConnection
+     * @param jdbcConnection the connection to the database.
      */
-    public AuthorController(JdbcConnection jdbcConnection) throws CouldNotAddAuthorException {
+    public AuthorController(JdbcConnection jdbcConnection) {
         this.jdbcConnection = jdbcConnection;
         try {
             authorRegister = new AuthorDatabase(this.jdbcConnection.connect());
-
         }catch (SQLException exception){
             System.err.println("Could not connect the author database.");
         }
@@ -43,13 +43,28 @@ public class AuthorController {
     }
 
     @GetMapping
-    public List<Author> getAuthors() throws SQLException {
-        return authorRegister.getAuthorList();
+    public List<Author> getAuthors(@RequestParam(value = "authorID", required = false) List<Long> authorIDs) throws SQLException, CouldNotGetAuthorException {
+        List<Author> authors;
+        if (authorIDs == null || authorIDs.isEmpty()){
+            authors =  authorRegister.getAuthorList();
+        }else {
+            System.out.println(authorIDs.size());
+            authors = new LinkedList<>();
+            for (long authorID : authorIDs){
+                authors.add(authorRegister.getAuthorById(authorID));
+            }
+        }
+        return authors;
     }
 
     @GetMapping("/{id}")
     public Author getAuthorWithID(@PathVariable long id) throws CouldNotGetAuthorException, SQLException {
         return authorRegister.getAuthorById(id);
+    }
+
+    @ExceptionHandler(CouldNotGetAuthorException.class)
+    public ResponseEntity<String> handleCouldNotGetException(Exception exception){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }
 
     /**

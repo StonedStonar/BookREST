@@ -63,7 +63,7 @@ public class BookDatabase implements BookRegister {
     @Override
     public List<Book> getAllBooksOfAuthorID(long authorID) throws SQLException {
         List<Book> bookList = new LinkedList<>();
-        ResultSet resultSet = statement.executeQuery("SELECT isbn FROM authorsofbook WHERE authorID = " + authorID + ";");
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM book WHERE isbn IN (SELECT isbn FROM authorsOfBook WHERE authorID = " + authorID + ")");
         while (resultSet.next()){
             Book book = makeSqlStatementIntoBook(resultSet);
             bookList.add(book);
@@ -76,7 +76,6 @@ public class BookDatabase implements BookRegister {
     public Book getBook(long bookID) throws CouldNotGetBookException, SQLException {
         checkIfBookID(bookID);
         ResultSet resultSet = statement.executeQuery("SELECT * FROM book WHERE isbn = " + bookID + ";");
-        resultSet.next();
         if (!resultSet.next()){
             throw new CouldNotGetBookException("Could not get book with isbn " + bookID + ".");
         }

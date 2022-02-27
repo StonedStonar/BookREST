@@ -32,6 +32,30 @@ public class User {
      * @param firstName the first name of the borrower.
      * @param lastName the last name of the borrower.
      * @param eMail the email of the user.
+     * @param password the password of the user.
+     * @param userID the id of the user.
+     * @param addresses the list with all the addresses.
+     */
+    public User(long userID, String firstName, String lastName, String eMail, String password, List<Address> addresses){
+        checkFirstName(firstName);
+        checkLastName(lastName);
+        checkUserID(userID);
+        checkPassword(password);
+        checkIfObjectIsNull(addresses, "addresses");
+        this.addresses = new LinkedList<>();
+        addresses.addAll(addresses);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.eMail = eMail;
+        this.userID = userID;
+        this.password = password;
+    }
+
+    /**
+     * Makes an instance of the User class.
+     * @param firstName the first name of the borrower.
+     * @param lastName the last name of the borrower.
+     * @param eMail the email of the user.
      */
     @JsonCreator
     public User(long userID, String firstName, String lastName, String eMail, String password){

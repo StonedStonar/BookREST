@@ -74,14 +74,12 @@ public class BookController {
 
     /**
      * Adds a new book to the register.
-     * @param body the body that contains the JSON file.
+     * @param book the body that contains the JSON file.
      * @throws JsonProcessingException gets thrown if the JSON could not be translated to the wanted object.
      * @throws CouldNotAddBookException gets thrown if the book could not be added.
      */
     @PostMapping
-    public void postBook(@RequestBody String body) throws JsonProcessingException, CouldNotAddBookException, SQLException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Book book = objectMapper.readValue(body, Book.class);
+    public void postBook(@RequestBody Book book) throws JsonProcessingException, CouldNotAddBookException, SQLException {
         bookRegister.addBook(book);
     }
 

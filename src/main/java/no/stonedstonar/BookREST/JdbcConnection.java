@@ -15,13 +15,13 @@ import java.sql.SQLException;
 @Component
 public class JdbcConnection {
 
-    @Value("${db.address}")
+    @Value("${MYSQL_HOST}")
     private String address;
 
-    @Value("${db.user}")
+    @Value("${MYSQL_USER}")
     private String user;
 
-    @Value("${db.password}")
+    @Value("${MYSQL_PASSWORD}")
     private String password;
 
     private Connection connection;
