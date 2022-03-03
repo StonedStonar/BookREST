@@ -2,16 +2,28 @@ package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import javax.persistence.*;
+
 /**
  * Represents a basic company with a name and some other deatils.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+@Entity
 public class Company {
 
+    @Id
+    @GeneratedValue
     private long companyID;
 
+    @Column(nullable = false)
     private String companyName;
+
+    /**
+     * Constructor for JPA.
+     */
+    public Company() {
+    }
 
     /**
       * Makes an instance of the Company class.

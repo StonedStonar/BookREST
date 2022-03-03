@@ -2,20 +2,28 @@ package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 /**
  *
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+@Entity
 public class Author {
 
-    private long ID;
+    @Id
+    private long authorID;
 
     private String firstName;
 
     private String lastName;
 
     private int birthYear;
+
+    public Author() {
+    }
 
     /**
       * Makes an instance of the Author class.
@@ -29,7 +37,7 @@ public class Author {
         checkFirstName(firstName);
         checkLastName(lastName);
         checkID(ID);
-        this.ID = ID;
+        this.authorID = ID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthYear = birthYear;
@@ -40,7 +48,7 @@ public class Author {
      * @return the ID.
      */
     public long getID() {
-        return ID;
+        return authorID;
     }
 
     /**
@@ -49,7 +57,7 @@ public class Author {
      */
     public void setID(long ID) {
         checkID(ID);
-        this.ID = ID;
+        this.authorID = ID;
     }
 
     /**

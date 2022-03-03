@@ -2,18 +2,33 @@ package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import javax.persistence.*;
+
 /**
  * Represents a book in a branch. This book holds the ISBN to the original copy of the book.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+@Entity
 public class BranchBook {
 
-    private final long branchBookID;
+    @Id
+    @GeneratedValue
+    private long branchBookID;
 
-    private final long isbn;
+    @JoinColumn(name="isbn", referencedColumnName = "isbn")
+    @Column(nullable = false)
+    private long isbn;
 
-    private final long branchID;
+    @JoinColumn(name="branchID", referencedColumnName = "branchID")
+    @Column(nullable = false)
+    private long branchID;
+
+    /**
+     * Empty constructor for JPA.
+     */
+    public BranchBook() {
+    }
 
     /**
      * Makes an instance of the BranchBook class.

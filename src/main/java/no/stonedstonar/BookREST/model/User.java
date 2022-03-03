@@ -2,30 +2,55 @@ package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAddressException;
-import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAddressException;
+import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.GeneratorType;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Represents a basic user object that can hold all the details needed for a user.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+@Entity
 public class User {
 
+    @Id
+    @GeneratedValue
+    @Column(nullable = false)
     private long userID;
 
+    @Column(nullable = false)
     private String firstName;
 
+    @Column(nullable = false)
     private String lastName;
 
+    @Column(nullable = false)
     private String eMail;
 
-    private final LinkedList<Address> addresses;
+    @OneToMany(orphanRemoval = true)
+    @JoinTable(name = "userAddress",
+                joinColumns = @JoinColumn(columnDefinition = "userID", referencedColumnName = "userID"),
+                inverseJoinColumns = @JoinColumn(columnDefinition = "addressID", referencedColumnName = "addressID"))
+    private List<Address> addresses = new java.util.ArrayList<>();
 
+    @Column(nullable = false)
     private String password;
 
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    /**
+     * Empty constructor for JPA.
+     */
+    public User() {
+    }
 
     /**
      * Makes an instance of the User class.
@@ -34,16 +59,16 @@ public class User {
      * @param eMail the email of the user.
      * @param password the password of the user.
      * @param userID the id of the user.
-     * @param addresses the list with all the addresses.
+     * @param addresses the list with addresses.
      */
     public User(long userID, String firstName, String lastName, String eMail, String password, List<Address> addresses){
         checkFirstName(firstName);
         checkLastName(lastName);
         checkUserID(userID);
         checkPassword(password);
-        checkIfObjectIsNull(addresses, "addresses");
+        checkIfObjectIsNull(this.addresses, "addresses");
         this.addresses = new LinkedList<>();
-        addresses.addAll(addresses);
+        this.addresses.addAll(addresses);
         this.firstName = firstName;
         this.lastName = lastName;
         this.eMail = eMail;
@@ -71,6 +96,15 @@ public class User {
         this.password = password;
     }
 
+    public void addAddress(Address address) throws CouldNotAddAddressException {
+        checkIfObjectIsNull(address, "address");
+        if (!this.addresses.contains(address)){
+            addresses.add(address);
+        }else {
+            throw new CouldNotAddAddressException("The address " + address.toString() +  " is already added.");
+        }
+    }
+
     /**
      * Gets the password of the user.
      * @return the password of the user.
@@ -79,31 +113,6 @@ public class User {
         return password;
     }
 
-    /**
-     * Adds an address to the users list of addresses.
-     * @param address the address to add.
-     * @throws CouldNotAddAddressException gets thrown if the address is already in the register.
-     */
-    public void addAddress(Address address) throws CouldNotAddAddressException {
-        checkAddress(address);
-        if (addresses.contains(address)){
-            throw new CouldNotAddAddressException("The address is already in the list.");
-        }else {
-            addresses.add(address);
-        }
-    }
-
-    /**
-     * Removes an address from the user.
-     * @param address the address to remove.
-     * @throws CouldNotRemoveAddressException gets thrown if the address is not a part of this user.
-     */
-    public void removeAddress(Address address) throws CouldNotRemoveAddressException {
-        checkAddress(address);
-        if (!addresses.remove(address)){
-            throw new CouldNotRemoveAddressException("The input address does not belong to this user.");
-        }
-    }
 
     /**
      * Checks if the password is correct to the set password. This is case-sensitive.
@@ -131,14 +140,6 @@ public class User {
             this.password = newPassword;
         }
         return valid;
-    }
-
-    /**
-     * Gets all the addresses this user has.
-     * @return all the addresses.
-     */
-    public List<Address> getAllAddresses(){
-        return addresses;
     }
 
     /**

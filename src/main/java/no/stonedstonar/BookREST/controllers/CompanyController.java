@@ -3,12 +3,13 @@ package no.stonedstonar.BookREST.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.stonedstonar.BookREST.model.Company;
-import no.stonedstonar.BookREST.model.CompanyRegister;
+import no.stonedstonar.BookREST.model.database.CompanyJPA;
+import no.stonedstonar.BookREST.model.registers.CompanyRegister;
 import no.stonedstonar.BookREST.JdbcConnection;
-import no.stonedstonar.BookREST.model.database.CompanyDatabase;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddCompanyException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetCompanyException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveCompanyException;
+import no.stonedstonar.BookREST.model.repositories.CompanyRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,23 +29,15 @@ import java.util.Optional;
 @RequestMapping("/company")
 public class CompanyController {
 
-    private final JdbcConnection jdbcConnection;
+    private final CompanyRegister companyRegister;
 
-    private CompanyRegister companyRegister;
-
-    private ObjectMapper objectMapper;
 
     /**
       * Makes an instance of the CompanyController class.
+      * @param companyRepository the company repository.
       */
-    public CompanyController(JdbcConnection jdbcConnection){
-        this.jdbcConnection = jdbcConnection;
-        try {
-            companyRegister = new CompanyDatabase(jdbcConnection.connect());
-        }catch (SQLException exception){
-            System.err.println("Could not connect the company database.");
-        }
-        this.objectMapper = new ObjectMapper();
+    public CompanyController(CompanyRepository companyRepository){
+        companyRegister = new CompanyJPA(companyRepository);
     }
 
     /**
@@ -52,7 +45,7 @@ public class CompanyController {
      * @return a list with all the companies.
      */
     @GetMapping
-    public List<Company> getCompanies(@RequestParam(value = "companyID", required = false)Optional<Long> opCompanyID) throws CouldNotGetCompanyException, SQLException {
+    public List<Company> getCompanies(@RequestParam(value = "companyID", required = false)Optional<Long> opCompanyID) throws CouldNotGetCompanyException {
         List<Company> companies;
         if (opCompanyID.isPresent()){
             companies = new LinkedList<>();
@@ -70,7 +63,7 @@ public class CompanyController {
      * @throws CouldNotGetCompanyException gets thrown if the company could not be found.
      */
     @GetMapping("/{companyID}")
-    public Company getCompanyWithId(@PathVariable long companyID) throws CouldNotGetCompanyException, SQLException {
+    public Company getCompanyWithId(@PathVariable long companyID) throws CouldNotGetCompanyException {
         return companyRegister.getCompanyWithID(companyID);
     }
 
@@ -81,7 +74,7 @@ public class CompanyController {
      * @throws CouldNotAddCompanyException gets thrown if the company could not be added.
      */
     @PostMapping
-    public void postCompany(@RequestBody Company company) throws JsonProcessingException, CouldNotAddCompanyException, SQLException {
+    public void postCompany(@RequestBody Company company) throws JsonProcessingException, CouldNotAddCompanyException {
         companyRegister.addCompany(company);
     }
 
@@ -91,19 +84,10 @@ public class CompanyController {
      * @throws CouldNotRemoveCompanyException gets thrown if the company is removed from the database.
      */
     @DeleteMapping("/{companyID}")
-    public void removeCompany(@PathVariable long companyID) throws CouldNotRemoveCompanyException, SQLException {
+    public void removeCompany(@PathVariable long companyID) throws CouldNotRemoveCompanyException {
         companyRegister.removeCompanyWithID(companyID);
     }
 
-    /**
-     * Handles a sql exception.
-     * @param exception the exception to handle.
-     * @return a response based on the exception.
-     */
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<String> handleSQLException(Exception exception){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to mysql server.");
-    }
 
     /**
      * Handles a invalid JSON format request.

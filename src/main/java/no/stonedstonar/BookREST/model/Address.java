@@ -1,17 +1,31 @@
 package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.RowId;
+import org.springframework.data.annotation.Reference;
+import org.springframework.web.bind.annotation.Mapping;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Represents a basic object that holds the address of someplace.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
-public class Address {
+@Entity
+public class Address implements Serializable {
 
-    private final String streetName;
+    @Id
+    @GeneratedValue
+    private long addressId;
 
-    private final int houseNumber;
+    @Column(nullable = false)
+    private String streetName;
+
+    @Column(nullable = false)
+    private int houseNumber;
 
     private char houseLetter;
 
@@ -19,10 +33,18 @@ public class Address {
 
     private int apartmentNumber;
 
-    private final int postalCode;
+    @Column(nullable = false)
+    private int postalCode;
+
+    /**
+     * An empty constructor for JPA.
+     */
+    public Address() {
+    }
 
     /**
      * Makes an instance of the Address class.
+     * @param userId the id of the user that lives on this address.
      * @param streetName the name of the street.
      * @param houseNumber the house number.
      * @param houseLetter the living quarter letter.
@@ -31,7 +53,7 @@ public class Address {
      * @param postalCode the postal code of the area.
      */
     @JsonCreator
-    public Address(String streetName, int houseNumber, char houseLetter, int floor, int apartmentNumber, int postalCode){
+    public Address(long userId, String streetName, int houseNumber, char houseLetter, int floor, int apartmentNumber, int postalCode){
         checkStreetName(streetName);
         checkHouseNumber(houseNumber);
         checkIfNumberIsBetween(0, 99, floor, "floor");

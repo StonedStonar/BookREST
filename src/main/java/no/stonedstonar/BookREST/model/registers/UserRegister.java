@@ -1,9 +1,11 @@
-package no.stonedstonar.BookREST.model;
+package no.stonedstonar.BookREST.model.registers;
 
+import no.stonedstonar.BookREST.model.User;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddUserException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetUserException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotLoginToUser;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveUserException;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -13,32 +15,30 @@ import java.util.List;
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+
 public interface UserRegister {
 
     /**
      * Adds a user to the register.
      * @param user the user you want to add.
      * @throws CouldNotAddUserException gets thrown if the user is already in the register.
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
-    void addUser(User user) throws CouldNotAddUserException, SQLException;
+    void addUser(User user) throws CouldNotAddUserException;
 
     /**
      * Removes a user from the register.
      * @param user the user to remove.
-     * @throws CouldNotRemoveUserException gets thrown if the user could not be found.
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
+     * @throws CouldNotRemoveUserException gets thrown if the user could not be found..
      */
-    void removeUser(User user) throws CouldNotRemoveUserException, SQLException;
+    void removeUser(User user) throws CouldNotRemoveUserException;
 
     /**
      * Gets a user by its userID.
      * @param userID the userID to search for.
      * @throws CouldNotGetUserException gets thrown if the user could not be found.
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
      * @return the user matching that ID.
      */
-    User getUserById(long userID) throws CouldNotGetUserException, SQLException;
+    User getUserById(long userID) throws CouldNotGetUserException;
 
     /**
      * Gets the user if the input password matches the set password.
@@ -47,16 +47,14 @@ public interface UserRegister {
      * @return the user that matches that email and password.
      * @throws CouldNotGetUserException gets thrown if the user could not be found.
      * @throws CouldNotLoginToUser gets thrown if the passwords does not match.
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
-    User loginToUser(String email, String password) throws CouldNotGetUserException, CouldNotLoginToUser, SQLException;
+    User loginToUser(String email, String password) throws CouldNotGetUserException, CouldNotLoginToUser;
 
     /**
      * Checks if the user register has users.
      * @return <code>true</code> if the register has users.
      *         <code>false</code> if the register has no users.
-     * @throws SQLException gets thrown if the connection to the DB could not be made.
      */
-    boolean checkIfRegisterHasUsers() throws SQLException;
+    boolean checkIfRegisterHasUsers();
 
 }

@@ -3,11 +3,11 @@ package no.stonedstonar.BookREST.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.LentBook;
-import no.stonedstonar.BookREST.model.LentBooksRegister;
-import no.stonedstonar.BookREST.model.database.LentBookDatabase;
-import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
-import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
-import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
+import no.stonedstonar.BookREST.model.database.LentBookJPA;
+import no.stonedstonar.BookREST.model.exceptions.*;
+import no.stonedstonar.BookREST.model.registers.LentBooksRegister;
+import no.stonedstonar.BookREST.model.repositories.LentBookRepository;
+import no.stonedstonar.BookREST.model.repositories.LentBooksLogRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,20 +25,15 @@ import java.util.Optional;
 @RequestMapping("/lentbooks")
 public class LentBooksController {
 
-    private LentBooksRegister lentBooksRegister;
-
-    private final JdbcConnection jdbcConnection;
+    private final LentBooksRegister lentBooksRegister;
 
     /**
      * Makes an instance of the LentBooksController class.
+     * @param lentBookRepository the lent book repository.
+     * @param lentBooksLogRepository the lent books log repository
      */
-    public LentBooksController(JdbcConnection jdbcConnection) {
-        this.jdbcConnection = jdbcConnection;
-        try {
-            lentBooksRegister = new LentBookDatabase(jdbcConnection.connect());
-        } catch (SQLException exception) {
-            System.err.println("Could not connect the lent books database.");
-        }
+    public LentBooksController(LentBookRepository lentBookRepository, LentBooksLogRepository lentBooksLogRepository) {
+        lentBooksRegister = new LentBookJPA(lentBookRepository, lentBooksLogRepository);
     }
 
     /**
@@ -60,21 +55,21 @@ public class LentBooksController {
     /**
      * Adds a lent book to the register.
      * @param lentBook the lent book to add.
-     * @throws DuplicateObjectException gets thrown if the branch book id is already lent out.
+     * @throws CouldNotAddLentBookException gets thrown if the branch book id is already lent out.
      */
     @PostMapping
-    public void addLentBook(@RequestBody LentBook lentBook) throws DuplicateObjectException, SQLException {
+    public void addLentBook(@RequestBody LentBook lentBook) throws CouldNotAddLentBookException {
         lentBooksRegister.addLentBook(lentBook);
     }
 
     /**
      * Deletes a book from the register.
      * @param branchBookID the branch book to deliver back.
-     * @throws RemoveObjectException gets thrown if the lent book could not be found.
+     * @throws CouldNotRemoveLentBookException gets thrown if the lent book could not be found.
      */
     @DeleteMapping
-    public void removeLentBook(@RequestParam(value = "branchBookID") long branchBookID) throws RemoveObjectException, SQLException, GetObjectException {
-        lentBooksRegister.removeLentBookByBranchBookID(branchBookID);
+    public void removeLentBook(@RequestParam(value = "branchBookID") long branchBookID) throws CouldNotRemoveLentBookException {
+        lentBooksRegister.removeLentBookWithLentBookId(branchBookID);
     }
 
     /**
@@ -82,7 +77,7 @@ public class LentBooksController {
      * @param exception the exception to handle.
      * @return the response according to exception.
      */
-    @ExceptionHandler(DuplicateObjectException.class)
+    @ExceptionHandler(CouldNotAddLentBookException.class)
     public ResponseEntity<String> handleDuplicateObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.IM_USED).body(exception.getMessage());
     }
@@ -92,7 +87,7 @@ public class LentBooksController {
      * @param exception the exception to handle.
      * @return the response according to the exception.
      */
-    @ExceptionHandler(GetObjectException.class)
+    @ExceptionHandler(CouldNotGetLentBookException.class)
     public ResponseEntity<String> handleGetObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }
@@ -102,19 +97,9 @@ public class LentBooksController {
      * @param exception the exception to handle.
      * @return the response according the exception
      */
-    @ExceptionHandler(RemoveObjectException.class)
+    @ExceptionHandler(CouldNotRemoveLentBookException.class)
     public ResponseEntity<String> handleRemoveObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
-    }
-
-    /**
-     * Handles a sql exception.
-     * @param exception the exception to handle.
-     * @return a response based on the exception.
-     */
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<String> handleSQLException(Exception exception){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to mysql server.");
     }
 
     /**

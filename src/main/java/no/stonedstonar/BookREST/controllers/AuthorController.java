@@ -1,9 +1,8 @@
 package no.stonedstonar.BookREST.controllers;
 
-import no.stonedstonar.BookREST.model.AuthorRegister;
+import no.stonedstonar.BookREST.model.database.AuthorJPA;
+import no.stonedstonar.BookREST.model.registers.AuthorRegister;
 import no.stonedstonar.BookREST.JdbcConnection;
-import no.stonedstonar.BookREST.model.database.AuthorDatabase;
-import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.Author;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
 import org.springframework.http.HttpStatus;
@@ -24,22 +23,13 @@ import java.util.List;
 @RequestMapping("/authors")
 public class AuthorController {
 
-    private final JdbcConnection jdbcConnection;
-
-    private AuthorRegister authorRegister;
+    private final AuthorRegister authorRegister;
 
     /**
       * Makes an instance of the AuthorController class.
-     * @param jdbcConnection the connection to the database.
      */
-    public AuthorController(JdbcConnection jdbcConnection) {
-        this.jdbcConnection = jdbcConnection;
-        try {
-            authorRegister = new AuthorDatabase(this.jdbcConnection.connect());
-        }catch (SQLException exception){
-            System.err.println("Could not connect the author database.");
-        }
-
+    public AuthorController(AuthorJPA authorJPA) {
+        this.authorRegister = authorJPA;
     }
 
     @GetMapping

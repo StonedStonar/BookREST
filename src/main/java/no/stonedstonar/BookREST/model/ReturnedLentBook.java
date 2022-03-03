@@ -1,5 +1,6 @@
 package no.stonedstonar.BookREST.model;
 
+import javax.persistence.*;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 
@@ -8,9 +9,16 @@ import java.time.LocalDate;
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+@Entity
 public class ReturnedLentBook extends LentBook {
 
     private LocalDate returnedDate;
+
+    /**
+     * Constructor for JPA.
+     */
+    public ReturnedLentBook() {
+    }
 
     /**
      * Makes an instance of the ReturnedLentBook class.

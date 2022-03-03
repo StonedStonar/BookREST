@@ -3,11 +3,12 @@ package no.stonedstonar.BookREST.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
-import no.stonedstonar.BookREST.model.BookRegister;
+import no.stonedstonar.BookREST.model.database.BookJPA;
+import no.stonedstonar.BookREST.model.registers.BookRegister;
 import no.stonedstonar.BookREST.JdbcConnection;
-import no.stonedstonar.BookREST.model.database.BookDatabase;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.Book;
+import no.stonedstonar.BookREST.model.repositories.BookRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,22 +28,14 @@ import java.util.Optional;
 @RequestMapping("/books")
 public class BookController {
 
-    private final JdbcConnection jdbcConnection;
-
-    private BookRegister bookRegister;
+    private final BookRegister bookRegister;
 
     /**
       * Makes an instance of the BookController class.
-     * @param jdbcConnection
+        * @param bookRepository the book repository.
      */
-    public BookController(JdbcConnection jdbcConnection) {
-        this.jdbcConnection = jdbcConnection;
-        LocalDate.now().plusYears(2).getYear();
-        try {
-            bookRegister = new BookDatabase(this.jdbcConnection.connect());
-        }catch (SQLException exception){
-            System.err.println("Could not connect the book database.");
-        }
+    public BookController(BookRepository bookRepository) {
+        bookRegister = new BookJPA(bookRepository);
     }
 
     /**
@@ -85,44 +78,12 @@ public class BookController {
 
     /**
      * Changes the existing book and its details.
-     * @param body the body of the HTTP request.
-     * @throws JsonProcessingException gets thrown if the body could not be made into a book.
+     * @param book the book as a json.
      * @throws CouldNotGetBookException gets thrown if the target book could not be found.
      */
     @PutMapping
-    public void changeBook(@RequestBody String body) throws JsonProcessingException, CouldNotGetBookException, SQLException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Book newDetails = objectMapper.readValue(body, Book.class);
-        Book bookToChange = bookRegister.getBook(newDetails.getISBN());
-        String title = newDetails.getTitle();
-        int year = newDetails.getYear();
-        int pages = newDetails.getNumberOfPages();
-        if (pages > 0){
-            bookToChange.setNumberOfPages(pages);
-        }
-        if (year > Integer.MIN_VALUE){
-            bookToChange.setYear(year);
-        }
-        if (!title.isEmpty()){
-            bookToChange.setTitle(title);
-        }
-        List<Long> authors = newDetails.getAuthors();
-        authors.forEach(author -> {
-            //Todo: Maybe change this.
-            if (author < 0){
-                try {
-                    System.out.println(-author);
-                    bookToChange.removeAuthor(-author);
-                }catch (CouldNotRemoveAuthorException exception){
-
-                }
-            }else if (author > 0){
-                try {
-                    bookToChange.addAuthor(author);
-                }catch (CouldNotAddAuthorException exception){
-                }
-            }
-        });
+    public void changeBook(@RequestBody Book book) throws CouldNotGetBookException {
+        bookRegister.updateBook(book);
     }
 
     /**
@@ -139,13 +100,11 @@ public class BookController {
     /**
      * Deletes a book from the book register.
      * @param id the ID of the book.
-     * @throws CouldNotGetBookException gets thrown if the book could not be found.
      * @throws CouldNotRemoveBookException gets thrown if the book could not be removed.
      */
     @DeleteMapping("/{id}")
-    public void deleteBook(@PathVariable long id) throws CouldNotGetBookException, CouldNotRemoveBookException, SQLException {
-        Book book = bookRegister.getBook(id);
-        bookRegister.removeBook(book);
+    public void deleteBook(@PathVariable long id) throws CouldNotRemoveBookException {
+        bookRegister.removeBookByID(id);
     }
 
     /**

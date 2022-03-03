@@ -2,16 +2,29 @@ package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import javax.persistence.*;
+
 /**
  * Represents a branch of the library.
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+@Entity
 public class Branch {
 
-    private final long branchID;
+    @Id
+    @GeneratedValue
+    @Column(nullable = false)
+    private long branchID;
 
+    @Column(nullable = false)
     private String branchName;
+
+    /**
+     * Empty constructor for JPA.
+     */
+    public Branch() {
+    }
 
     /**
      * Makes an instance of the Branch class.

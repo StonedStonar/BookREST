@@ -3,6 +3,8 @@ package no.stonedstonar.BookREST;
 import no.stonedstonar.BookREST.model.*;
 import no.stonedstonar.BookREST.model.database.*;
 import no.stonedstonar.BookREST.model.exceptions.*;
+import no.stonedstonar.BookREST.model.registers.*;
+import no.stonedstonar.BookREST.model.repositories.*;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -30,46 +32,36 @@ public class RegisterTestData {
      * Makes an instance of the RegisterTestData to fill it with test data.
      * @param jdbcConnection the jdbc connection to connect to the database.
      */
-    public RegisterTestData(JdbcConnection jdbcConnection){
+    public RegisterTestData(BookRepository bookRepository, AuthorRepository authorRepository, CompanyRepository companyRepository, BranchRepository branchRepository,
+                            UserRepository userRepository, BranchBookRepository branchBookRepository, LentBookRepository lentBookRepository,
+                            LentBooksLogRepository lentBooksLogRepository, AddressRepository addressRepository){
         tablesMap = new HashMap<>();
-        makeTestDatabaseFromBottom(jdbcConnection);
-    }
 
-    /**
-     * Makes a database from the bottom and up. Checks if all the tables are added before it adds test data.
-     * @param jdbcConnection the jdbc connection to connect to the database.
-     */
-    public void makeTestDatabaseFromBottom(JdbcConnection jdbcConnection){
+        BookRegister bookRegister = new BookJPA(bookRepository);
+        AuthorRegister authorRegister = new AuthorJPA(authorRepository);
+        CompanyRegister companyRegister = new CompanyJPA(companyRepository);
+        BranchRegister libraryDatabase = new BranchJPA(branchRepository);
+        UserRegister userRegister = new UserJPA(userRepository, addressRepository);
+        BranchBookRegister branchBookRegister = new BranchBookJPA(branchBookRepository);
+        LentBooksRegister lentBooksRegister = new LentBookJPA(lentBookRepository, lentBooksLogRepository);
+        LentBooksLog lentBooksLog = new LentBooksLogJPA(lentBooksLogRepository);
+        //checkIfTableIsMadeIfNotADd(connection);
         try {
-            Connection connection = jdbcConnection.connect();
 
-            BookRegister bookRegister = new BookDatabase(connection);
-            AuthorRegister authorRegister = new AuthorDatabase(connection);
-            CompanyRegister companyRegister = new CompanyDatabase(connection);
-            LibraryDatabase libraryDatabase = new LibraryDatabase(connection);
-            UserRegister userRegister = new UserDatabase(connection);
-            BranchBookRegister branchBookRegister = new BranchBookDatabase(connection);
-            LentBooksRegister lentBooksRegister = new LentBookDatabase(connection);
-            LentBooksLog lentBooksLog = new LentBooksLogDatabase(connection);
-            checkIfTableIsMadeIfNotADd(connection);
-            try {
-                addAuthorsToRegister(authorRegister);
-                addCompaniesToRegister(companyRegister);
-                addBooksToRegister(bookRegister);
-                addBranchesToLibrary(libraryDatabase);
-                addUsersToRegister(userRegister);
-                addBranchBooksToRegister(branchBookRegister);
-                addLentBooksToRegister(lentBooksRegister);
-                addReturnedBooksToRegister(lentBooksLog);
-            }catch (Exception exception){
-                System.out.println("Failed to add test data.");
-                System.out.println(exception.getMessage());
-            }
-        } catch (SQLException | IOException exception) {
-            System.err.println("Falied to make database and add test data.");
-            exception.printStackTrace();
+            List<Author> authors = addAuthorsToRegister(authorRegister);
+            addCompaniesToRegister(companyRegister);
+            addBooksToRegister(bookRegister, authors);
+            addBranchesToLibrary(libraryDatabase);
+            addUsersToRegister(userRegister);
+            addBranchBooksToRegister(branchBookRegister);
+            addLentBooksToRegister(lentBooksRegister);
+            addReturnedBooksToRegister(lentBooksLog);
+        }catch (Exception exception){
+            System.out.println("Failed to add test data.");
+            System.out.println(exception.getMessage());
         }
     }
+
 
     /**
      * Checks if a table is already made. If it's not made this logic makes it.
@@ -158,19 +150,20 @@ public class RegisterTestData {
      * @param bookRegister the book register to fill.
      * @throws CouldNotAddBookException gets thrown if a book could not be added.
      */
-    private void addBooksToRegister(BookRegister bookRegister) throws CouldNotAddBookException, SQLException {
+    private void addBooksToRegister(BookRegister bookRegister, List<Author> originalAuthors) throws CouldNotAddBookException, SQLException {
         checkIfObjectIsNull(bookRegister, "book register");
         if (bookRegister.getBookList().isEmpty()){
-            List<Long> authors = new ArrayList<>();
-            List<Long> authors2 = new ArrayList<>();
-            List<Long> authors3 = new ArrayList<>();
-            List<Long> authors4 = new ArrayList<>();
+            List<Author> authors = new ArrayList<>();
+            List<Author> authors2 = new ArrayList<>();
+            List<Author> authors3 = new ArrayList<>();
+            List<Author> authors4 = new ArrayList<>();
 
-            authors.add(1L);
-            authors2.add(2L);
-            authors3.add(3L);
-            authors3.add(4L);
-            authors4.add(5L);
+            authors.add(getAuthorFromList("Jo", originalAuthors));
+            authors2.add(getAuthorFromList("Jo", originalAuthors));
+            authors2.add(getAuthorFromList("Lars", originalAuthors));
+            authors3.add(getAuthorFromList("Nils", originalAuthors));
+            authors3.add(getAuthorFromList("Øyvind", originalAuthors));
+            authors4.add(getAuthorFromList("Abid", originalAuthors));
 
             bookRegister.addBook(new Book(9788203192128L, "Snømannen", authors,2007, 438,1));
             bookRegister.addBook(new Book(9788203364181L, "Kniv", authors,2019, 519, 1));
@@ -180,13 +173,16 @@ public class RegisterTestData {
         }
     }
 
+    private Author getAuthorFromList(String firstNameOfAuthor, List<Author> originalAuthors){
+        return originalAuthors.stream().filter(author -> author.getFirstName().equals("Jo")).findFirst().get();
+    }
+
     /**
      * Adds predefined returned book to register.
      * @param lentBooksLog the lent books log to add to.
-     * @throws SQLException gets thrown if the connection to the SQL database is not stable.
-     * @throws DuplicateObjectException gets thrown if the returned book is already in the register.
+     * @throws CouldNotAddLentBookException gets thrown if the returned book is already in the register.
      */
-    private void addReturnedBooksToRegister(LentBooksLog lentBooksLog) throws SQLException, DuplicateObjectException {
+    private void addReturnedBooksToRegister(LentBooksLog lentBooksLog) throws CouldNotAddLentBookException {
         if (lentBooksLog.getAllReturnedBooks().isEmpty()){
             lentBooksLog.addReturnedLentBook(new ReturnedLentBook(1, 1, LocalDate.now().minusDays(3), LocalDate.now(), LocalDate.now()));
             lentBooksLog.addReturnedLentBook(new ReturnedLentBook(5, 2, LocalDate.now().minusDays(7), LocalDate.now().minusDays(4), LocalDate.now().minusDays(3)));
@@ -196,11 +192,11 @@ public class RegisterTestData {
     /**
      *
      * @param lentBooksRegister
-     * @throws DuplicateObjectException
+     * @throws CouldNotAddLentBookException
      */
-    private void addLentBooksToRegister(LentBooksRegister lentBooksRegister) throws DuplicateObjectException, SQLException {
+    private void addLentBooksToRegister(LentBooksRegister lentBooksRegister) throws CouldNotAddLentBookException {
         checkIfObjectIsNull(lentBooksRegister, "lent books register");
-        if (lentBooksRegister.getAllBooksWithBranchID(1).isEmpty()){
+        if (lentBooksRegister.getAllLentBooks().isEmpty()){
             lentBooksRegister.addLentBook(new LentBook(1, 1, LocalDate.now(), LocalDate.now().plusDays(1)));
             lentBooksRegister.addLentBook(new LentBook(2, 1, LocalDate.now().minusDays(4), LocalDate.now().minusDays(1)));
             lentBooksRegister.addLentBook(new LentBook(7, 1, LocalDate.now().minusDays(14), LocalDate.now().minusDays(10)));
@@ -212,11 +208,11 @@ public class RegisterTestData {
     /**
      * Adds a predefined amount of branch books to the register.
      * @param branchBookRegister the branch book register to add to.
-     * @throws DuplicateObjectException gets thrown if the branch book is already in the system.
+     * @throws CouldNotAddBranchBookException gets thrown if the branch book is already in the system.
      */
-    private void addBranchBooksToRegister(BranchBookRegister branchBookRegister) throws DuplicateObjectException, SQLException {
+    private void addBranchBooksToRegister(BranchBookRegister branchBookRegister) throws CouldNotAddBranchBookException {
         checkIfObjectIsNull(branchBookRegister, "branch book register");
-        if (!branchBookRegister.checkIfBranchBooksIsEmpty()){
+        if (!branchBookRegister.checkIfBranchBooksRegisterHasBooks()){
             int amount = 1;
             for (int i = 1; i < 4; i++){
                 branchBookRegister.addBranchBook(new BranchBook(amount, 9788202562939L, i));
@@ -234,8 +230,9 @@ public class RegisterTestData {
      * Adds all the predefined authors to an author register.
      * @param authorRegister the author register to add to.
      * @throws CouldNotAddAuthorException gets thrown if one author could not be added.
+     * @return a list with all the authors added.
      */
-    private void addAuthorsToRegister(AuthorRegister authorRegister) throws CouldNotAddAuthorException, SQLException {
+    private List<Author> addAuthorsToRegister(AuthorRegister authorRegister) throws CouldNotAddAuthorException, SQLException {
         checkIfObjectIsNull(authorRegister, "authorregister");
         List<Author> authors = authorRegister.getAuthorList();
         if (authors.isEmpty()){
@@ -245,6 +242,7 @@ public class RegisterTestData {
             authorRegister.addAuthor(new Author(4, "Nils", "Anker", 1961));
             authorRegister.addAuthor(new Author(5, "Abid", "Raja", 1975));
         }
+        return authorRegister.getAuthorList();
     }
 
     /**
@@ -273,10 +271,7 @@ public class RegisterTestData {
             User leif = new User(2, "Leif", "Lofsen", "leif@gmail.com", "password");
             User tbone = new User(3, "Tbone", "Lavar", "t@gmail.com", "pp");
 
-            bjarne.addAddress(new Address("BjarneBakken", 13, 6000));
-            leif.addAddress(new Address("LeifBakken", 15, 5000));
-            bjarne.addAddress(new Address("BjarneStakken", 3, 6300));
-            tbone.addAddress(new Address("Test", 2, 3000));
+            bjarne.addAddress(new Address("SSs", 12, 2010));
 
             userRegister.addUser(bjarne);
             userRegister.addUser(leif);
@@ -287,14 +282,14 @@ public class RegisterTestData {
     /**
      * Adds a preset amount of branches to the library database.
      * @param libraryDatabase the library database to add to.
-     * @throws DuplicateObjectException gets thrown if the branch is already added to the database.
+     * @throws CouldNotAddBranchException gets thrown if the branch is already added to the database.
      */
-    private void addBranchesToLibrary(LibraryDatabase libraryDatabase) throws DuplicateObjectException, SQLException {
+    private void addBranchesToLibrary(BranchRegister libraryDatabase) throws CouldNotAddBranchException {
         checkIfObjectIsNull(libraryDatabase, "library database");
         if (libraryDatabase.getAllBranches().isEmpty()){
-            libraryDatabase.addNewBranch(new Branch(1, "Oslo"));
-            libraryDatabase.addNewBranch(new Branch(2, "Ålesund"));
-            libraryDatabase.addNewBranch(new Branch(3, "Trondheim"));
+            libraryDatabase.addBranch(new Branch(1, "Oslo"));
+            libraryDatabase.addBranch(new Branch(2, "Ålesund"));
+            libraryDatabase.addBranch(new Branch(3, "Trondheim"));
         }
     }
     

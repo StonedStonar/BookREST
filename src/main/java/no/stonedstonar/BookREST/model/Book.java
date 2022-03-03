@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
 
-import java.util.LinkedList;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,18 +13,30 @@ import java.util.List;
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+@Entity
 public class Book {
 
+    @Id
     private long isbn;
 
+    @Column(nullable = false)
     private String title;
 
-    private final LinkedList<Long> authors;
+    @ManyToMany(targetEntity = Author.class)
+    @JoinTable(name = "authorsOfBook",
+            joinColumns = @JoinColumn(name="isbn", referencedColumnName = "isbn"),
+            inverseJoinColumns = @JoinColumn(name="authorId", referencedColumnName = "authorID")
+    )
+    private final List<Author> authors;
 
+    @Column(nullable = false)
     private int year;
 
+    @Column(nullable = false)
     private int numberOfPages;
 
+    @JoinColumn(name="publisherID", referencedColumnName = "companyID")
+    @Column(nullable = false)
     private long publisherID;
 
     /**
@@ -32,27 +45,27 @@ public class Book {
     public Book(){
         this.isbn = 0;
         this.title = "";
-        this.authors = new LinkedList<>();
+        this.authors = new ArrayList<>();
         this.numberOfPages = 0;
         this.year = Integer.MIN_VALUE;
     }
 
     /**
-      * Makes an instance of the Books class.
-      * @param isbn the ISBN the book has.
-      * @param authors a list with all the authors of this book with their ID's.
-      * @param title the title of the book.
-      * @param year the year of the book.
-      * @param numberOfPages the amount of pages in the book.
-      *  @param publisherID the ID of the publisher.
-      */
+     * Makes an instance of the Books class.
+     * @param isbn the ISBN the book has.
+     * @param authors a list with all the authors of this book with their ID's.
+     * @param title the title of the book.
+     * @param year the year of the book.
+     * @param numberOfPages the amount of pages in the book.
+     *  @param publisherID the ID of the publisher.
+     */
     @JsonCreator
-    public Book(long isbn, String title, List<Long> authors, int year, int numberOfPages, long publisherID){
+    public Book(long isbn, String title, List<Author> authors, int year, int numberOfPages, long publisherID){
         checkISBN(isbn);
         checkTitle(title);
         checkNumberOfPages(numberOfPages);
         checkPublisherID(publisherID);
-        this.authors = new LinkedList<>();
+        this.authors = new ArrayList<>();
         this.isbn = isbn;
         this.year = year;
         this.title = title;
@@ -63,15 +76,15 @@ public class Book {
 
     /**
      * Adds an author to the book.
-     * @param authorID the ID of the author to add.
+     * @param author the ID of the author to add.
      * @throws CouldNotAddAuthorException gets thrown if the author could not be added.
      */
-    public void addAuthor(long authorID) throws CouldNotAddAuthorException {
-        checkAuthorID(authorID);
-        if (!authors.contains(authorID)){
-            authors.add(authorID);
+    public void addAuthor(Author author) throws CouldNotAddAuthorException {
+        checkIfObjectIsNull(author, "author");
+        if (!authors.contains(author)){
+            authors.add(author);
         }else {
-            throw new CouldNotAddAuthorException("The author with the ID " + authorID + " is already a part of this book.");
+            throw new CouldNotAddAuthorException("The author with the ID " + author + " is already a part of this book.");
         }
     }
 
@@ -91,16 +104,6 @@ public class Book {
         this.publisherID = publisherID;
     }
 
-    /**
-     * Checks if the input author is a part of this book.
-     * @param authorID the authors ID.
-     * @return <code>true</code> if the author is already in this book.
-     *         <code>false</code> if the author is not already in this book.
-     */
-    public boolean checkIfAuthorIsPartOfBook(long authorID){
-        checkAuthorID(authorID);
-        return authors.stream().anyMatch(number -> number == authorID);
-    }
 
     /**
      * Removes an authors ID from this book.
@@ -118,7 +121,7 @@ public class Book {
      * Gets the list with all the authors ID's.
      * @return a list with all the authors ID's.
      */
-    public List<Long> getAuthors(){
+    public List<Author> getAuthors(){
         return authors;
     }
 
@@ -259,15 +262,15 @@ public class Book {
             throw new IllegalArgumentException("The " + errorPrefix + " cannot be empty.");
         }
     }
-    
+
     /**
      * Checks if an object is null.
      * @param object the object you want to check.
      * @param error the error message the exception should have.
      */
     private void checkIfObjectIsNull(Object object, String error){
-       if (object == null){
-           throw new IllegalArgumentException("The " + error + " cannot be null.");
-       }
+        if (object == null){
+            throw new IllegalArgumentException("The " + error + " cannot be null.");
+        }
     }
 }

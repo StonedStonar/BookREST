@@ -3,12 +3,14 @@ package no.stonedstonar.BookREST.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.User;
-import no.stonedstonar.BookREST.model.UserRegister;
-import no.stonedstonar.BookREST.model.database.UserDatabase;
+import no.stonedstonar.BookREST.model.database.UserJPA;
+import no.stonedstonar.BookREST.model.registers.UserRegister;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddUserException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetUserException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotLoginToUser;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveUserException;
+import no.stonedstonar.BookREST.model.repositories.AddressRepository;
+import no.stonedstonar.BookREST.model.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,20 +27,14 @@ import java.sql.SQLException;
 @RequestMapping("/user")
 public class UserController {
 
-    private final JdbcConnection jdbcConnection;
-
-    private UserRegister userRegister;
+    private final UserRegister userRegister;
 
     /**
       * Makes an instance of the UserController class.
+      * @param userRepository the user repository.
       */
-    public UserController(JdbcConnection jdbcConnection){
-        this.jdbcConnection = jdbcConnection;
-        try {
-            userRegister = new UserDatabase(jdbcConnection.connect());
-        }catch (SQLException exception){
-            System.err.println("Could not connect the user database.");
-        }
+    public UserController(UserRepository userRepository, AddressRepository addressRepository){
+        userRegister = new UserJPA(userRepository, addressRepository);
     }
 
     /**

@@ -2,6 +2,8 @@ package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import javax.annotation.processing.Generated;
+import javax.persistence.*;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 
@@ -10,15 +12,38 @@ import java.time.LocalDate;
  * @version 0.1
  * @author Steinar Hjelle Midthus
  */
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class LentBook {
 
+    @Id
+    @GeneratedValue
+    private long lentBookId;
+
+    @JoinColumn(name="branchBookID", referencedColumnName = "branchBookID")
+    @Column(nullable = false)
     private long branchBookID;
 
+    @JoinColumn(name="userID", referencedColumnName = "userID")
+    @Column(nullable = false)
     private long userID;
 
+    @Column(nullable = false)
     private LocalDate lentDate;
 
+    @Column(nullable = false)
     private LocalDate dueDate;
+
+    /**
+     * Gets the lent book id.
+     * @return the new lent book id.
+     */
+    public Long getLentBookId() {
+        return lentBookId;
+    }
+
+    public LentBook() {
+    }
 
     /**
      * Makes an instance of the LentBook class.

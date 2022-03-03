@@ -3,10 +3,10 @@ package no.stonedstonar.BookREST.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.stonedstonar.BookREST.model.Branch;
 import no.stonedstonar.BookREST.JdbcConnection;
-import no.stonedstonar.BookREST.model.database.LibraryDatabase;
-import no.stonedstonar.BookREST.model.exceptions.DuplicateObjectException;
-import no.stonedstonar.BookREST.model.exceptions.GetObjectException;
-import no.stonedstonar.BookREST.model.exceptions.RemoveObjectException;
+import no.stonedstonar.BookREST.model.database.BranchJPA;
+import no.stonedstonar.BookREST.model.exceptions.*;
+import no.stonedstonar.BookREST.model.registers.BranchRegister;
+import no.stonedstonar.BookREST.model.repositories.BranchRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,20 +23,14 @@ import java.util.List;
 @RequestMapping("/library")
 public class LibraryController {
 
-    private final JdbcConnection jdbcConnection;
-
-    private LibraryDatabase libraryDatabase;
+    private final BranchRegister branchRegister;
 
     /**
      * Makes an instance of the LibraryController class.
+     * @param branchRepository the branch repository.
      */
-    public LibraryController(JdbcConnection jdbcConnection) {
-        this.jdbcConnection = jdbcConnection;
-        try {
-            libraryDatabase = new LibraryDatabase(jdbcConnection.connect());
-        } catch (SQLException exception) {
-            System.err.println("Could not connect to library database.");
-        }
+    public LibraryController(BranchRepository branchRepository) {
+        branchRegister = new BranchJPA(branchRepository);
     }
 
     /**
@@ -46,17 +40,17 @@ public class LibraryController {
      */
     @GetMapping
     public List<Branch> getBranches() throws SQLException {
-        return libraryDatabase.getAllBranches();
+        return branchRegister.getAllBranches();
     }
 
     /**
      * Adds a branch to the system.
      * @param branch the branch to add.
-     * @throws DuplicateObjectException gets thrown if the branch with that ID is already in the system.
+     * @throws CouldNotAddBranchException gets thrown if the branch with that ID is already in the system.
      */
     @PostMapping
-    public void addBranch(@RequestBody Branch branch) throws DuplicateObjectException, SQLException {
-        libraryDatabase.addNewBranch(branch);
+    public void addBranch(@RequestBody Branch branch) throws SQLException, CouldNotAddBranchException {
+        branchRegister.addBranch(branch);
     }
 
     /**
@@ -65,8 +59,8 @@ public class LibraryController {
      * @throws RemoveObjectException gets thrown if the object could not be removed.
      */
     @DeleteMapping
-    public void deleteBranch(@RequestParam(value = "branchID") long branchID) throws RemoveObjectException, SQLException {
-        libraryDatabase.removeBranchWithID(branchID);
+    public void deleteBranch(@RequestParam(value = "branchID") long branchID) throws CouldNotRemoveBranchException {
+        branchRegister.removeBranchWithBranchID(branchID);
     }
 
     /**
@@ -74,7 +68,7 @@ public class LibraryController {
      * @param exception the exception to handle.
      * @return the response according to exception.
      */
-    @ExceptionHandler(DuplicateObjectException.class)
+    @ExceptionHandler(CouldNotAddBranchException.class)
     public ResponseEntity<String> handleDuplicateObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.IM_USED).body(exception.getMessage());
     }
@@ -84,7 +78,7 @@ public class LibraryController {
      * @param exception the exception to handle.
      * @return the response according to the exception.
      */
-    @ExceptionHandler(GetObjectException.class)
+    @ExceptionHandler(CouldNotGetBranchException.class)
     public ResponseEntity<String> handleGetObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }
@@ -94,7 +88,7 @@ public class LibraryController {
      * @param exception the exception to handle.
      * @return the response according the exception
      */
-    @ExceptionHandler(RemoveObjectException.class)
+    @ExceptionHandler(CouldNotRemoveBranchException.class)
     public ResponseEntity<String> handleRemoveObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }
@@ -106,16 +100,6 @@ public class LibraryController {
     @ExceptionHandler(JsonProcessingException.class)
     public ResponseEntity<String> handleJsonFormatFault(){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Format on JSON file is invalid.");
-    }
-
-    /**
-     * Handles SQL exception that happens when the connection to the database is terminated.
-     * @param exception the exception.
-     * @return the response according to the exception.
-     */
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<String> handleSQLException(Exception exception){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to the SQL server.");
     }
 
     /**
