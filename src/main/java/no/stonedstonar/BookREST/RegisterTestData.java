@@ -237,7 +237,8 @@ public class RegisterTestData {
      */
     private void addAuthorsToRegister(AuthorRegister authorRegister) throws CouldNotAddAuthorException, SQLException {
         checkIfObjectIsNull(authorRegister, "authorregister");
-        if (authorRegister.getAuthorList().isEmpty()){
+        List<Author> authors = authorRegister.getAuthorList();
+        if (authors.isEmpty()){
             authorRegister.addAuthor(new Author(1, "Jo", "Nesbø", 1960));
             authorRegister.addAuthor(new Author(2, "Lars", "Monsen", 1963));
             authorRegister.addAuthor(new Author(3, "Øyvind", "Sauvik", 1976));
