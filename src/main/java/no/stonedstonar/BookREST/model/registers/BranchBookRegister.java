@@ -57,6 +57,12 @@ public interface BranchBookRegister {
      */
     List<BranchBook> getAllBranchBooksForBranchWithID(long branchID);
 
+    /**
+     * Gets all the branch books in the system.
+     * @return a list with all the branch books.
+     */
+    List<BranchBook> getAllBranchBooks();
+
 
     /**
      * Checks if the branch books is empty or not.

@@ -57,4 +57,9 @@ public interface UserRegister {
      */
     boolean checkIfRegisterHasUsers();
 
+    /**
+     * Gets all the users in the system.
+     * @return the list with all the users.
+     */
+    List<User> getAllUsers();
 }

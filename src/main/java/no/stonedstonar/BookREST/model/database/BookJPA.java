@@ -7,7 +7,6 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotAddBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveBookException;
 import no.stonedstonar.BookREST.model.repositories.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -76,7 +75,7 @@ public class BookJPA implements BookRegister {
     @Override
     public List<Book> getAllBooksOfAuthorID(long authorID) {
         List<Book> books = new ArrayList<>();
-        //bookRepository.findAllBookWithAuthorID(authorID).forEach(books::add);
+        bookRepository.findAllBookWithAuthorID(authorID).forEach(books::add);
         return books;
     }
 

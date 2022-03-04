@@ -20,13 +20,13 @@ public class LentBook {
     @GeneratedValue
     private long lentBookId;
 
-    @JoinColumn(name="branchBookID", referencedColumnName = "branchBookID")
-    @Column(nullable = false)
-    private long branchBookID;
+    @OneToOne(targetEntity = BranchBook.class)
+    @JoinColumn(name = "branchBookId")
+    private BranchBook branchBook;
 
-    @JoinColumn(name="userID", referencedColumnName = "userID")
-    @Column(nullable = false)
-    private long userID;
+    @ManyToOne(targetEntity = User.class)
+    @JoinColumn(name="userID")
+    private User user;
 
     @Column(nullable = false)
     private LocalDate lentDate;
@@ -47,36 +47,36 @@ public class LentBook {
 
     /**
      * Makes an instance of the LentBook class.
-     * @param branchBookID the bookID of the lent book.
-     * @param userID the users ID.
+     * @param branchBook the bookID of the lent book.
+     * @param user the users ID.
      * @param lentDate the date this book was lent.
      * @param dueDate the date this book is supposed to be delivered.
      */
     @JsonCreator
-    public LentBook(long branchBookID, long userID, LocalDate lentDate, LocalDate dueDate){
-        setDetails(branchBookID, userID, lentDate, dueDate);
+    public LentBook(BranchBook branchBook, User user, LocalDate lentDate, LocalDate dueDate){
+        setDetails(branchBook, user, lentDate, dueDate);
     }
 
     /**
      * Makes an instance of the LentBook class. This book has set lent date to today.
-     * @param branchBookID the bookID of the lent book.
-     * @param userID the users ID.
+     * @param branchBook the lent branch book.
+     * @param user the users ID.
      * @param dueDate the date this book is supposed to be delivered.
      */
-    public LentBook(long branchBookID, long userID, LocalDate dueDate){
-        setDetails(branchBookID, userID, LocalDate.now(), dueDate);
+    public LentBook(BranchBook branchBook, User user, LocalDate dueDate){
+        setDetails(branchBook, user, LocalDate.now(), dueDate);
     }
 
     /**
      * Sets the details of the book.
-     * @param bookID the bookID of the lent book.
-     * @param userID the users ID.
+     * @param branchBook the branch book.
+     * @param user the users ID.
      * @param lentDate the date this book was lent.
      * @param dueDate the date this book is supposed to be returned.
      */
-    private void setDetails(long bookID, long userID, LocalDate lentDate, LocalDate dueDate){
-        checkIfLongIsAboveZero(bookID, "bookID");
-        checkIfLongIsAboveZero(userID, "userID");
+    private void setDetails(BranchBook branchBook, User user, LocalDate lentDate, LocalDate dueDate){
+        checkIfObjectIsNull(branchBook, "branchbook");
+        checkIfObjectIsNull(user, "user");
         checkIfObjectIsNull(dueDate, "due date");
         checkIfObjectIsNull(lentDate, "lent date");
         if (dueDate.isBefore(lentDate)){
@@ -84,24 +84,24 @@ public class LentBook {
         }
         this.dueDate = dueDate;
         this.lentDate = lentDate;
-        this.branchBookID = bookID;
-        this.userID = userID;
+        this.branchBook = branchBook;
+        this.user = user;
     }
 
     /**
-     * Gets the id of the book.
-     * @return the ID of the book.
+     * Gets the branch book.
+     * @return gets the branch book this lent book represents.
      */
-    public long getBranchBookID() {
-        return branchBookID;
+    public BranchBook getBranchBook(){
+        return branchBook;
     }
 
     /**
-     * Gets the userID.
-     * @return the ID of the user who lent this book.
+     * Gets the user from the lent object.
+     * @return the user.
      */
-    public long getUserID() {
-        return userID;
+    public User getUser(){
+        return user;
     }
 
     /**

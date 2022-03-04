@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,7 +70,7 @@ public class LentBooksController {
      */
     @DeleteMapping
     public void removeLentBook(@RequestParam(value = "branchBookID") long branchBookID) throws CouldNotRemoveLentBookException {
-        lentBooksRegister.removeLentBookWithLentBookId(branchBookID);
+        lentBooksRegister.removeLentBookWithLentBookId(branchBookID, true, LocalDate.now());
     }
 
     /**

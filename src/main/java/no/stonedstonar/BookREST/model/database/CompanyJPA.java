@@ -6,7 +6,6 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotGetCompanyException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveCompanyException;
 import no.stonedstonar.BookREST.model.registers.CompanyRegister;
 import no.stonedstonar.BookREST.model.repositories.CompanyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;

@@ -1,5 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
+import org.hibernate.annotations.Columns;
+
 import javax.persistence.*;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -14,6 +16,8 @@ public class ReturnedLentBook extends LentBook {
 
     private LocalDate returnedDate;
 
+
+
     /**
      * Constructor for JPA.
      */
@@ -22,14 +26,14 @@ public class ReturnedLentBook extends LentBook {
 
     /**
      * Makes an instance of the ReturnedLentBook class.
-     * @param bookID the bookID of the lent book.
+     * @param branchBook the branchbook that is lent.
      * @param userID the users ID.
      * @param lentDate the date this book was lent.
      * @param dueDate the date this book is supposed to be delivered.
      * @param returnedDate the date this book was returned.
      */
-    public ReturnedLentBook(long bookID, long userID, LocalDate lentDate, LocalDate dueDate, LocalDate returnedDate){
-        super(bookID, userID, lentDate, dueDate);
+    public ReturnedLentBook(BranchBook branchBook, User user, LocalDate lentDate, LocalDate dueDate, LocalDate returnedDate){
+        super(branchBook, user, lentDate, dueDate);
         checkReturnedDate(returnedDate);
         this.returnedDate = returnedDate;
     }
@@ -40,7 +44,7 @@ public class ReturnedLentBook extends LentBook {
      * @param returnedDate the date this book was returned.
      */
     public ReturnedLentBook(LentBook lentBook, LocalDate returnedDate){
-        super(lentBook.getBranchBookID(), lentBook.getUserID(), lentBook.getLentDate(), lentBook.getDueDate());
+        super(lentBook.getBranchBook(), lentBook.getUser(), lentBook.getLentDate(), lentBook.getDueDate());
         checkReturnedDate(returnedDate);
 
         this.returnedDate = returnedDate;

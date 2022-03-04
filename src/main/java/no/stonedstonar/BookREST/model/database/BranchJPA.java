@@ -6,7 +6,6 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotGetBranchException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveBranchException;
 import no.stonedstonar.BookREST.model.registers.BranchRegister;
 import no.stonedstonar.BookREST.model.repositories.BranchRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;

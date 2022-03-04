@@ -35,9 +35,12 @@ public interface LentBooksRegister {
     /**
      * Removes a lent book with its id.
      * @param lentBookID the id of the lent book to remove.
+     * @param returned <code>true</code> if the book is returned.
+     *                 <code>false</code> if the book is not returned.
+     * @param localDate the date this book was returned.
      * @throws CouldNotRemoveLentBookException gets thrown if the lent book could not be removed.
      */
-    void removeLentBookWithLentBookId(long lentBookID) throws CouldNotRemoveLentBookException;
+    void removeLentBookWithLentBookId(long lentBookID, boolean returned, LocalDate localDate) throws CouldNotRemoveLentBookException;
 
     /**
      * Gets a lent book with branch id.

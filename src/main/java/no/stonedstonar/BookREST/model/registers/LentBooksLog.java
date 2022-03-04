@@ -22,13 +22,6 @@ public interface LentBooksLog{
     void addReturnedLentBook(ReturnedLentBook returnedLentBook) throws CouldNotAddLentBookException;
 
     /**
-     * Removes a lent book with branch book id.
-     * @param branchBookID the branch book id to remove.
-     * @throws CouldNotRemoveLentBookException gets thrown if the book could not be removed.
-     */
-    void removeLentBookByBranchBookID(long branchBookID) throws CouldNotRemoveLentBookException;
-
-    /**
      * Removes a lent book with the id.
      * @param lentBookId the id of the lent book to be removed.
      * @throws CouldNotRemoveLentBookException gets thrown if the lent book could not be removed.
@@ -44,11 +37,10 @@ public interface LentBooksLog{
 
     /**
      * Gets all the times the book with this ID has been lent.
-     * @param bookID the ID of the book that was lent.
-     * @param branchID the branch ID this book belongs to.
+     * @param branchBookID the branch book ID of the book that was lent.
      * @return all the different times this book has been lent.
      */
-    List<ReturnedLentBook> getAllTheTimesBookHasBeenLent(long bookID, long branchID);
+    List<ReturnedLentBook> getAllTheTimesBookHasBeenLent(long branchBookID);
 
     /**
      * Gets all the lent books that are in the log.

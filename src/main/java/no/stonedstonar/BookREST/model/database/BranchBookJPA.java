@@ -1,12 +1,9 @@
 package no.stonedstonar.BookREST.model.database;
 
-import no.stonedstonar.BookREST.model.Book;
 import no.stonedstonar.BookREST.model.BranchBook;
 import no.stonedstonar.BookREST.model.exceptions.*;
-import no.stonedstonar.BookREST.model.registers.BookRegister;
 import no.stonedstonar.BookREST.model.registers.BranchBookRegister;
 import no.stonedstonar.BookREST.model.repositories.BranchBookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -33,7 +30,7 @@ public class BranchBookJPA implements BranchBookRegister {
     @Override
     public void addBranchBook(BranchBook branchBook) throws CouldNotAddBranchBookException {
         checkIfBranchBookIsValid(branchBook);
-        if (!branchBookRepository.existsById(branchBook.getBranchID())){
+        if (!branchBookRepository.existsById(branchBook.getBranchBookID())){
             branchBookRepository.save(branchBook);
         }else {
             throw new CouldNotAddBranchBookException("The branch book with id " + branchBook.getBranchBookID() + " is already in the system.");
@@ -60,7 +57,7 @@ public class BranchBookJPA implements BranchBookRegister {
     @Override
     public void updateBranchBook(BranchBook branchBook) throws CouldNotGetBranchBookException {
         checkIfBranchBookIsValid(branchBook);
-        if (branchBookRepository.existsById(branchBook.getBranchID())){
+        if (branchBookRepository.existsById(branchBook.getBranchBookID())){
             branchBookRepository.save(branchBook);
         }else {
             throw new CouldNotGetBranchBookException("The branch book with id " + branchBook.getBranchBookID() + " could not be modified since its not in the system.");
@@ -86,10 +83,21 @@ public class BranchBookJPA implements BranchBookRegister {
     }
 
     @Override
+    public List<BranchBook> getAllBranchBooks() {
+        List<BranchBook> branchBooks = new LinkedList<>();
+        branchBookRepository.findAll().forEach(branchBooks::add);
+        return branchBooks;
+    }
+
+    @Override
     public boolean checkIfBranchBooksRegisterHasBooks() {
         return branchBookRepository.count() > 0;
     }
 
+    /**
+     * Checks if the branch book is not null.
+     * @param branchBook the branch to check
+     */
     private void checkIfBranchBookIsValid(BranchBook branchBook){
         checkIfObjectIsNull(branchBook, "branch book");
     }

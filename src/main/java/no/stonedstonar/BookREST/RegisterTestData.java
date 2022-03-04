@@ -40,22 +40,21 @@ public class RegisterTestData {
         BookRegister bookRegister = new BookJPA(bookRepository);
         AuthorRegister authorRegister = new AuthorJPA(authorRepository);
         CompanyRegister companyRegister = new CompanyJPA(companyRepository);
-        BranchRegister libraryDatabase = new BranchJPA(branchRepository);
+        BranchRegister branchRegister = new BranchJPA(branchRepository);
         UserRegister userRegister = new UserJPA(userRepository, addressRepository);
         BranchBookRegister branchBookRegister = new BranchBookJPA(branchBookRepository);
         LentBooksRegister lentBooksRegister = new LentBookJPA(lentBookRepository, lentBooksLogRepository);
         LentBooksLog lentBooksLog = new LentBooksLogJPA(lentBooksLogRepository);
         //checkIfTableIsMadeIfNotADd(connection);
         try {
-
-            List<Author> authors = addAuthorsToRegister(authorRegister);
+            addAuthorsToRegister(authorRegister);
             addCompaniesToRegister(companyRegister);
-            addBooksToRegister(bookRegister, authors);
-            addBranchesToLibrary(libraryDatabase);
+            addBooksToRegister(bookRegister, authorRegister.getAuthorList(), companyRegister.getAllCompanies());
+            addBranchesToLibrary(branchRegister);
             addUsersToRegister(userRegister);
-            addBranchBooksToRegister(branchBookRegister);
-            addLentBooksToRegister(lentBooksRegister);
-            addReturnedBooksToRegister(lentBooksLog);
+            addBranchBooksToRegister(branchBookRegister,bookRegister.getBookList() , branchRegister.getAllBranches());
+            addLentBooksToRegister(lentBooksRegister, branchBookRegister.getAllBranchBooks(), userRegister.getAllUsers());
+            addReturnedBooksToRegister(lentBooksLog, branchBookRegister.getAllBranchBooks(), userRegister.getAllUsers());
         }catch (Exception exception){
             System.out.println("Failed to add test data.");
             System.out.println(exception.getMessage());
@@ -150,7 +149,7 @@ public class RegisterTestData {
      * @param bookRegister the book register to fill.
      * @throws CouldNotAddBookException gets thrown if a book could not be added.
      */
-    private void addBooksToRegister(BookRegister bookRegister, List<Author> originalAuthors) throws CouldNotAddBookException, SQLException {
+    private void addBooksToRegister(BookRegister bookRegister, List<Author> originalAuthors, List<Company> companies) throws CouldNotAddBookException, SQLException {
         checkIfObjectIsNull(bookRegister, "book register");
         if (bookRegister.getBookList().isEmpty()){
             List<Author> authors = new ArrayList<>();
@@ -159,22 +158,21 @@ public class RegisterTestData {
             List<Author> authors4 = new ArrayList<>();
 
             authors.add(getAuthorFromList("Jo", originalAuthors));
-            authors2.add(getAuthorFromList("Jo", originalAuthors));
             authors2.add(getAuthorFromList("Lars", originalAuthors));
             authors3.add(getAuthorFromList("Nils", originalAuthors));
             authors3.add(getAuthorFromList("Øyvind", originalAuthors));
             authors4.add(getAuthorFromList("Abid", originalAuthors));
 
-            bookRegister.addBook(new Book(9788203192128L, "Snømannen", authors,2007, 438,1));
-            bookRegister.addBook(new Book(9788203364181L, "Kniv", authors,2019, 519, 1));
-            bookRegister.addBook(new Book(9788202562939L, "Lars Monsen - mitt liv", authors2, 2020, 246, 2));
-            bookRegister.addBook(new Book(9788234702235L, "Verden ifølge Vinni", authors3, 2021, 236, 3));
-            bookRegister.addBook(new Book(9788202713461L, "Min skyld - en historie om frigjøring", authors4, 2021, 239, 2));
+            bookRegister.addBook(new Book(9788203192128L, "Snømannen", authors,2007, 438,companies.get(0)));
+            bookRegister.addBook(new Book(9788203364181L, "Kniv", authors,2019, 519, companies.get(0)));
+            bookRegister.addBook(new Book(9788202562939L, "Lars Monsen - mitt liv", authors2, 2020, 246, companies.get(1)));
+            bookRegister.addBook(new Book(9788234702235L, "Verden ifølge Vinni", authors3, 2021, 236, companies.get(2)));
+            bookRegister.addBook(new Book(9788202713461L, "Min skyld - en historie om frigjøring", authors4, 2021, 239, companies.get(2)));
         }
     }
 
     private Author getAuthorFromList(String firstNameOfAuthor, List<Author> originalAuthors){
-        return originalAuthors.stream().filter(author -> author.getFirstName().equals("Jo")).findFirst().get();
+        return originalAuthors.stream().filter(author -> author.getFirstName().equals(firstNameOfAuthor)).findFirst().get();
     }
 
     /**
@@ -182,10 +180,11 @@ public class RegisterTestData {
      * @param lentBooksLog the lent books log to add to.
      * @throws CouldNotAddLentBookException gets thrown if the returned book is already in the register.
      */
-    private void addReturnedBooksToRegister(LentBooksLog lentBooksLog) throws CouldNotAddLentBookException {
+    private void addReturnedBooksToRegister(LentBooksLog lentBooksLog, List<BranchBook> branchBooks, List<User> users) throws CouldNotAddLentBookException {
         if (lentBooksLog.getAllReturnedBooks().isEmpty()){
-            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(1, 1, LocalDate.now().minusDays(3), LocalDate.now(), LocalDate.now()));
-            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(5, 2, LocalDate.now().minusDays(7), LocalDate.now().minusDays(4), LocalDate.now().minusDays(3)));
+            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(branchBooks.get(0), users.get(0), LocalDate.now().minusDays(3), LocalDate.now(), LocalDate.now()));
+            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(branchBooks.get(6), users.get(1), LocalDate.now().minusDays(7), LocalDate.now().minusDays(4), LocalDate.now().minusDays(3)));
+            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(branchBooks.get(6), users.get(1), LocalDate.now().minusDays(8), LocalDate.now().minusDays(7), LocalDate.now().minusDays(3)));
         }
     }
 
@@ -194,13 +193,13 @@ public class RegisterTestData {
      * @param lentBooksRegister
      * @throws CouldNotAddLentBookException
      */
-    private void addLentBooksToRegister(LentBooksRegister lentBooksRegister) throws CouldNotAddLentBookException {
+    private void addLentBooksToRegister(LentBooksRegister lentBooksRegister, List<BranchBook> branchBooks, List<User> users) throws CouldNotAddLentBookException {
         checkIfObjectIsNull(lentBooksRegister, "lent books register");
         if (lentBooksRegister.getAllLentBooks().isEmpty()){
-            lentBooksRegister.addLentBook(new LentBook(1, 1, LocalDate.now(), LocalDate.now().plusDays(1)));
-            lentBooksRegister.addLentBook(new LentBook(2, 1, LocalDate.now().minusDays(4), LocalDate.now().minusDays(1)));
-            lentBooksRegister.addLentBook(new LentBook(7, 1, LocalDate.now().minusDays(14), LocalDate.now().minusDays(10)));
-            lentBooksRegister.addLentBook(new LentBook(11, 2, LocalDate.now(), LocalDate.now().plusDays(15)));
+            lentBooksRegister.addLentBook(new LentBook(branchBooks.get(1), users.get(0), LocalDate.now(), LocalDate.now().plusDays(1)));
+            lentBooksRegister.addLentBook(new LentBook(branchBooks.get(0), users.get(0), LocalDate.now().minusDays(4), LocalDate.now().minusDays(1)));
+            lentBooksRegister.addLentBook(new LentBook(branchBooks.get(5), users.get(0), LocalDate.now().minusDays(14), LocalDate.now().minusDays(10)));
+            lentBooksRegister.addLentBook(new LentBook(branchBooks.get(10), users.get(1), LocalDate.now(), LocalDate.now().plusDays(15)));
         }
 
     }
@@ -210,20 +209,25 @@ public class RegisterTestData {
      * @param branchBookRegister the branch book register to add to.
      * @throws CouldNotAddBranchBookException gets thrown if the branch book is already in the system.
      */
-    private void addBranchBooksToRegister(BranchBookRegister branchBookRegister) throws CouldNotAddBranchBookException {
+    private void addBranchBooksToRegister(BranchBookRegister branchBookRegister, List<Book> books ,List<Branch> branches) throws CouldNotAddBranchBookException {
         checkIfObjectIsNull(branchBookRegister, "branch book register");
+        List<BranchBook> branchBooks = new LinkedList<>();
         if (!branchBookRegister.checkIfBranchBooksRegisterHasBooks()){
             int amount = 1;
             for (int i = 1; i < 4; i++){
-                branchBookRegister.addBranchBook(new BranchBook(amount, 9788202562939L, i));
-                branchBookRegister.addBranchBook(new BranchBook(amount + 1 , 9788202713461L, i));
-                branchBookRegister.addBranchBook(new BranchBook(amount + 2, 9788203192128L, i));
-                branchBookRegister.addBranchBook(new BranchBook(amount + 3, 9788203364181L, i));
-                branchBookRegister.addBranchBook(new BranchBook(amount + 4, 9788234702235L ,i));
+                int number = amount *10000;
+                branchBooks.add(new BranchBook(number, books.get(0), branches.get(i-1)));
+                branchBooks.add(new BranchBook(number + 2, books.get(0), branches.get(i-1)));
+                branchBooks.add(new BranchBook(number + 1 , books.get(2), branches.get(i-1)));
+                branchBooks.add(new BranchBook(number + 2, books.get(3), branches.get(i-1)));
+                branchBooks.add(new BranchBook(number + 3, books.get(2), branches.get(i-1)));
+                branchBooks.add(new BranchBook(number + 4, books.get(3) ,branches.get(i-1)));
+                for (BranchBook branchBook: branchBooks){
+                    branchBookRegister.addBranchBook(branchBook);
+                }
                 amount += 5;
             }
         }
-
     }
 
     /**
@@ -232,17 +236,15 @@ public class RegisterTestData {
      * @throws CouldNotAddAuthorException gets thrown if one author could not be added.
      * @return a list with all the authors added.
      */
-    private List<Author> addAuthorsToRegister(AuthorRegister authorRegister) throws CouldNotAddAuthorException, SQLException {
+    private void addAuthorsToRegister(AuthorRegister authorRegister) throws CouldNotAddAuthorException, SQLException {
         checkIfObjectIsNull(authorRegister, "authorregister");
-        List<Author> authors = authorRegister.getAuthorList();
-        if (authors.isEmpty()){
+        if (authorRegister.getAuthorList().isEmpty()){
             authorRegister.addAuthor(new Author(1, "Jo", "Nesbø", 1960));
             authorRegister.addAuthor(new Author(2, "Lars", "Monsen", 1963));
             authorRegister.addAuthor(new Author(3, "Øyvind", "Sauvik", 1976));
             authorRegister.addAuthor(new Author(4, "Nils", "Anker", 1961));
             authorRegister.addAuthor(new Author(5, "Abid", "Raja", 1975));
         }
-        return authorRegister.getAuthorList();
     }
 
     /**

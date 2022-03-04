@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Steinar Hjelle Midthus
@@ -68,21 +69,30 @@ public class LentBookJPA implements LentBooksRegister {
     }
 
     @Override
-    public void removeLentBookWithLentBookId(long lentBookID) throws CouldNotRemoveLentBookException {
+    public void removeLentBookWithLentBookId(long lentBookID, boolean returned, LocalDate localDate) throws CouldNotRemoveLentBookException {
         checkIfIdIsNotBelowZero(lentBookID);
-
+        try {
+            removeLentBook(getLentBook(lentBookID), returned, localDate);
+        }catch (CouldNotGetLentBookException exception){
+            throw new CouldNotRemoveLentBookException("The lent book with id " + lentBookID + " is not in the system.");
+        }
     }
 
 
     @Override
     public LentBook getLentBook(long branchBookID) throws CouldNotGetLentBookException {
-        return null;
+        checkIfIdIsNotBelowZero(branchBookID);
+        Optional<LentBook> opLentBook = lentBookRepository.findByBranchBookID(branchBookID);
+        if (opLentBook.isEmpty()){
+            throw new CouldNotGetLentBookException("The lent book with branch book id " + branchBookID + " could not be found.");
+        }
+        return opLentBook.get();
     }
 
 
     @Override
     public List<LentBook> getAllDueBooks() {
-        return null;
+        return lentBookRepository.findLentBooksByDueDate();
     }
 
     @Override
@@ -94,17 +104,19 @@ public class LentBookJPA implements LentBooksRegister {
 
     @Override
     public List<LentBook> getAllDueBooksForBranch(long branchID, int amountOfDays) {
-        return null;
+        checkIfIdIsNotBelowZero(branchID);
+        checkIfLongIsAboveZero(amountOfDays, "amount of days");
+        return lentBookRepository.findLentBooksByBranchIDAndDueDate(branchID, amountOfDays);
     }
 
     @Override
     public List<LentBook> getAllBooksWithBranchID(long branchID) {
-        return null;
+        return lentBookRepository.findLentBooksByBranchID(branchID);
     }
 
     @Override
     public List<LentBook> getAllDueBooksForUser(long userID) {
-        return null;
+        return lentBookRepository.findLentBooksThatHasUserIDAndAfterDueDate(userID);
     }
 
     /**

@@ -43,25 +43,28 @@ public class LentBooksLogJPA implements LentBooksLog {
     }
 
     @Override
-    public void removeLentBookByBranchBookID(long branchBookID) throws CouldNotRemoveLentBookException {
-        checkIfIdIsValid(branchBookID);
-        
-
-    }
-
-    @Override
     public void removeLentBookWithLentBookID(long lentBookId) throws CouldNotRemoveLentBookException {
-
+        checkIfIdIsValid(lentBookId);
+        if (!lentBooksLogRepository.existsById(lentBookId)){
+            lentBooksLogRepository.deleteById(lentBookId);
+        }else {
+            throw new CouldNotRemoveLentBookException("The lent book with id " + lentBookId + " could not be located.");
+        }
     }
 
     @Override
     public void updateReturnedLentBook(ReturnedLentBook returnedLentBook) throws CouldNotGetLentBookException {
-
+        checkIfLentBookIsNotNull(returnedLentBook);
+        if (lentBooksLogRepository.existsById(returnedLentBook.getLentBookId())){
+            lentBooksLogRepository.save(returnedLentBook);
+        }else {
+            throw new CouldNotGetLentBookException("The lent book with id " + returnedLentBook.getLentBookId() + " could not be found.");
+        }
     }
 
     @Override
-    public List<ReturnedLentBook> getAllTheTimesBookHasBeenLent(long bookID, long branchID) {
-        return null;
+    public List<ReturnedLentBook> getAllTheTimesBookHasBeenLent(long branchBookID) {
+        return lentBooksLogRepository.findAllTheTimesBookHasBeenLentOut(branchBookID);
     }
 
     @Override

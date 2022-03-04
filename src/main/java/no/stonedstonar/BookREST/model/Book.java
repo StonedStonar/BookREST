@@ -22,12 +22,12 @@ public class Book {
     @Column(nullable = false)
     private String title;
 
-    @ManyToMany(targetEntity = Author.class)
+    @ManyToMany
     @JoinTable(name = "authorsOfBook",
-            joinColumns = @JoinColumn(name="isbn", referencedColumnName = "isbn"),
-            inverseJoinColumns = @JoinColumn(name="authorId", referencedColumnName = "authorID")
+            joinColumns = @JoinColumn(name= "isbn", referencedColumnName = "isbn"),
+            inverseJoinColumns = @JoinColumn(name= "authorId", referencedColumnName = "authorID")
     )
-    private final List<Author> authors;
+    private List<Author> authors;
 
     @Column(nullable = false)
     private int year;
@@ -35,9 +35,9 @@ public class Book {
     @Column(nullable = false)
     private int numberOfPages;
 
-    @JoinColumn(name="publisherID", referencedColumnName = "companyID")
-    @Column(nullable = false)
-    private long publisherID;
+    @ManyToOne(targetEntity = Company.class)
+    @JoinColumn(name = "companyID")
+    private Company company;
 
     /**
      * Makes a basic book with all the fields set to a default invalid value.
@@ -57,21 +57,21 @@ public class Book {
      * @param title the title of the book.
      * @param year the year of the book.
      * @param numberOfPages the amount of pages in the book.
-     *  @param publisherID the ID of the publisher.
+     * @param company the company of the book.
      */
     @JsonCreator
-    public Book(long isbn, String title, List<Author> authors, int year, int numberOfPages, long publisherID){
+    public Book(long isbn, String title, List<Author> authors, int year, int numberOfPages, Company company){
         checkISBN(isbn);
         checkTitle(title);
         checkNumberOfPages(numberOfPages);
-        checkPublisherID(publisherID);
+        checkIfObjectIsNull(company, "company");
         this.authors = new ArrayList<>();
         this.isbn = isbn;
         this.year = year;
         this.title = title;
         this.numberOfPages = numberOfPages;
         this.authors.addAll(authors);
-        this.publisherID = publisherID;
+        this.company = company;
     }
 
     /**
@@ -89,19 +89,11 @@ public class Book {
     }
 
     /**
-     * Gets the publishers ID.
-     * @return the ID the publisher has.
+     * Gets the company that published this book.
+     * @return the company that published this book.
      */
-    public long getPublisherID() {
-        return publisherID;
-    }
-
-    /**
-     * Sets the publisher ID to a new value.
-     * @param publisherID the publisher ID.
-     */
-    public void setPublisherID(long publisherID) {
-        this.publisherID = publisherID;
+    public Company getCompany(){
+        return company;
     }
 
 

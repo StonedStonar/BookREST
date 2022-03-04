@@ -12,6 +12,8 @@ import no.stonedstonar.BookREST.model.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -75,6 +77,13 @@ public class UserJPA implements UserRegister {
     @Override
     public boolean checkIfRegisterHasUsers() {
         return false;
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        List<User> users = new LinkedList<>();
+        userRepository.findAll().forEach(users::add);
+        return users;
     }
 
     /**

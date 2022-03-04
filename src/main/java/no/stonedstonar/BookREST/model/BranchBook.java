@@ -16,13 +16,13 @@ public class BranchBook {
     @GeneratedValue
     private long branchBookID;
 
-    @JoinColumn(name="isbn", referencedColumnName = "isbn")
-    @Column(nullable = false)
-    private long isbn;
+    @ManyToOne(targetEntity = Book.class)
+    @JoinColumn(name = "isbn")
+    private Book book;
 
-    @JoinColumn(name="branchID", referencedColumnName = "branchID")
-    @Column(nullable = false)
-    private long branchID;
+    @ManyToOne(targetEntity = Branch.class)
+    @JoinColumn(name = "branchID")
+    private Branch branch;
 
     /**
      * Empty constructor for JPA.
@@ -33,18 +33,18 @@ public class BranchBook {
     /**
      * Makes an instance of the BranchBook class.
      * @param branchBookID the branch book id.
-     * @param isbn the books ISBN code.
-     * @param branchID the branch ID.
+     * @param book the book this represents.
+     * @param branch the branch this book belongs to.
      */
     @JsonCreator
-    public BranchBook(long branchBookID, long isbn, long branchID){
+    public BranchBook(long branchBookID, Book book, Branch branch){
         checkIfLongIsAboveZero(branchBookID, "branch book id");
-        checkIfLongIsAboveZero(isbn, "ISBN");
-        checkIfLongIsAboveZero(branchID, "branch ID");
+        checkIfObjectIsNull(book,"book");
+        checkIfObjectIsNull(branch, "branch");
 
-        this.isbn = isbn;
+        this.book = book;
         this.branchBookID = branchBookID;
-        this.branchID = branchID;
+        this.branch = branch;
     }
 
     /**
@@ -56,19 +56,19 @@ public class BranchBook {
     }
 
     /**
-     * Gets the ISBN this branch book is underneath.
-     * @return the ISBN of the book.
+     * Gets the book.
+     * @return the book this branch book represents.
      */
-    public long getIsbn() {
-        return isbn;
+    public Book getBook(){
+        return book;
     }
 
     /**
-     * Gets the branchID that is book belongs to.
-     * @return the branch ID.
+     * Gets the branch this book belongs too.
+     * @return the branch this book belongs to.
      */
-    public long getBranchID() {
-        return branchID;
+    public Branch getBranch(){
+        return branch;
     }
 
     /**
