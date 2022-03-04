@@ -1,15 +1,11 @@
 package no.stonedstonar.BookREST.model.database;
 
-import no.stonedstonar.BookREST.JdbcConnection;
-import no.stonedstonar.BookREST.RegisterTestData;
 import no.stonedstonar.BookREST.model.Author;
-import no.stonedstonar.BookREST.model.Book;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
 import no.stonedstonar.BookREST.model.registers.AuthorRegister;
 import no.stonedstonar.BookREST.model.repositories.AuthorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -35,17 +31,17 @@ public class AuthorJPA implements AuthorRegister {
     @Override
     public void addAuthor(Author author) throws CouldNotAddAuthorException {
         checkIfAuthorIsRightFormat(author);
-        if (!authorRepository.existsById(author.getID())){
+        if (!authorRepository.existsById(author.getAuthorID())){
             authorRepository.save(author);
         }else {
-            throw new CouldNotAddAuthorException("The author with the ID " + author.getID() + " is already in the system.");
+            throw new CouldNotAddAuthorException("The author with the ID " + author.getAuthorID() + " is already in the system.");
         }
     }
 
     @Override
     public void removeAuthor(Author author) throws CouldNotRemoveAuthorException {
         checkIfAuthorIsRightFormat(author);
-        removeAuthorWithId(author.getID());
+        removeAuthorWithId(author.getAuthorID());
     }
 
     @Override
@@ -61,10 +57,10 @@ public class AuthorJPA implements AuthorRegister {
     @Override
     public void updateAuthor(Author author) throws CouldNotGetAuthorException {
         checkIfAuthorIsRightFormat(author);
-        if (authorRepository.existsById(author.getID())){
+        if (authorRepository.existsById(author.getAuthorID())){
             authorRepository.save(author);
         }else {
-            throw new CouldNotGetAuthorException("The author with the ID " + author.getID() + " could not be found in the system.");
+            throw new CouldNotGetAuthorException("The author with the ID " + author.getAuthorID() + " could not be found in the system.");
         }
     }
 

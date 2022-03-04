@@ -3,6 +3,7 @@ package no.stonedstonar.BookREST.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
@@ -14,6 +15,7 @@ import javax.persistence.Id;
 public class Author {
 
     @Id
+    @GeneratedValue
     private long authorID;
 
     private String firstName;
@@ -27,17 +29,18 @@ public class Author {
 
     /**
       * Makes an instance of the Author class.
-      * @param ID the ID of the author.
+      * @param authorID the ID of the author.
       * @param firstName the first name of the author.
       * @param lastName the last name of the author.
       * @param birthYear the birth year of the author.
       */
     @JsonCreator
-    public Author(long ID, String firstName, String lastName, int birthYear){
+    public Author(long authorID, String firstName, String lastName, int birthYear){
         checkFirstName(firstName);
         checkLastName(lastName);
-        checkID(ID);
-        this.authorID = ID;
+        checkID(authorID);
+
+        this.authorID = authorID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthYear = birthYear;
@@ -47,7 +50,7 @@ public class Author {
      * Gets the ID of the author.
      * @return the ID.
      */
-    public long getID() {
+    public long getAuthorID() {
         return authorID;
     }
 
@@ -55,7 +58,7 @@ public class Author {
      * Sets the ID of the author.
      * @param ID the new ID of the author.
      */
-    public void setID(long ID) {
+    public void setAuthorID(long ID) {
         checkID(ID);
         this.authorID = ID;
     }

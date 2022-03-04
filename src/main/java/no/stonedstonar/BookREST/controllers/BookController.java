@@ -1,8 +1,12 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import io.swagger.annotations.ApiOperation;
+import no.stonedstonar.BookREST.model.Author;
+import no.stonedstonar.BookREST.model.Company;
 import no.stonedstonar.BookREST.model.database.BookJPA;
 import no.stonedstonar.BookREST.model.registers.BookRegister;
 import no.stonedstonar.BookREST.JdbcConnection;
@@ -14,9 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 
@@ -43,7 +45,7 @@ public class BookController {
      * @return all the books in the register.
      */
     @GetMapping
-    public List<Book> getBooks(@RequestParam(value = "authorID", required = false) Optional<Long> optionalAuthorID) throws SQLException {
+    public List<Book> getBooks(@RequestParam(value = "authorID", required = false) Optional<Long> optionalAuthorID) {
         if (optionalAuthorID.isEmpty()){
             return bookRegister.getBookList();
         }else {
@@ -61,7 +63,7 @@ public class BookController {
             notes = "Provide an ID to look up for a specific book.",
             response = Book.class)
     @GetMapping("/{id}")
-    public Book getBookById(@PathVariable long id) throws CouldNotGetBookException, SQLException {
+    public Book getBookById(@PathVariable long id) throws CouldNotGetBookException {
         return bookRegister.getBook(id);
     }
 
@@ -72,7 +74,7 @@ public class BookController {
      * @throws CouldNotAddBookException gets thrown if the book could not be added.
      */
     @PostMapping
-    public void postBook(@RequestBody Book book) throws JsonProcessingException, CouldNotAddBookException, SQLException {
+    public void postBook(@RequestBody Book book) throws JsonProcessingException, CouldNotAddBookException {
         bookRegister.addBook(book);
     }
 
@@ -84,16 +86,6 @@ public class BookController {
     @PutMapping
     public void changeBook(@RequestBody Book book) throws CouldNotGetBookException {
         bookRegister.updateBook(book);
-    }
-
-    /**
-     * Handles a sql exception.
-     * @param exception the exception to handle.
-     * @return a response based on the exception.
-     */
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<String> handleSQLException(Exception exception){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not connect to mysql server.");
     }
 
 

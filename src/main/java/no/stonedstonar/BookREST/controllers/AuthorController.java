@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.controllers;
 
 import no.stonedstonar.BookREST.model.database.AuthorJPA;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.registers.AuthorRegister;
 import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.Author;
@@ -48,9 +49,20 @@ public class AuthorController {
     }
 
     @GetMapping("/{id}")
-    public Author getAuthorWithID(@PathVariable long id) throws CouldNotGetAuthorException, SQLException {
+    public Author getAuthorWithID(@PathVariable long id) throws CouldNotGetAuthorException {
         return authorRegister.getAuthorById(id);
     }
+
+    @PostMapping
+    public void addAuthor(@RequestBody Author author) throws CouldNotAddAuthorException {
+        authorRegister.addAuthor(author);
+    }
+
+    @PutMapping
+    public void changeAuthor(@RequestBody Author author) throws CouldNotGetAuthorException {
+        authorRegister.updateAuthor(author);
+    }
+
 
     @ExceptionHandler(CouldNotGetAuthorException.class)
     public ResponseEntity<String> handleCouldNotGetException(Exception exception){

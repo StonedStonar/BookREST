@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import no.stonedstonar.BookREST.model.BranchBook;
 import no.stonedstonar.BookREST.model.database.BranchBookJPA;
 import no.stonedstonar.BookREST.model.exceptions.*;
