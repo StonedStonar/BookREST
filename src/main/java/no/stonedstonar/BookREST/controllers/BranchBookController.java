@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import no.stonedstonar.BookREST.model.BranchBook;
 import no.stonedstonar.BookREST.model.database.BranchBookJPA;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,18 +42,38 @@ public class BranchBookController {
      * @return a list with all the branch books in that branch.
      */
     @GetMapping
-    public List<BranchBook> getBranchBooks(@RequestParam(value = "branchID") long branchId) throws SQLException {
-        return branchBookRegister.getAllBranchBooksForBranchWithID(branchId);
+    public List<BranchBook> getBranchBooks(@RequestParam(value = "branchID") long branchId,@RequestParam(value = "isbn") long isbn) {
+        List<BranchBook> branchBooks;
+        if (branchId != 0){
+            branchBooks = branchBookRegister.getAllBranchBooksForBranchWithID(branchId);
+        }else if (isbn != 0){
+            branchBooks = branchBookRegister.getAllBranchBooksWithISBN(isbn);
+        }else {
+            branchBooks = branchBookRegister.getAllBranchBooksForBranchWithID(branchId);
+        }
+        return branchBooks;
     }
 
     /**
      * Adds a new branch book to the register.
-     * @param branchBook the branch book to add.
+     * @param body the branch book to add.
      * @throws CouldNotAddBranchBookException gets thrown when the object could not be added.
+     * @throws JsonProcessingException gets thrown if the format is invalid.
      */
     @PostMapping
-    public void addBranchBook(@RequestBody BranchBook branchBook) throws CouldNotAddBranchBookException {
-        branchBookRegister.addBranchBook(branchBook);
+    public void addBranchBook(@RequestBody String body) throws CouldNotAddBranchBookException, JsonProcessingException {
+        branchBookRegister.addBranchBook(getBranchBook(body));
+    }
+
+    /**
+     * Updates a book and its details.
+     * @param body the branch book as a json.
+     * @throws CouldNotGetBranchBookException gets thrown if the branch book could not be located.
+     * @throws JsonProcessingException gets thrown if the format is invalid.
+     */
+    @PutMapping
+    public void updateBranchBook(@RequestBody String body) throws JsonProcessingException, CouldNotGetBranchBookException {
+        branchBookRegister.updateBranchBook(getBranchBook(body));
     }
 
     /**
@@ -65,11 +87,22 @@ public class BranchBookController {
     }
 
     /**
+     * Gets a branch book from a json body.
+     * @param body the json body.
+     * @return the branch book that was in the json.
+     * @throws JsonProcessingException gets thrown if the format is invalid.
+     */
+    private BranchBook getBranchBook(String body) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(body, BranchBook.class);
+    }
+
+    /**
      * Handles a duplicate object exception.
      * @param exception the exception to handle.
      * @return the response according to exception.
      */
-    @ExceptionHandler(DuplicateObjectException.class)
+    @ExceptionHandler(CouldNotAddBranchBookException.class)
     public ResponseEntity<String> handleDuplicateObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.IM_USED).body(exception.getMessage());
     }
@@ -79,7 +112,7 @@ public class BranchBookController {
      * @param exception the exception to handle.
      * @return the response according to the exception.
      */
-    @ExceptionHandler(GetObjectException.class)
+    @ExceptionHandler(CouldNotGetBranchBookException.class)
     public ResponseEntity<String> handleGetObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }
@@ -89,7 +122,7 @@ public class BranchBookController {
      * @param exception the exception to handle.
      * @return the response according the exception
      */
-    @ExceptionHandler(RemoveObjectException.class)
+    @ExceptionHandler(CouldNotRemoveBranchBookException.class)
     public ResponseEntity<String> handleRemoveObjectException(Exception exception){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }

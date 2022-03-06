@@ -1,7 +1,6 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.database.LentBookJPA;
 import no.stonedstonar.BookREST.model.exceptions.*;
@@ -43,7 +42,7 @@ public class LentBooksController {
      * @return a list with all the books.
      */
     @GetMapping
-    public List<LentBook> getLentBooks(@RequestParam(value = "branchID", required = false) Optional<Long> branchID) throws SQLException {
+    public List<LentBook> getLentBooks(@RequestParam(value = "branchID", required = false) Optional<Long> branchID){
         List<LentBook> returnedLentBooks;
         if (branchID.isEmpty()){
             returnedLentBooks = lentBooksRegister.getAllDueBooks();

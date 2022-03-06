@@ -43,6 +43,13 @@ public interface BranchBookRegister {
     void updateBranchBook(BranchBook branchBook) throws CouldNotGetBranchBookException;
 
     /**
+     * Gets all the branch books with a certain ISBN.
+     * @param isbn the isbn to search for.
+     * @return a list with all the branch books with that ISBN.
+     */
+    List<BranchBook> getAllBranchBooksWithISBN(long isbn);
+
+    /**
      * Gets a branch book.
      * @param branchBookID the branch book ID.
      * @return the branch book that matches the ID.

@@ -66,26 +66,44 @@ public class BranchBookJPA implements BranchBookRegister {
     }
 
     @Override
+    public List<BranchBook> getAllBranchBooksWithISBN(long isbn) {
+        List<BranchBook> branchBooks = branchBookRepository.getAllBooksWithISBNThatIsFree(isbn);
+        branchBookRepository.getAllBooksWithISBNThatIsLent(isbn).forEach(branchBook -> {
+            branchBook.setTaken(true);
+            branchBooks.add(branchBook);
+        });
+        return branchBooks;
+    }
+
+    @Override
     public BranchBook getBranchBook(long branchBookID) throws CouldNotGetBranchBookException {
         checkIfBranchBookIdIsAboveZero(branchBookID);
         Optional<BranchBook> optionalBranchBook = branchBookRepository.findById(branchBookID);
         if (optionalBranchBook.isEmpty()){
             throw new CouldNotGetBranchBookException("The branch book with id " + branchBookID + " could not be found in the register.");
         }
-        return optionalBranchBook.get();
+        BranchBook branchBook = optionalBranchBook.get();
+        branchBook.setTaken(branchBookRepository.checkIfBranchBookIsLent(branchBookID) > 1);
+        return branchBook;
     }
 
     @Override
     public List<BranchBook> getAllBranchBooksForBranchWithID(long branchID) {
-        List<BranchBook> branchBooks = new LinkedList<>();
-        branchBookRepository.findAll().forEach(branchBooks::add);
+        List<BranchBook> branchBooks = branchBookRepository.getAllBranchBooksThatIsLent(branchID);
+        branchBookRepository.getAllBranchBooksThatIsLent(branchID).forEach(branchBook -> {
+            branchBook.setTaken(true);
+            branchBooks.add(branchBook);
+        });
         return branchBooks;
     }
 
     @Override
     public List<BranchBook> getAllBranchBooks() {
-        List<BranchBook> branchBooks = new LinkedList<>();
-        branchBookRepository.findAll().forEach(branchBooks::add);
+        List<BranchBook> branchBooks = branchBookRepository.getAllBranchBooksThatIsNotLent();
+        branchBookRepository.getAllBranchBooksThatIsLent().forEach(branchBook -> {
+            branchBook.setTaken(true);
+            branchBooks.add(branchBook);
+        });
         return branchBooks;
     }
 
@@ -124,7 +142,6 @@ public class BranchBookJPA implements BranchBookRegister {
 
     /**
      * Checks if a string is of a valid format or not.
-     *
      * @param stringToCheck the string you want to check.
      * @param errorPrefix   the error the exception should have if the string is invalid.
      */

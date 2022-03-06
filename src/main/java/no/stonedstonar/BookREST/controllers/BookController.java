@@ -1,15 +1,10 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import io.swagger.annotations.ApiOperation;
-import no.stonedstonar.BookREST.model.Author;
-import no.stonedstonar.BookREST.model.Company;
 import no.stonedstonar.BookREST.model.database.BookJPA;
 import no.stonedstonar.BookREST.model.registers.BookRegister;
-import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.Book;
 import no.stonedstonar.BookREST.model.repositories.BookRepository;
@@ -17,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -69,23 +63,23 @@ public class BookController {
 
     /**
      * Adds a new book to the register.
-     * @param book the body that contains the JSON file.
+     * @param body the body that contains the JSON file.
      * @throws JsonProcessingException gets thrown if the JSON could not be translated to the wanted object.
      * @throws CouldNotAddBookException gets thrown if the book could not be added.
      */
     @PostMapping
-    public void postBook(@RequestBody Book book) throws JsonProcessingException, CouldNotAddBookException {
-        bookRegister.addBook(book);
+    public void postBook(@RequestBody String body) throws JsonProcessingException, CouldNotAddBookException {
+        bookRegister.addBook(getBook(body));
     }
 
     /**
      * Changes the existing book and its details.
-     * @param book the book as a json.
+     * @param body the book as a json.
      * @throws CouldNotGetBookException gets thrown if the target book could not be found.
      */
     @PutMapping
-    public void changeBook(@RequestBody Book book) throws CouldNotGetBookException {
-        bookRegister.updateBook(book);
+    public void changeBook(@RequestBody String body) throws CouldNotGetBookException, JsonProcessingException {
+        bookRegister.updateBook(getBook(body));
     }
 
 
@@ -97,6 +91,17 @@ public class BookController {
     @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable long id) throws CouldNotRemoveBookException {
         bookRegister.removeBookByID(id);
+    }
+
+    /**
+     * Makes a book from a json string.
+     * @param body the body to make the book from.
+     * @return the book that is in the body.
+     * @throws JsonProcessingException gets thrown if the format is invalid.
+     */
+    private Book getBook(String body) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(body, Book.class);
     }
 
     /**

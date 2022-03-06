@@ -24,10 +24,14 @@ public class BranchBook {
     @JoinColumn(name = "branchID")
     private Branch branch;
 
+    @Transient
+    private boolean taken;
+
     /**
      * Empty constructor for JPA.
      */
     public BranchBook() {
+
     }
 
     /**
@@ -45,6 +49,25 @@ public class BranchBook {
         this.book = book;
         this.branchBookID = branchBookID;
         this.branch = branch;
+        taken = false;
+    }
+
+    /**
+     * Sets the taken status of a branch book. It is taken if it's lent out.
+     * @param taken <code>true</code> if the book is lent out.
+     *              <code>false</code> if the book is not lent out.
+     */
+    public void setTaken(boolean taken){
+        this.taken = taken;
+    }
+
+    /**
+     * Gets if the book is already taken.
+     * @return <code>true</code> if the branch book is lent out.
+     *         <code>false</code> if the branch book is not lent out.
+     */
+    public boolean getTaken(){
+        return taken;
     }
 
     /**

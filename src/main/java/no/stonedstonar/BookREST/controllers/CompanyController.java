@@ -1,11 +1,9 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.stonedstonar.BookREST.model.Company;
 import no.stonedstonar.BookREST.model.database.CompanyJPA;
 import no.stonedstonar.BookREST.model.registers.CompanyRegister;
-import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddCompanyException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetCompanyException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveCompanyException;
@@ -14,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -128,28 +125,4 @@ public class CompanyController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
     }
 
-
-    
-    /**
-     * Checks if a string is of a valid format or not.
-     * @param stringToCheck the string you want to check.
-     * @param errorPrefix the error the exception should have if the string is invalid.
-     */
-    private void checkString(String stringToCheck, String errorPrefix){
-        checkIfObjectIsNull(stringToCheck, errorPrefix);
-        if (stringToCheck.isEmpty()){
-            throw new IllegalArgumentException("The " + errorPrefix + " cannot be empty.");
-        }
-    }
-    
-    /**
-     * Checks if an object is null.
-     * @param object the object you want to check.
-     * @param error the error message the exception should have.
-     */
-    private void checkIfObjectIsNull(Object object, String error){
-       if (object == null){
-           throw new IllegalArgumentException("The " + error + " cannot be null.");
-       }
-    }
 }
