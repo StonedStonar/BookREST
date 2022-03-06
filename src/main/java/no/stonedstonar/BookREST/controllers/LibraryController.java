@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RestController
 @CrossOrigin
-@RequestMapping("/library")
+@RequestMapping("/branch")
 public class LibraryController {
 
     private final BranchRegister branchRegister;
@@ -50,7 +50,7 @@ public class LibraryController {
      * @throws CouldNotAddBranchException gets thrown if the branch with that ID is already in the system.
      */
     @PostMapping
-    public void addBranch(@RequestBody String body) throws SQLException, CouldNotAddBranchException, JsonProcessingException {
+    public void addBranch(@RequestBody String body) throws CouldNotAddBranchException, JsonProcessingException {
         branchRegister.addBranch(getBranch(body));
     }
 
@@ -59,8 +59,8 @@ public class LibraryController {
      * @param branchID the branch to remove.
      * @throws RemoveObjectException gets thrown if the object could not be removed.
      */
-    @DeleteMapping
-    public void deleteBranch(@RequestParam(value = "branchID") long branchID) throws CouldNotRemoveBranchException {
+    @DeleteMapping("/{branchID}")
+    public void deleteBranch(@PathVariable long branchID) throws CouldNotRemoveBranchException {
         branchRegister.removeBranchWithBranchID(branchID);
     }
 

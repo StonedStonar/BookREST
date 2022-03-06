@@ -93,11 +93,11 @@ public class LentBookJPA implements LentBooksRegister {
     @Override
     public LentBook getLentBook(long branchBookID) throws CouldNotGetLentBookException {
         checkIfIdIsNotBelowZero(branchBookID);
-        Optional<LentBook> opLentBook = lentBookRepository.findByBranchBookID(branchBookID);
-        if (opLentBook.isEmpty()){
+        LentBook lentBook = lentBookRepository.findByBranchBookID(branchBookID);
+        if (lentBook == null){
             throw new CouldNotGetLentBookException("The lent book with branch book id " + branchBookID + " could not be found.");
         }
-        return opLentBook.get();
+        return lentBook;
     }
 
 

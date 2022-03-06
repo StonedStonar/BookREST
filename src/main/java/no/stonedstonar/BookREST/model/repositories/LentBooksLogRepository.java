@@ -15,6 +15,6 @@ import java.util.Optional;
  */
 public interface LentBooksLogRepository extends CrudRepository<ReturnedLentBook, Long> {
 
-    @Query(value = "SELECT *  FROM returnedlentbook r  WHERE r.branchBookID = :branchBookID", nativeQuery = true)
+    @Query(value = "SELECT *  FROM returnedlentbook  WHERE branchBookID = :branchBookID", nativeQuery = true)
     List<ReturnedLentBook> findAllTheTimesBookHasBeenLentOut(@Param(value = "branchBookID") long branchBookID);
 }

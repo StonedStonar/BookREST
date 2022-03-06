@@ -2,6 +2,7 @@ package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.stonedstonar.BookREST.model.Book;
 import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.database.LentBookJPA;
 import no.stonedstonar.BookREST.model.exceptions.*;
@@ -45,7 +46,7 @@ public class LentBooksController {
     public List<LentBook> getLentBooks(@RequestParam(value = "branchID", required = false) Optional<Long> branchID){
         List<LentBook> returnedLentBooks;
         if (branchID.isEmpty()){
-            returnedLentBooks = lentBooksRegister.getAllDueBooks();
+            returnedLentBooks = lentBooksRegister.getAllLentBooks();
         }else {
             returnedLentBooks = lentBooksRegister.getAllBooksWithBranchID(branchID.get());
         }

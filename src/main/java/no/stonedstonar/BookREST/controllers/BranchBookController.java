@@ -2,20 +2,17 @@ package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import no.stonedstonar.BookREST.model.BranchBook;
 import no.stonedstonar.BookREST.model.database.BranchBookJPA;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.registers.BranchBookRegister;
-import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.repositories.BranchBookRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Steinar Hjelle Midthus
@@ -42,16 +39,27 @@ public class BranchBookController {
      * @return a list with all the branch books in that branch.
      */
     @GetMapping
-    public List<BranchBook> getBranchBooks(@RequestParam(value = "branchID") long branchId,@RequestParam(value = "isbn") long isbn) {
+    public List<BranchBook> getBranchBooks(@RequestParam(value = "branchID", required = false) Optional<Long> branchId, @RequestParam(value = "isbn", required = false) Optional<Long> isbn) {
         List<BranchBook> branchBooks;
-        if (branchId != 0){
-            branchBooks = branchBookRegister.getAllBranchBooksForBranchWithID(branchId);
-        }else if (isbn != 0){
-            branchBooks = branchBookRegister.getAllBranchBooksWithISBN(isbn);
+        if (branchId.isEmpty() && isbn.isEmpty()){
+            branchBooks = branchBookRegister.getAllBranchBooks();
+        }else if (branchId.isPresent()){
+            branchBooks = branchBookRegister.getAllBranchBooksForBranchWithID(branchId.get());
         }else {
-            branchBooks = branchBookRegister.getAllBranchBooksForBranchWithID(branchId);
+            branchBooks = branchBookRegister.getAllBranchBooksWithISBN(isbn.get());
         }
         return branchBooks;
+    }
+
+    /**
+     * Get sa branch book based on the ID.
+     * @param id the id of the branch book.
+     * @return the branch book that has this id.
+     * @throws CouldNotGetBranchBookException gets thrown if the branch book does not exsist.
+     */
+    @GetMapping("/{id}")
+    public BranchBook getBranchBookWithId(@PathVariable long id) throws CouldNotGetBranchBookException {
+        return branchBookRegister.getBranchBook(id);
     }
 
     /**

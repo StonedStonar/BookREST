@@ -18,7 +18,7 @@ public interface BookRepository extends CrudRepository<Book, Long> {
      * @param authorID the author id to look for.
      * @return books that are written by this author.
      */
-    @Query(value = "SELECT * FROM book b JOIN authorsofbook a USING(isbn) WHERE a.authorId = :authorID", nativeQuery = true)
+    @Query(value = "SELECT * FROM book JOIN authorsofbook USING(isbn) WHERE authorId = :authorID", nativeQuery = true)
     List<Book> findAllBookWithAuthorID(@Param(value = "authorID") long authorID);
 
 }

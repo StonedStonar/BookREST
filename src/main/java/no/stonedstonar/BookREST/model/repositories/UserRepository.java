@@ -16,6 +16,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query(value = "SELECT * FROM `user` WHERE eMail = :em AND password = :pass", nativeQuery = true)
     Optional<User> getUserByEmailAndMatchingPassword(@Param("em") String em, @Param("pass") String pass);
 
-    @Query(value = "SELECT count(email) FROM `user` WHERE eMail = \":email\"", nativeQuery = true)
+    @Query(value = "SELECT count(email) FROM `user` WHERE eMail = :email", nativeQuery = true)
     int getIfEmailIsTaken(@Param(value = "email") String email);
 }
