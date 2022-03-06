@@ -1,6 +1,5 @@
 package no.stonedstonar.BookREST.model.repositories;
 
-import no.stonedstonar.BookREST.model.Book;
 import no.stonedstonar.BookREST.model.ReturnedLentBook;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

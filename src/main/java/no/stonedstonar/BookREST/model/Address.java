@@ -1,6 +1,6 @@
 package no.stonedstonar.BookREST.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.*;
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.RowId;
 import org.springframework.data.annotation.Reference;
@@ -72,7 +72,6 @@ public class Address implements Serializable {
      * @param houseNumber the house number.
      * @param postalCode the postal code of the area.
      */
-    @JsonCreator
     public Address(String streetName, int houseNumber, int postalCode){
         checkStreetName(streetName);
         checkHouseNumber(houseNumber);
@@ -80,6 +79,14 @@ public class Address implements Serializable {
         this.streetName = streetName;
         this.houseNumber = houseNumber;
         this.postalCode = postalCode;
+    }
+
+    /**
+     * Gets the addresses ID
+     * @return the id of the address.
+     */
+    public long getAddressId(){
+        return addressId;
     }
 
     /**

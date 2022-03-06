@@ -1,9 +1,10 @@
 package no.stonedstonar.BookREST.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.*;
 
 import javax.annotation.processing.Generated;
 import javax.persistence.*;
+import java.lang.annotation.Inherited;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 
@@ -13,16 +14,19 @@ import java.time.LocalDate;
  * @author Steinar Hjelle Midthus
  */
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class LentBook {
 
     @Id
     @GeneratedValue
     private long lentBookId;
 
-    @OneToOne(targetEntity = BranchBook.class)
-    @JoinColumn(name = "branchBookId")
+    @ManyToOne
+    @JoinColumn(name = "branchBookID", unique = true)
+    @JsonIgnore
     private BranchBook branchBook;
+
+    @Column(name = "branchBookID", updatable = false, insertable = false)
+    private long branchBookID;
 
     @ManyToOne(targetEntity = User.class)
     @JoinColumn(name="userID")
@@ -123,22 +127,11 @@ public class LentBook {
     }
 
     /**
-     * Checks if the input long is above zero.
-     * @param number the number to check.
-     * @param prefix the prefix the error should have.
-     */
-    protected void checkIfLongIsAboveZero(long number, String prefix){
-        if (number <= 0){
-            throw new IllegalArgumentException("The " + prefix + " must be above zero.");
-        }
-    }
-
-    /**
      * Checks if an object is null.
      * @param object the object you want to check.
      * @param error the error message the exception should have.
      */
-    protected void checkIfObjectIsNull(Object object, String error){
+    private void checkIfObjectIsNull(Object object, String error){
        if (object == null){
            throw new IllegalArgumentException("The " + error + " cannot be null.");
        }

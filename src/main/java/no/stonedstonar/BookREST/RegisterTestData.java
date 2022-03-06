@@ -220,9 +220,9 @@ public class RegisterTestData {
      */
     private void addReturnedBooksToRegister(LentBooksLog lentBooksLog, List<BranchBook> branchBooks, List<User> users) throws CouldNotAddLentBookException {
         if (lentBooksLog.getAllReturnedBooks().isEmpty()){
-            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(branchBooks.get(0), users.get(0), LocalDate.now().minusDays(3), LocalDate.now(), LocalDate.now()));
-            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(branchBooks.get(6), users.get(1), LocalDate.now().minusDays(7), LocalDate.now().minusDays(4), LocalDate.now().minusDays(3)));
-            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(branchBooks.get(6), users.get(1), LocalDate.now().minusDays(8), LocalDate.now().minusDays(7), LocalDate.now().minusDays(3)));
+            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(branchBooks.get(0), users.get(0), LocalDate.now().minusDays(3), LocalDate.now(), LocalDate.now(), 1000));
+            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(branchBooks.get(6), users.get(1), LocalDate.now().minusDays(7), LocalDate.now().minusDays(4), LocalDate.now().minusDays(3), 2000));
+            lentBooksLog.addReturnedLentBook(new ReturnedLentBook(branchBooks.get(6), users.get(1), LocalDate.now().minusDays(8), LocalDate.now().minusDays(7), LocalDate.now().minusDays(3), 3000));
         }
     }
 

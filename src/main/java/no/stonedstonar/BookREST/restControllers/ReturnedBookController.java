@@ -1,4 +1,4 @@
-package no.stonedstonar.BookREST.controllers;
+package no.stonedstonar.BookREST.restControllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.stonedstonar.BookREST.model.ReturnedLentBook;
@@ -6,18 +6,18 @@ import no.stonedstonar.BookREST.model.database.LentBooksLogJPA;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.registers.LentBooksLog;
 import no.stonedstonar.BookREST.model.repositories.LentBooksLogRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
 
 /**
  * @author Steinar Hjelle Midthus
  * @version 0.1
  */
+@RestController
+@RequestMapping("/returnedBooks")
 public class ReturnedBookController {
 
     private final LentBooksLog lentBooksLog;
@@ -58,7 +58,8 @@ public class ReturnedBookController {
      */
     @GetMapping("/{lentBookID}")
     public ReturnedLentBook getReturnedBook(@PathVariable long lentBookID) throws CouldNotGetLentBookException {
-        return lentBooksLog.getLentBook(lentBookID);
+        ReturnedLentBook returnedLentBook = lentBooksLog.getLentBook(lentBookID);
+        return returnedLentBook;
     }
 
     /**

@@ -1,7 +1,6 @@
 package no.stonedstonar.BookREST.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAddressException;
 import org.hibernate.annotations.GenerationTime;
 import org.hibernate.annotations.GeneratorType;
@@ -38,9 +37,10 @@ public class User {
     @JoinTable(name = "userAddress",
                 joinColumns = @JoinColumn(columnDefinition = "userID", referencedColumnName = "userID"),
                 inverseJoinColumns = @JoinColumn(columnDefinition = "addressID", referencedColumnName = "addressID"))
-    private List<Address> addresses = new java.util.ArrayList<>();
+    private List<Address> addresses;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     /**
@@ -112,14 +112,6 @@ public class User {
         }else {
             throw new CouldNotAddAddressException("The address " + address.toString() +  " is already added.");
         }
-    }
-
-    /**
-     * Gets the password of the user.
-     * @return the password of the user.
-     */
-    public String getPassword(){
-        return password;
     }
 
 

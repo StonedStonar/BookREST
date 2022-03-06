@@ -1,10 +1,8 @@
-package no.stonedstonar.BookREST.controllers;
+package no.stonedstonar.BookREST.restControllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.stonedstonar.BookREST.model.Branch;
-import no.stonedstonar.BookREST.JdbcConnection;
-import no.stonedstonar.BookREST.model.BranchBook;
 import no.stonedstonar.BookREST.model.database.BranchJPA;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.registers.BranchRegister;
@@ -13,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
 
 /**

@@ -1,8 +1,7 @@
-package no.stonedstonar.BookREST.controllers;
+package no.stonedstonar.BookREST.restControllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.stonedstonar.BookREST.model.Book;
 import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.database.LentBookJPA;
 import no.stonedstonar.BookREST.model.exceptions.*;

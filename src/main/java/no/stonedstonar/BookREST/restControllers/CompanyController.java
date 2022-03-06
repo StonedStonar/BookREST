@@ -1,4 +1,4 @@
-package no.stonedstonar.BookREST.controllers;
+package no.stonedstonar.BookREST.restControllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.stonedstonar.BookREST.model.Company;

@@ -34,10 +34,10 @@ public class LentBooksLogJPA implements LentBooksLog {
     @Override
     public void addReturnedLentBook(ReturnedLentBook returnedLentBook) throws CouldNotAddLentBookException {
         checkIfReturnedBookIsValid(returnedLentBook);
-        if (!lentBooksLogRepository.existsById(returnedLentBook.getLentBookId())){
+        if (!lentBooksLogRepository.existsById(returnedLentBook.getReturnedBookID())){
             lentBooksLogRepository.save(returnedLentBook);
         }else {
-            throw new CouldNotAddLentBookException("The returned book with id " + returnedLentBook.getLentBookId() + " is already in the system.");
+            throw new CouldNotAddLentBookException("The returned book with id " + returnedLentBook.getReturnedBookID() + " is already in the system.");
         }
 
     }
@@ -64,16 +64,17 @@ public class LentBooksLogJPA implements LentBooksLog {
         if (opRe.isEmpty()){
             throw new CouldNotGetLentBookException("There is no lent book with id " + lentBookID + " in the system.");
         }
-        return opRe.get();
+        ReturnedLentBook returnedLentBook = opRe.get();
+        return returnedLentBook;
     }
 
     @Override
     public void updateReturnedLentBook(ReturnedLentBook returnedLentBook) throws CouldNotGetLentBookException {
-        checkIfLentBookIsNotNull(returnedLentBook);
-        if (lentBooksLogRepository.existsById(returnedLentBook.getLentBookId())){
+        checkIfObjectIsNull(returnedLentBook, "returned lent book");
+        if (lentBooksLogRepository.existsById(returnedLentBook.getReturnedBookID())){
             lentBooksLogRepository.save(returnedLentBook);
         }else {
-            throw new CouldNotGetLentBookException("The lent book with id " + returnedLentBook.getLentBookId() + " could not be found.");
+            throw new CouldNotGetLentBookException("The lent book with id " + returnedLentBook.getReturnedBookID() + " could not be found.");
         }
     }
 
