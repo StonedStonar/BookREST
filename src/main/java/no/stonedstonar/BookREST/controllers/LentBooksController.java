@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.database.LentBookJPA;
 import no.stonedstonar.BookREST.model.exceptions.*;
@@ -11,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -52,14 +52,24 @@ public class LentBooksController {
         return returnedLentBooks;
     }
 
+    @GetMapping("/{branchBookID}")
+    public LentBook getLentBook(@PathVariable long branchBookID) throws CouldNotGetLentBookException {
+        return lentBooksRegister.getLentBook(branchBookID);
+    }
+
     /**
      * Adds a lent book to the register.
-     * @param lentBook the lent book to add.
+     * @param body the lent book to add.
      * @throws CouldNotAddLentBookException gets thrown if the branch book id is already lent out.
      */
     @PostMapping
-    public void addLentBook(@RequestBody LentBook lentBook) throws CouldNotAddLentBookException {
-        lentBooksRegister.addLentBook(lentBook);
+    public void addLentBook(@RequestBody String body) throws CouldNotAddLentBookException, JsonProcessingException {
+        lentBooksRegister.addLentBook(getLentBook(body));
+    }
+
+    @PutMapping
+    public void updateLentBook(@RequestBody String body) throws JsonProcessingException, CouldNotGetBranchBookException {
+        lentBooksRegister.updateLentBook(getLentBook(body));
     }
 
     /**
@@ -70,6 +80,17 @@ public class LentBooksController {
     @DeleteMapping
     public void removeLentBook(@RequestParam(value = "branchBookID") long branchBookID) throws CouldNotRemoveLentBookException {
         lentBooksRegister.removeLentBookWithLentBookId(branchBookID, true, LocalDate.now());
+    }
+
+    /**
+     * Makes a lent book from a json body.
+     * @param body the string with the json
+     * @return a lent book matching the input.
+     * @throws JsonProcessingException gets thrown if the lent book could not be converted.
+     */
+    private LentBook getLentBook(String body) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(body, LentBook.class);
     }
 
     /**

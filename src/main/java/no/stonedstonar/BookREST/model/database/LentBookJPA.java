@@ -3,6 +3,7 @@ package no.stonedstonar.BookREST.model.database;
 import no.stonedstonar.BookREST.model.LentBook;
 import no.stonedstonar.BookREST.model.ReturnedLentBook;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddLentBookException;
+import no.stonedstonar.BookREST.model.exceptions.CouldNotGetBranchBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetLentBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveLentBookException;
 import no.stonedstonar.BookREST.model.registers.LentBooksRegister;
@@ -75,6 +76,16 @@ public class LentBookJPA implements LentBooksRegister {
             removeLentBook(getLentBook(lentBookID), returned, localDate);
         }catch (CouldNotGetLentBookException exception){
             throw new CouldNotRemoveLentBookException("The lent book with id " + lentBookID + " is not in the system.");
+        }
+    }
+
+    @Override
+    public void updateLentBook(LentBook lentBook) throws CouldNotGetBranchBookException {
+        checkIfLentBookIsNotNull(lentBook);
+        if (lentBookRepository.existsById(lentBook.getLentBookId())){
+            lentBookRepository.save(lentBook);
+        }else {
+            throw new CouldNotGetBranchBookException("The lent book with id " + lentBook.getLentBookId() + " could not be located.");
         }
     }
 

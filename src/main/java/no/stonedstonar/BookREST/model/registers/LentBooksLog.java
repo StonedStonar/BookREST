@@ -29,6 +29,20 @@ public interface LentBooksLog{
     void removeLentBookWithLentBookID(long lentBookId) throws CouldNotRemoveLentBookException;
 
     /**
+     * Removes all the lent books with the branch book id.
+     * @param branchBookID the branch books id.
+     * @throws CouldNotRemoveLentBookException gets thrown if one of the removal processes fail.
+     */
+    void removeLentBookWithBranchBookID(long branchBookID) throws CouldNotRemoveLentBookException;
+
+    /**
+     * Gets a returned book by the lent book id.
+     * @param lentBookID the lent book id to search for.
+     * @throws CouldNotGetLentBookException gets thrown if the lent book could not be located.
+     */
+    ReturnedLentBook getLentBook(long lentBookID) throws CouldNotGetLentBookException;
+
+    /**
      * Updates the returned lent book with new details.
      * @param returnedLentBook the new returned book.
      * @throws CouldNotGetLentBookException gets thrown if the returned lent book is not in the register.

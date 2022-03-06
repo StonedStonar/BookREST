@@ -43,6 +43,13 @@ public interface LentBooksRegister {
     void removeLentBookWithLentBookId(long lentBookID, boolean returned, LocalDate localDate) throws CouldNotRemoveLentBookException;
 
     /**
+     * Updates the lent book if its in the system.
+     * @param lentBook the lent book with updated details.
+     * @throws CouldNotGetBranchBookException gets thrown if the lent book could not be located.
+     */
+    void updateLentBook(LentBook lentBook) throws CouldNotGetBranchBookException;
+
+    /**
      * Gets a lent book with branch id.
      * @param branchBookID the branch book id.
      * @return the lent book that matches the branch book id.

@@ -45,10 +45,17 @@ public interface UserRegister {
      * @param email the email of the user.
      * @param password the password of the user.
      * @return the user that matches that email and password.
-     * @throws CouldNotGetUserException gets thrown if the user could not be found.
      * @throws CouldNotLoginToUser gets thrown if the passwords does not match.
      */
-    User loginToUser(String email, String password) throws CouldNotGetUserException, CouldNotLoginToUser;
+    User loginToUser(String email, String password) throws CouldNotLoginToUser;
+
+    /**
+     * Checks if the email is taken.
+     * @param email the email to check for.
+     * @return <code>true</code> if the email is taken.
+     *         <code>false</code> if the email is not taken.
+     */
+    boolean checkIfEmailIsTaken(String email);
 
     /**
      * Checks if the user register has users.

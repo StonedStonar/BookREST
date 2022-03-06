@@ -43,6 +43,7 @@ public class LentBook {
     }
 
     public LentBook() {
+
     }
 
     /**
@@ -82,6 +83,7 @@ public class LentBook {
         if (dueDate.isBefore(lentDate)){
             throw new DateTimeException("The due date cannot be after the lent date.");
         }
+        branchBook.setTaken(true);
         this.dueDate = dueDate;
         this.lentDate = lentDate;
         this.branchBook = branchBook;

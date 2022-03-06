@@ -7,11 +7,11 @@ import no.stonedstonar.BookREST.model.exceptions.CouldNotGetLentBookException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveLentBookException;
 import no.stonedstonar.BookREST.model.registers.LentBooksLog;
 import no.stonedstonar.BookREST.model.repositories.LentBooksLogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Steinar Hjelle Midthus
@@ -50,6 +50,21 @@ public class LentBooksLogJPA implements LentBooksLog {
         }else {
             throw new CouldNotRemoveLentBookException("The lent book with id " + lentBookId + " could not be located.");
         }
+    }
+
+    @Override
+    public void removeLentBookWithBranchBookID(long branchBookID) throws CouldNotRemoveLentBookException {
+        List<ReturnedLentBook> returnedLentBooks = lentBooksLogRepository.findAllTheTimesBookHasBeenLentOut(branchBookID);
+        returnedLentBooks.forEach(lentBook -> lentBooksLogRepository.delete(lentBook));
+    }
+
+    @Override
+    public ReturnedLentBook getLentBook(long lentBookID) throws CouldNotGetLentBookException {
+        Optional<ReturnedLentBook> opRe = lentBooksLogRepository.findById(lentBookID);
+        if (opRe.isEmpty()){
+            throw new CouldNotGetLentBookException("There is no lent book with id " + lentBookID + " in the system.");
+        }
+        return opRe.get();
     }
 
     @Override
@@ -107,19 +122,6 @@ public class LentBooksLogJPA implements LentBooksLog {
     private void checkIfLongIsAboveZero(long number, String prefix){
         if (number <= 0){
             throw new IllegalArgumentException("The " + prefix + " must be above zero.");
-        }
-    }
-
-    /**
-     * Checks if a string is of a valid format or not.
-     *
-     * @param stringToCheck the string you want to check.
-     * @param errorPrefix   the error the exception should have if the string is invalid.
-     */
-    private void checkString(String stringToCheck, String errorPrefix) {
-        checkIfObjectIsNull(stringToCheck, errorPrefix);
-        if (stringToCheck.isEmpty()) {
-            throw new IllegalArgumentException("The " + errorPrefix + " cannot be empty.");
         }
     }
 

@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.stonedstonar.BookREST.JdbcConnection;
 import no.stonedstonar.BookREST.model.User;
 import no.stonedstonar.BookREST.model.database.UserJPA;
@@ -52,18 +53,49 @@ public class UserController {
         return userRegister.loginToUser(email, password);
     }
 
+    /**
+     * Adds a new user to the register.
+     * @param body the new user as a json.
+     * @throws CouldNotAddUserException gets thrown if a user with this id is in the register.
+     * @throws JsonProcessingException gets thrown if the format on the json string is invalid.
+     */
     @PostMapping
-    public void addUser(@RequestBody User user) throws CouldNotAddUserException, SQLException {
-        userRegister.addUser(user);
+    public void addUser(@RequestBody String body) throws CouldNotAddUserException, JsonProcessingException {
+        userRegister.addUser(makeUserFromJson(body));
     }
 
+    /**
+     * Deletes a user from the register.
+     * @param email the email of the user.
+     * @param password the password of the user.
+     * @throws CouldNotLoginToUser gets thrown if the email or password does not match the set user.
+     * @throws CouldNotGetUserException gets thrown if the user could not be found.
+     * @throws CouldNotRemoveUserException gets thrown if the user could not be removed.
+     */
     @DeleteMapping("/{userID}")
-    public void deleteUser(@RequestParam(value = "email") String email, @RequestParam(value = "password") String password) throws CouldNotLoginToUser, CouldNotGetUserException, CouldNotRemoveUserException, SQLException {
+    public void deleteUser(@RequestParam(value = "email") String email, @RequestParam(value = "password") String password) throws CouldNotLoginToUser, CouldNotGetUserException, CouldNotRemoveUserException {
         checkString(password, "password");
         checkString(email, "email");
         User user = userRegister.loginToUser(email, password);
 
         userRegister.removeUser(user);
+    }
+
+    @GetMapping("/check")
+    public boolean getIfEmailIsTaken(@RequestParam(value = "emailToCheck") String emailToCheck){
+        checkString(emailToCheck, "email to check");
+        return userRegister.checkIfEmailIsTaken(emailToCheck);
+    }
+
+    /**
+     * Makes a user from a json string.
+     * @param body the string.
+     * @return the user that has the properties of the json string.
+     * @throws JsonProcessingException gets thrown if the json string is the wrong format.
+     */
+    private User makeUserFromJson(String body) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(body, User.class);
     }
 
     /**

@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 
@@ -31,7 +32,7 @@ public class Company {
       * @param companyName the name of the company.
       */
     @JsonCreator
-    public Company(long companyID, String companyName){
+    public Company(@JsonProperty("companyID") long companyID, @JsonProperty("companyName") String companyName){
         checkCompanyName(companyName);
         checkCompanyID(companyID);
         this.companyID = companyID;

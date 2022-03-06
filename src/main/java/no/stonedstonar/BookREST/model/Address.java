@@ -44,7 +44,6 @@ public class Address implements Serializable {
 
     /**
      * Makes an instance of the Address class.
-     * @param userId the id of the user that lives on this address.
      * @param streetName the name of the street.
      * @param houseNumber the house number.
      * @param houseLetter the living quarter letter.
@@ -53,7 +52,7 @@ public class Address implements Serializable {
      * @param postalCode the postal code of the area.
      */
     @JsonCreator
-    public Address(long userId, String streetName, int houseNumber, char houseLetter, int floor, int apartmentNumber, int postalCode){
+    public Address(String streetName, int houseNumber, char houseLetter, int floor, int apartmentNumber, int postalCode){
         checkStreetName(streetName);
         checkHouseNumber(houseNumber);
         checkIfNumberIsBetween(0, 99, floor, "floor");

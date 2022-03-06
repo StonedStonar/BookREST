@@ -1,6 +1,9 @@
 package no.stonedstonar.BookREST.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Columns;
+import org.springframework.data.repository.query.Param;
 
 import javax.persistence.*;
 import java.time.DateTimeException;
@@ -27,12 +30,14 @@ public class ReturnedLentBook extends LentBook {
     /**
      * Makes an instance of the ReturnedLentBook class.
      * @param branchBook the branchbook that is lent.
-     * @param userID the users ID.
+     * @param user the user lending the book.
      * @param lentDate the date this book was lent.
      * @param dueDate the date this book is supposed to be delivered.
      * @param returnedDate the date this book was returned.
      */
-    public ReturnedLentBook(BranchBook branchBook, User user, LocalDate lentDate, LocalDate dueDate, LocalDate returnedDate){
+    @JsonCreator
+    public ReturnedLentBook(@JsonProperty("branchBook") BranchBook branchBook, @JsonProperty("user") User user, @JsonProperty("lentDate") LocalDate lentDate,
+                            @JsonProperty("dueDate") LocalDate dueDate, @JsonProperty("returnedDate") LocalDate returnedDate){
         super(branchBook, user, lentDate, dueDate);
         checkReturnedDate(returnedDate);
         this.returnedDate = returnedDate;

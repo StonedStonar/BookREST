@@ -1,8 +1,10 @@
 package no.stonedstonar.BookREST.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.stonedstonar.BookREST.model.Branch;
 import no.stonedstonar.BookREST.JdbcConnection;
+import no.stonedstonar.BookREST.model.BranchBook;
 import no.stonedstonar.BookREST.model.database.BranchJPA;
 import no.stonedstonar.BookREST.model.exceptions.*;
 import no.stonedstonar.BookREST.model.registers.BranchRegister;
@@ -36,21 +38,20 @@ public class LibraryController {
     /**
      * Gets all the branches.
      * @return a list with branches.
-     * @throws SQLException gets thrown if the connection to the database gets closed.
      */
     @GetMapping
-    public List<Branch> getBranches() throws SQLException {
+    public List<Branch> getBranches(){
         return branchRegister.getAllBranches();
     }
 
     /**
      * Adds a branch to the system.
-     * @param branch the branch to add.
+     * @param body the branch to add.
      * @throws CouldNotAddBranchException gets thrown if the branch with that ID is already in the system.
      */
     @PostMapping
-    public void addBranch(@RequestBody Branch branch) throws SQLException, CouldNotAddBranchException {
-        branchRegister.addBranch(branch);
+    public void addBranch(@RequestBody String body) throws SQLException, CouldNotAddBranchException, JsonProcessingException {
+        branchRegister.addBranch(getBranch(body));
     }
 
     /**
@@ -61,6 +62,37 @@ public class LibraryController {
     @DeleteMapping
     public void deleteBranch(@RequestParam(value = "branchID") long branchID) throws CouldNotRemoveBranchException {
         branchRegister.removeBranchWithBranchID(branchID);
+    }
+
+    /**
+     * Updates a branch and its details.
+     * @param body the json body.
+     * @throws JsonProcessingException gets thrown if the json body does not match a branches constructor.
+     */
+    @PutMapping
+    public void updateBranch(@RequestBody String body) throws JsonProcessingException, CouldNotGetBranchException {
+        branchRegister.updateBranch(getBranch(body));
+    }
+
+    /**
+     * Gets the branch with the matching id.
+     * @param branchID the branches id.
+     * @return the branch that matches the branch id.
+     * @throws CouldNotGetBranchException gets thrown if the branch could not be located.
+     */
+    @GetMapping("/{branchID}")
+    public Branch getBranch(@PathVariable long branchID) throws CouldNotGetBranchException {
+        return branchRegister.getBranchByID(branchID);
+    }
+
+    /**
+     * Makes the json into a branch.
+     * @param body the body of the branch.
+     * @throws JsonProcessingException gets thrown if the format on the json string is invalid.
+     */
+    private Branch getBranch(String body) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(body, Branch.class);
     }
 
     /**

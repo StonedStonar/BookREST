@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 
@@ -32,7 +33,7 @@ public class Branch {
      * @param branchName the name of the branch.
      */
     @JsonCreator
-    public Branch(long branchID, String branchName){
+    public Branch(@JsonProperty("branchID") long branchID, @JsonProperty("branchName") String branchName){
         checkIfBranchIDIsValid(branchID);
         checkIfBranchNameIsValid(branchName);
         this.branchID = branchID;

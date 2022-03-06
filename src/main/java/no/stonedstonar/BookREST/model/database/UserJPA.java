@@ -1,6 +1,5 @@
 package no.stonedstonar.BookREST.model.database;
 
-import no.stonedstonar.BookREST.model.Address;
 import no.stonedstonar.BookREST.model.User;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddUserException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotGetUserException;
@@ -11,7 +10,6 @@ import no.stonedstonar.BookREST.model.repositories.AddressRepository;
 import no.stonedstonar.BookREST.model.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +41,7 @@ public class UserJPA implements UserRegister {
             addressRepository.saveAll(user.getAddresses());
             userRepository.save(user);
         }else {
-            throw new CouldNotAddUserException("The user with id " + user.getUserID() + " is already in the system.");
+            throw new CouldNotAddUserException("User with id " + user.getUserID() + " is already in the system.");
         }
 
     }
@@ -69,9 +67,18 @@ public class UserJPA implements UserRegister {
     }
 
     @Override
-    public User loginToUser(String email, String password) throws CouldNotGetUserException, CouldNotLoginToUser {
+    public User loginToUser(String email, String password) throws CouldNotLoginToUser {
+        Optional<User> opUser = userRepository.getUserByEmailAndMatchingPassword(email, password);
+        if (opUser.isEmpty()){
+            throw new CouldNotLoginToUser("A user with matching email or password could not be found.");
+        }
+        return opUser.get();
+    }
 
-        return null;
+    @Override
+    public boolean checkIfEmailIsTaken(String email) {
+        checkString(email, "email");
+        return userRepository.getIfEmailIsTaken(email) > 0;
     }
 
     @Override

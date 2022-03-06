@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAddressException;
 import org.hibernate.annotations.GenerationTime;
 import org.hibernate.annotations.GeneratorType;
@@ -42,6 +43,10 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    /**
+     * Gets all addresses as a list.
+     * @return the addresses.
+     */
     public List<Address> getAddresses() {
         return addresses;
     }
@@ -61,7 +66,10 @@ public class User {
      * @param userID the id of the user.
      * @param addresses the list with addresses.
      */
-    public User(long userID, String firstName, String lastName, String eMail, String password, List<Address> addresses){
+    @JsonCreator
+    public User(@JsonProperty("userID") long userID, @JsonProperty("firstName") String firstName,
+                @JsonProperty("lastName") String lastName, @JsonProperty("eMail") String eMail, @JsonProperty("password") String password,
+                @JsonProperty("addresses") List<Address> addresses){
         checkFirstName(firstName);
         checkLastName(lastName);
         checkUserID(userID);
@@ -83,7 +91,8 @@ public class User {
      * @param eMail the email of the user.
      */
     @JsonCreator
-    public User(long userID, String firstName, String lastName, String eMail, String password){
+    public User(@JsonProperty("userID") long userID, @JsonProperty("firstName") String firstName,
+                @JsonProperty("lastName") String lastName, @JsonProperty("eMail") String eMail, @JsonProperty("password") String password){
         checkFirstName(firstName);
         checkLastName(lastName);
         checkUserID(userID);

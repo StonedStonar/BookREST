@@ -14,7 +14,7 @@ import java.util.List;
 public interface BookRepository extends CrudRepository<Book, Long> {
 
     /**
-     * Finds all the books with authorid.
+     * Finds all the books with author id.
      * @param authorID the author id to look for.
      * @return books that are written by this author.
      */

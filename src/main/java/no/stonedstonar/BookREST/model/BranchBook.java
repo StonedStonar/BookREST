@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 
@@ -41,7 +42,7 @@ public class BranchBook {
      * @param branch the branch this book belongs to.
      */
     @JsonCreator
-    public BranchBook(long branchBookID, Book book, Branch branch){
+    public BranchBook(@JsonProperty("branchBookID") long branchBookID, @JsonProperty("book") Book book, @JsonProperty("branch") Branch branch){
         checkIfLongIsAboveZero(branchBookID, "branch book id");
         checkIfObjectIsNull(book,"book");
         checkIfObjectIsNull(branch, "branch");

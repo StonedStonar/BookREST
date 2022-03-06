@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -35,7 +36,7 @@ public class Author {
       * @param birthYear the birth year of the author.
       */
     @JsonCreator
-    public Author(long authorID, String firstName, String lastName, int birthYear){
+    public Author(@JsonProperty("authorID") long authorID, @JsonProperty("firstName") String firstName, @JsonProperty("lastName") String lastName, @JsonProperty("birthYear") int birthYear){
         checkFirstName(firstName);
         checkLastName(lastName);
         checkID(authorID);

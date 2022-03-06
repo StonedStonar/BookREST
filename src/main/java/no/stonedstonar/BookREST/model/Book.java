@@ -1,6 +1,7 @@
 package no.stonedstonar.BookREST.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotAddAuthorException;
 import no.stonedstonar.BookREST.model.exceptions.CouldNotRemoveAuthorException;
@@ -61,7 +62,8 @@ public class Book {
      * @param company the company of the book.
      */
     @JsonCreator
-    public Book(long isbn, String title, List<Author> authors, int year, int numberOfPages, Company company){
+    public Book(@JsonProperty("isbn") long isbn,@JsonProperty("title") String title,@JsonProperty("authors") List<Author> authors,
+                @JsonProperty("year") int year,@JsonProperty("numberOfPages") int numberOfPages,@JsonProperty("company") Company company){
         checkISBN(isbn);
         checkTitle(title);
         checkNumberOfPages(numberOfPages);

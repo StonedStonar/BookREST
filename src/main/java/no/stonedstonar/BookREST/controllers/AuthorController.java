@@ -71,7 +71,7 @@ public class AuthorController {
      * @throws CouldNotAddAuthorException gets thrown if the author could not be added.
      */
     @PostMapping
-    public void addAuthor(String body) throws CouldNotAddAuthorException, JsonProcessingException {
+    public void addAuthor(@RequestBody String body) throws CouldNotAddAuthorException, JsonProcessingException {
         authorRegister.addAuthor(getAuthor(body));
     }
 
